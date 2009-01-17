@@ -1,4 +1,4 @@
-import processing.video.*;
+import codeanticode.gsvideo.*;
 import java.util.*;
 
 Capture video;
