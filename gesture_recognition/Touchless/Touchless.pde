@@ -1,13 +1,13 @@
 import codeanticode.gsvideo.*;
 import java.util.*;
 
-Capture video;
+GSCapture video;
 PImage img; 
 
 void setup() {
   size( 640, 480 );
-  video = new Capture( this, width, height, 30 );
-  img = loadImage( "mangoofdeath.jpg" );
+  video = new GSCapture( this, width, height, 30 );
+  img = loadImage( "olive.jpg" );
   noStroke();
   smooth();
 }
