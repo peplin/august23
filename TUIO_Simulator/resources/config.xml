@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<!-- 
+
+shapes:
+circle, square, roundsquare, triangle, star
+octagon, ellipse, cross, hourglass, pentagon
+hexagon, sphere
+
+colors:
+RGB in HEX format
+white=FFFFFF, black=000000, red=FF0000, etc.
+
+-->
+
+<tuio>
+
+<!-- 
+the definition of the various object classes 
+you can define the shape, color and name of each object
+-->
+
+<class name="blue cube" shape="square" color="174EAA" description="blue cube"/>
+<class name="red cube" shape="square" color="DC1F2C" description="red cube"/>
+<class name="green cube" shape="square" color="0EA44A" description="green cube"/>
+<class name="yellow cube" shape="square" color="E4D81F" description="yellow cube"/>
+
+<class name="blue disk" shape="circle" color="174EAA" description="blue disk"/>
+<class name="red disk" shape="circle" color="DC1F2C" description="red disk"/>
+<class name="green disk" shape="circle" color="0EA44A" description="green disk"/>
+<class name="yellow disk" shape="circle" color="E4D81F" description="yellow disk"/>
+
+<class name="blue pentagon" shape="pentagon" color="174EAA" description="blue pentagon"/>
+<class name="red pentagon" shape="pentagon" color="DC1F2C" description="red pentagon"/>
+<class name="green pentagon" shape="pentagon" color="0EA44A" description="green pentagon"/>
+<class name="yellow pentagon" shape="pentagon" color="E4D81F" description="yellow pentagon"/>
+
+<class name="blue round" shape="roundsquare" color="174EAA" description="blue round"/>
+<class name="red round" shape="roundsquare" color="DC1F2C" description="red round"/>
+<class name="green round" shape="roundsquare" color="0EA44A" description="green round"/>
+<class name="yellow round" shape="roundsquare" color="E4D81F" description="yellow round"/>
+
+<class name="blue dome" shape="sphere" color="174EAA" description="blue dome"/>
+<class name="red dome" shape="sphere" color="DC1F2C" description="red dome"/>
+<class name="green dome" shape="sphere" color="E4D81F" description="green dome"/>
+<class name="yellow dome" shape="sphere" color="E4D81F" description="yellow dome"/>
+
+<class name="blue cross" shape="cross" color="174EAA" description="blue cross"/>
+<class name="red cross" shape="cross" color="DC1F2C" description="red cross"/>
+<class name="green cross" shape="cross" color="0EA44A" description="green cross"/>
+<class name="yellow cross" shape="cross" color="E4D81F" description="yellow cross"/>
+
+<!-- 
+the definition of the actual object instances 
+you can define the type, IDs and position  each object
+-->
+
+
+<!-- 
+first we create four cubes, with six sides and define the according fiducial IDs
+-->
+
+<object class="blue cube" fiducials="0,1,2,3,4,5" active="false" xpos="120" ypos="30" angle="180"/>
+<object class="red cube" fiducials="6,7,8,9,10,11" active="false" xpos="180" ypos="30" angle="180"/>
+<object class="yellow cube" fiducials="12,13,14,15,16,17" active="false" xpos="240" ypos="30" angle="180"/>
+<object class="green cube" fiducials="18,19,20,21,22,23" active="false" xpos="300" ypos="30" angle="180"/>
+
+<!-- 
+first we create four disks, with two sides and define the according fiducial IDs
+-->
+
+<object class="blue disk" fiducials="24,25" active="false" xpos="500" ypos="30" angle="180"/>
+<object class="red disk" fiducials="26,27" active="false" xpos="560" ypos="30" angle="180"/>
+<object class="yellow disk" fiducials="28,29" active="false" xpos="620" ypos="30" angle="180"/>
+<object class="green disk" fiducials="30,31" active="false" xpos="680" ypos="30" angle="180"/>
+
+<!-- 
+here we create four rounded squares, please note that you can actually repeat fiducial IDs
+-->
+
+<object class="blue round" fiducials="32" active="false" xpos="500" ypos="570" angle="180"/>
+<object class="red round" fiducials="33" active="false" xpos="560" ypos="570" angle="180"/>
+<object class="blue round" fiducials="32" active="false" xpos="620" ypos="570" angle="180"/>
+<object class="red round" fiducials="33" active="false" xpos="685" ypos="570" angle="180"/>
+
+<!-- 
+here we create four pentagon shaped objects
+-->
+
+<object class="blue pentagon" fiducials="34" active="false" xpos="120" ypos="570" angle="180"/>
+<object class="red pentagon" fiducials="35" active="false" xpos="180" ypos="570" angle="180"/>
+<object class="yellow pentagon" fiducials="36" active="false" xpos="240" ypos="570" angle="180"/>
+<object class="green pentagon" fiducials="37" active="false" xpos="300" ypos="570" angle="180"/>
+
+<!-- 
+and finally a few domes and cross objects which show that the fiducial IDs
+can be defined in any particular order
+-->
+
+<object class="blue dome" fiducials="39" active="false" xpos="50" ypos="100" angle="180"/>
+<object class="red dome" fiducials="36" active="false" xpos="50" ypos="160" angle="180"/>
+<object class="yellow dome" fiducials="37" active="false" xpos="50" ypos="220" angle="180"/>
+<object class="green dome" fiducials="38" active="false" xpos="50" ypos="280" angle="180"/>
+
+<object class="blue cross" fiducials="43" active="false" xpos="750" ypos="100" angle="180"/>
+<object class="red cross" fiducials="42" active="false" xpos="750" ypos="160" angle="180"/>
+<object class="yellow cross" fiducials="41" active="false" xpos="750" ypos="220" angle="180"/>
+<object class="green cross" fiducials="40" active="false" xpos="750" ypos="280" angle="180"/>
+
+</tuio>
