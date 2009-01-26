@@ -1,11 +1,12 @@
 import processing.opengl.*;
 import tuio.*;
+import ca.ubc.cs.wiimote.*;
 
 VBPointCloud cloud;
     TuioClient tuioClient;
 
 void setup(){
-    size(640, 480, OPENGL);
+    size(1280, 1024, OPENGL);
     cloud = new VBPointCloud(this);
     tuioClient = new TuioClient(this);
     //--------------------------Choose which file to load HERE!-------------------------------------------------------------
