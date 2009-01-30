@@ -6,12 +6,12 @@ VBPointCloud cloud;
     TuioClient tuioClient;
 
 void setup(){
-    size(1280, 1024, OPENGL);
+    size(1024, 768, OPENGL);
     cloud = new VBPointCloud(this);
     tuioClient = new TuioClient(this);
     //--------------------------Choose which file to load HERE!-------------------------------------------------------------
-    //cloud.loadFloats(loadPoints("culdesac.csv"));
-    cloud.loadFloats(loadPoints("/home/peplin/programming/processing/sketchbook/hoc/SceneViewer/data/city.csv"));
+    cloud.loadFloats(loadPoints("culdesac.csv"));
+    //cloud.loadFloats(loadPoints("data/city.csv"));
 }
 
 void draw(){
