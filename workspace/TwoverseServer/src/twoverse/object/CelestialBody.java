@@ -4,47 +4,61 @@ import java.awt.Color;
 import java.sql.Time;
 //import javax.vecmath.GVector;
 
+import twoverse.util.PhysicsVector3d;
+import twoverse.util.User;
+
 abstract class CelestialBody {
+	public CelestialBody(int id, 
+						User owner, 
+						Time birthTime, 
+						Time deathTime, 
+						CelestialBody parent, 
+						PhysicsVector3d velocity,
+						PhysicsVector3d acceleration,
+						Color color) {
+		
+	}
+	
 
     int getId() {
-        return id;
+        return mId;
     }
 
     User getOwner() {
-        return owner;
+        return mOwner;
     }
 
     Time getBirthTime() {
-        return birthTime;
+        return mBirthTime;
     }
 
     Time getDeathTime() {
-        return deathTime;
+        return mBirthTime;
     }
 
     CelestialBody getParent() {
-        return parent;
+        return mParent;
     }
 
-    /*GVector getVelocity() {
-        return velocity;
+    PhysicsVector3d getVelocity() {
+        return mVelocity;
     }
 
-    GVector getAcceleration() {
-        return acceleration;
-    }*/
+    PhysicsVector3d getAcceleration() {
+        return mAcceleration;
+    }
 
     Color getColor() {
-        return color;
+        return mColor;
     }
 
     
-    private int id;
-    private User owner;
-    private Time birthTime;
-    private Time deathTime;
-    private CelestialBody parent;
-    //private GVector velocity;
-    //private GVector acceleration;
-    private Color color;
+    private int mId;
+    private User mOwner;
+    private Time mBirthTime;
+    private Time mDeathTime;
+    private CelestialBody mParent;
+    private PhysicsVector3d mVelocity;
+    private PhysicsVector3d mAcceleration;
+    private Color mColor;
 }

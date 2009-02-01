@@ -1,6 +1,43 @@
 package twoverse.object;
 
-public class PlanetarySystem extends CelestialBody {
+import java.awt.Color;
+import java.sql.Time;
 
+import twoverse.util.PhysicsVector3d;
+import twoverse.util.User;
+
+public class PlanetarySystem extends CelestialBody {
+	public PlanetarySystem(int id, 
+			User owner, 
+			Time birthTime, 
+			Time deathTime, 
+			CelestialBody parent, 
+			PhysicsVector3d velocity,
+			PhysicsVector3d acceleration,
+			Color color,
+			GenericBody center,
+			double mass) {
+		super(id, owner, birthTime, deathTime, parent, 
+				velocity, acceleration, color);
+	}
+	
+	public void setCenter(GenericBody center) {
+		mCenter = center;
+	}
+	public GenericBody getCenter() {
+		return mCenter;
+	}
+
+	public void setMass(double mass) {
+		mMass = mass;
+	}
+
+	public double getMass() {
+		return mMass;
+	}
+
+	private GenericBody mCenter;
+	private double mMass;
+	
 }
 

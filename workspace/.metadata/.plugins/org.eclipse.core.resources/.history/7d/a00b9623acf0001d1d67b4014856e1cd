@@ -1,0 +1,11 @@
+package twoverse.object;
+
+import twoverse.util.GalaxyShape;
+
+public class Galaxy extends CelestialBody {
+
+	private GalaxyShape mShape;
+	private double mMass;
+	private double mDensity;
+}
+

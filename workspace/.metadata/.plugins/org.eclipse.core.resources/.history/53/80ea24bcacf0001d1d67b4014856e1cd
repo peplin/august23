@@ -1,0 +1,12 @@
+package twoverse.object;
+
+public class PlanetarySystem extends CelestialBody {
+	public PlanetarySystem() {
+		
+	}
+	
+	private GenericBody mCenter;
+	private double mMass;
+	
+}
+

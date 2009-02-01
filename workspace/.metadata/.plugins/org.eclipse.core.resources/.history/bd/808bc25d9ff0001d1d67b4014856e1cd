@@ -1,0 +1,243 @@
+package twoverse.util;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Properties;
+
+class DatabaseException extends Exception {
+	DatabaseException(String message) {}
+}
+
+public class Database {
+    private static final String dbClassName = "com.mysql.jdbc.Driver";
+    private Connection mConnection = null;
+    private Properties mConfigFile;
+    private PreparedStatement mSelectUserStatement;
+    private PreparedStatement mAddUserStatement;
+    private PreparedStatement mUpdateUserLastLoginStatement;
+    private PreparedStatement mUpdateUserPreferenceStatement;
+    private PreparedStatement mDeleteUserStatement; //cascade update
+    private PreparedStatement mAddGalaxyStatement;
+    private PreparedStatement mAddPlanetarySystemStatement;
+    private PreparedStatement mAddPlanetStatement;
+    private PreparedStatement mAddManmadeBodyStatement;
+    private PreparedStatement mAddGenericBodyStatement;
+    private PreparedStatement mAddPhenomenonStatement;
+    private PreparedStatement mGetGalaxiesStatement;
+    private PreparedStatement mGetPlanetsStatement;
+    private PreparedStatement mGetPlanetarySystemsStatement;
+    private PreparedStatement mGetManmadeBodyStatement;
+    private PreparedStatement mGetGenericBodyStatement;
+    private PreparedStatement mGetPhenomenonStatement;
+    private PreparedStatement mUpdateSimDataStatement;
+    private PreparedStatement mUpdateGalaxyStatement;
+    private PreparedStatement mUpdatePlanetStatement;
+    private PreparedStatement mUpdatePlanetarySystemStatement;
+    private PreparedStatement mUpdateManmadeBodyStatement;
+    private PreparedStatement mUpdateGenericBodyStatement;
+    private PreparedStatement mGetGenericBodyTypesStatement;
+    private PreparedStatement mGetColorsStatement;
+    
+    
+    //private PreparedStatement mGetObjectParentStatement;
+    //private PreparedStatement mGetObjectChildrenStatement;
+  
+  
+    public Database() throws DatabaseException {
+    	try {
+        mConfigFile.load(this.getClass().
+        				getClassLoader().getResourceAsStream(
+        							"../config/util/Database.properties"));
+    	} catch (IOException e) {
+    	
+    	}
+        // Load the oracle driver
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+        } catch (Exception e) {
+            throw new DatabaseException(
+                    "Failed to load MySQL driver (" + e.toString() + ")");
+        }
+        
+        try {
+            // Make a mConnection handle to the database
+            mConnection = DriverManager.getConnection(
+                                mConfigFile.getProperty("url"), 
+                                mConfigFile.getProperty("DB_USER"), 
+                                mConfigFile.getProperty("DB_PASSWORD"));
+            mConnection.setAutoCommit(true);
+        } catch(Exception e) {
+        	throw new DatabaseException(
+        			"Connection to database failed: " + e.getMessage());
+        }
+        prepareStatements();
+    }
+
+    private void prepareStatements() throws DatabaseException {
+        try {
+            mSelectUserStatement = mConnection.prepareStatement(
+                "SELECT id, password FROM user " +
+                "WHERE username = ?");    
+            mAddUserStatement = mConnection.prepareStatement(
+                "INSERT INTO user (username, password, email, sms) " +
+                "VALUES (?, ?, ?, ?)");
+            mUpdateUserLastLoginStatement = mConnection.prepareStatement(
+                "UPDATE user " +
+                "SET last_login = NOW() " +
+                "WHERE username = ?");
+            /*mUpdateUserPreferenceStatement = mConnection.prepareStatement(
+                "UPDATE user_pref" +
+                "SETINSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");*/
+            mDeleteUserStatement = mConnection.prepareStatement(
+                "DELETE FROM user " +
+                "WHERE username = ?");
+            mAddParentObjectStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+            	"VALUES (fileidsequence.nextval, ?, ?)");
+            mAddGalaxyStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mAddPlanetarySystemStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mAddPlanetStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mAddManmadeBodyStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mAddGenericBodyStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mAddPhenomenonStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mGetGalaxiesStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mGetPlanetsStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mGetPlanetarySystemsStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mGetManmadeBodyStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mGetGenericBodyStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mGetPhenomenonStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mUpdateSimDataStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mUpdateGalaxyStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mUpdatePlanetStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mUpdatePlanetarySystemStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mUpdateManmadeBodyStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mUpdateGenericBodyStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mGetGenericBodyTypesStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+            mGetColorsStatement = mConnection.prepareStatement(
+                "INSERT INTO filetable (fileid, filename, ownerid) " +
+                "VALUES (fileidsequence.nextval, ?, ?)");
+        } catch (SQLException e) {
+            throw new DatabaseException("Couldn't prepare statements: " + e.getMessage());
+        }
+    }
+
+    private void closeConnection() throws java.sql.SQLException {
+        if (mConnection != null) mConnection.close();
+    }
+
+    private void unexpectedError(String message, Throwable e) {
+            System.err.println("***ERROR: " + message);
+            e.printStackTrace();
+    }
+
+    /*public boolean addFile(String filename, String owner) {
+        owner = normalizeUserid(owner);
+        filename = normalizeFilename(filename);
+        if (owner == null || filename == null) return false;
+        
+        Map<String, Integer> words = countWords(filename);
+        if (words == null) return false;
+        
+        try {
+            mConnection.setAutoCommit(false);
+            
+            selectFileSt.setString(1, filename);
+            ResultSet rs = selectFileSt.executeQuery();
+            if (rs.next()) { // The file already exists
+                int fileid = rs.getInt("fileid");
+                String previousOwner = rs.getString("ownerid");
+                rs.close();
+                
+                if (!owner.equals(previousOwner)) {
+                    transferOwnershipSt.setString(1, owner);
+                    transferOwnershipSt.setInt(2, fileid);
+                    
+                    int rc = transferOwnershipSt.executeUpdate();
+                    assert rc == 1;
+                }
+
+                clearWordsSt.setInt(1, fileid);
+                clearWordsSt.executeUpdate();
+                
+                addWordSt.setInt(1, fileid);
+                for (Map.Entry<String, Integer> entry : words.entrySet()) {
+                    addWordSt.setString(2, entry.getKey());
+                    addWordSt.setInt(3, entry.getValue());
+                    int rc = addWordSt.executeUpdate();
+                    assert rc == 1;
+                }
+
+            } else { // The file does not exist
+                rs.close();
+                
+                addFileSt.setString(1, filename);
+                addFileSt.setString(2, owner);
+                addFileSt.executeUpdate();
+
+                for (Map.Entry<String, Integer> entry : words.entrySet()) {
+                    addWordNewFileSt.setString(1, entry.getKey());
+                    addWordNewFileSt.setInt(2, entry.getValue());
+                    int rc = addWordNewFileSt.executeUpdate();
+                    assert rc == 1;
+                }
+            }
+            
+            mConnection.commit();
+            mConnection.setAutoCommit(true);
+        } catch (SQLException e) {
+            if (e.getErrorCode() != FOREIGN_KEY_CONSTRAINT)
+                unexpectedError("Could not add file", e);
+            try {
+                mConnection.rollback();
+                mConnection.setAutoCommit(true);
+            } catch (SQLException e2) {
+                unexpectedError("Could not rollback", e2);
+            }
+            return false;
+        }
+        return true;
+    }*/
+}

@@ -1,0 +1,11 @@
+package twoverse;
+
+public class User {
+	public User(String username) {
+		
+	}
+
+	private String mUsername;
+	private String mPassword;
+	private int mId;
+}

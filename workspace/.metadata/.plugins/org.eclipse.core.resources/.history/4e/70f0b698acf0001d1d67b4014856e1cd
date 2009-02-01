@@ -1,0 +1,18 @@
+package twoverse.util;
+
+public class GalaxyShape {
+	public GalaxyShape() {
+		
+	}
+
+	public void setId(int id) {
+		mId = id;
+	}
+	public int getId() {
+		return mId;
+	}
+
+	private int mId;
+	private String mName;
+	private String mTextureFile;
+}

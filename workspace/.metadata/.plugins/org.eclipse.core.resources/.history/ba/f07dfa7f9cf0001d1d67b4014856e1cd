@@ -1,0 +1,15 @@
+package twoverse.util;
+
+import java.sql.SQLException;
+
+class BadUsernameException extends Exception {
+	BadUsernameException(String message) {}
+}
+
+class BadPasswordException extends Exception {	
+	BadPasswordException(String message) {}
+}
+
+class DatabaseException extends Exception {
+	DatabaseException(String message) {}
+}

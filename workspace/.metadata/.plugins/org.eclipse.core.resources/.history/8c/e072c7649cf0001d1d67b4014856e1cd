@@ -1,0 +1,50 @@
+package twoverse.object;
+
+import java.awt.Color;
+import java.sql.Time;
+//import javax.vecmath.GVector;
+
+abstract class CelestialBody {
+
+    int getId() {
+        return mId;
+    }
+
+    int getOwnerId() {
+        return mOwnerId;
+    }
+
+    Time getBirthTime() {
+        return mBirthTime;
+    }
+
+    Time getDeathTime() {
+        return mBirthTime;
+    }
+
+    CelestialBody getParent() {
+        return mParent;
+    }
+
+    PhysicsVector3d getVelocity() {
+        return velocity;
+    }
+
+    PhysicsVector3d getAcceleration() {
+        return acceleration;
+    }
+
+    Color getColor() {
+        return mColor;
+    }
+
+    
+    private int mId;
+    private int mOwnerId;
+    private Time mBirthTime;
+    private Time mDeathTime;
+    private CelestialBody mParent;
+    private PhysicsVector3d velocity;
+    private PhysicsVector3d acceleration;
+    private Color mColor;
+}

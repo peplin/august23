@@ -1,0 +1,21 @@
+package twoverse;
+
+public class User {
+	public User(String username) {
+		
+	}
+
+	public void setUsername(String username) {
+		mUsername = username;
+	}
+	public String getUsername() {
+		return mUsername;
+	}
+
+	private String mUsername;
+	private String mPassword;
+	private int mId;
+	private String mEmail;
+	private String mPhone;
+	private int mPoints;
+}

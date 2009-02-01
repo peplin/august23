@@ -1,0 +1,12 @@
+#Sun Feb 01 13:10:47 EST 2009
+override=true
+USER_MANUAL_PREFERENCE=enabledManualValidatorListorg.eclipse.wst.common.componentcore.internal.ModuleCoreValidator;
+suspend=false
+stateTS=0
+eclipse.preferences.version=1
+vf.version=3
+DELEGATES_PREFERENCE=delegateValidatorList
+saveAuto=false
+confirmDialog=true
+USER_PREFERENCE=saveAutomaticallyfalseprojectsCanOverridetruedisableAllValidationfalseversion1.2.3.v200811101716
+USER_BUILD_PREFERENCE=enabledBuildValidatorListorg.eclipse.wst.common.componentcore.internal.ModuleCoreValidator;
