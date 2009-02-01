@@ -1,7 +1,8 @@
 package twoverse.object;
 
+import java.awt.Color;
 import java.sql.Time;
-import javax.vecmath.GVector;
+//import javax.vecmath.GVector;
 
 abstract class CelestialBody {
 
@@ -25,13 +26,13 @@ abstract class CelestialBody {
         return parent;
     }
 
-    GVector getVelocity() {
+    /*GVector getVelocity() {
         return velocity;
     }
 
     GVector getAcceleration() {
         return acceleration;
-    }
+    }*/
 
     Color getColor() {
         return color;
@@ -43,7 +44,7 @@ abstract class CelestialBody {
     private Time birthTime;
     private Time deathTime;
     private CelestialBody parent;
-    private GVector velocity;
-    private GVector acceleration;
+    //private GVector velocity;
+    //private GVector acceleration;
     private Color color;
 }
