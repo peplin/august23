@@ -13,37 +13,155 @@ import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
 
+class InvalidUserException extends Exception {
+	public InvalidUserException(String e) {
+		
+	}
+}
 
 public class Database {
-    private static final String DB_CLASS_NAME = "com.mysql.jdbc.Driver";
-    private Connection mConnection = null;
-    private Properties mConfigFile;
-    private PreparedStatement mSelectUserStatement;
-    private PreparedStatement mAddUserStatement;
-    private PreparedStatement mUpdateUserLastLoginStatement;
-    private PreparedStatement mUpdateUserPreferenceStatement;
-    private PreparedStatement mDeleteUserStatement; //cascade update
-    private PreparedStatement mAddParentObjectStatement;
-    private PreparedStatement mAddGalaxyStatement;
-    private PreparedStatement mAddPlanetarySystemStatement;
-    private PreparedStatement mAddManmadeBodyStatement;
-    //private PreparedStatement mAddPhenomenonStatement;
-    private PreparedStatement mGetGalaxiesStatement;
-    private PreparedStatement mGetPlanetarySystemsStatement;
-    private PreparedStatement mGetManmadeBodiesStatement;
-    //private PreparedStatement mGetPhenomenonStatement;
-    private PreparedStatement mUpdateSimDataStatement;
-    private PreparedStatement mUpdateGalaxyStatement;
-    private PreparedStatement mUpdatePlanetarySystemStatement;
-    private PreparedStatement mUpdatePhenomenonStatement;
-    private PreparedStatement mGetColorsStatement;
-    
-    //private PreparedStatement mGetObjectParentStatement;
-    //private PreparedStatement mGetObjectChildrenStatement;
-    
-    public User getUser(String username) {
-		return new User("null");
+   public Database() throws DatabaseException {
+    	try {
+        mConfigFile.load(this.getClass().
+        				getClassLoader().getResourceAsStream(
+        							"../config/util/Database.properties"));
+    	} catch (IOException e) {
     	
+    	}
+        // Load the oracle driver
+        try {
+            Class.forName(DB_CLASS_NAME);
+        } catch (Exception e) {
+            throw new DatabaseException(
+                    "Failed to load MySQL driver (" + e.toString() + ")");
+        }
+        
+        try {
+            // Make a mConnection handle to the database
+            mConnection = DriverManager.getConnection(
+                                mConfigFile.getProperty("CONNECTION"), 
+                                mConfigFile.getProperty("DB_USER"), 
+                                mConfigFile.getProperty("DB_PASSWORD"));
+            mConnection.setAutoCommit(true);
+        } catch(Exception e) {
+        	throw new DatabaseException(
+        			"Connection to database failed: " + e.getMessage());
+        }
+        prepareStatements();
+    }
+
+    private void prepareStatements() throws DatabaseException {
+        try {
+            mSelectUserStatement = mConnection.prepareStatement(
+                "SELECT * FROM user " +
+                "WHERE username = ?");    
+            mAddUserStatement = mConnection.prepareStatement(
+                "INSERT INTO user (username, password, email, sms) " +
+                "VALUES (?, ?, ?, ?)");
+            mUpdateUserLastLoginStatement = mConnection.prepareStatement(
+                "UPDATE user " +
+                "SET last_login = NOW() " +
+                "WHERE username = ?");
+            mDeleteUserStatement = mConnection.prepareStatement(
+                "DELETE FROM user " +
+                "WHERE username = ?");
+            mAddParentObjectStatement = mConnection.prepareStatement(
+                "INSERT INTO object (owner, parent, velocity_magnitude, " +
+	                "velocity_vector_x, velocity_vector_y, velocity_vector_z, "+
+	                "accel_magnitude, accel_vector_x, accel_vector_y, " +
+	                "accel_vector_z, color, type) " +
+	            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            mAddGalaxyStatement = mConnection.prepareStatement(
+                "INSERT INTO galaxy (id, shape, mass, density) " +
+                "VALUES (?, ?, ?, ?)");
+            mAddPlanetarySystemStatement = mConnection.prepareStatement(
+                "INSERT INTO planetary_system (id, centerid, density) " +
+                "VALUES (?, ?, ?)");
+            mAddManmadeBodyStatement = mConnection.prepareStatement(
+                "INSERT INTO manmade (id) " +
+                "VALUES (?)");
+            mGetGalaxiesStatement = mConnection.prepareStatement(
+                "SELECT * FROM object, galaxy, galaxy_shapes, colors, user" +
+                "WHERE object.id = galaxy.id " +
+                	"AND galaxy.shape = galaxy_shapes.id" +
+                	"AND object.color = colors.id" +
+                	"AND object.owner = user.id");
+            mGetPlanetarySystemsStatement = mConnection.prepareStatement(
+            	"SELECT * FROM object, planetary_system, colors, user " +
+		            "WHERE object.id = planetary_system.id " +
+		        	"AND object.color = colors.id" +
+		        	"AND object.owner = user.id");
+            mGetManmadeBodiesStatement = mConnection.prepareStatement(
+            	"SELECT * FROM object, manmade, colors, user " +
+		            "WHERE object.id = body.id " +
+		        	"AND object.color = colors.id" +
+		        	"AND object.owner = user.id");
+            mUpdateSimDataStatement = mConnection.prepareStatement(
+                "UPDATE object " +
+                "SET velocity_magnitude = ?," +
+                	"velocity_vector_x = ?, " +
+                	"velocity_vector_y = ?, " +
+                	"velocity_vector_z = ?, " +
+                	"accel_magnitude = ?, " +
+                	"accel_vector_x = ?, " +
+                	"accel_vector_y = ?, " +
+                	"accel_vector_z = ?," +
+                	"x = ?, " +
+                	"y = ?, " +
+                	"z = ? " +
+            	"WHERE id = ?");
+            mUpdateGalaxyStatement = mConnection.prepareStatement(
+        		"UPDATE galaxy " +
+                "SET shape = ?," +
+                	"mass = ?, " +
+                	"density = ? " +                	
+            	"WHERE id = ?");
+            mUpdatePlanetarySystemStatement = mConnection.prepareStatement(
+            		"UPDATE galaxy " +
+                    "SET centerid = ?," +
+                    	"density = ? " +                	
+                	"WHERE id = ?");
+            mGetColorsStatement = mConnection.prepareStatement(
+            	"SELECT * FROM colors");
+        } catch (SQLException e) {
+            throw new DatabaseException("Couldn't prepare statements: " + e.getMessage());
+        }
+    }
+
+    private void closeConnection() throws java.sql.SQLException {
+        if (mConnection != null) mConnection.close();
+    }
+
+    private void unexpectedError(String message, Throwable e) {
+            System.err.println("***ERROR: " + message);
+            e.printStackTrace();
+    }
+	
+	public User getUser(String username) throws InvalidUserException {
+    	User requestedUser = null;
+    	try {
+			mSelectUserStatement.setString(1, username);
+		
+	        ResultSet resultSet = mSelectUserStatement.executeQuery();
+	        if (resultSet.next()) {
+	        	requestedUser = new User(resultSet.getInt("id"),
+	        								resultSet.getString("username"),
+	        								resultSet.getString("password"),
+	        								resultSet.getString("email"),
+	        								resultSet.getString("sms"),
+	        								resultSet.getInt("points"));
+	        	resultSet.close();
+	        	return requestedUser;
+	        } else {
+	        	// TODO problem, no user
+	        	throw new InvalidUserException("No user " + username);
+	        }
+    	} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return requestedUser;
+        
     }
 
 	public void addUser(User user) {
@@ -186,123 +304,7 @@ public class Database {
     }
     
   
-    public Database() throws DatabaseException {
-    	try {
-        mConfigFile.load(this.getClass().
-        				getClassLoader().getResourceAsStream(
-        							"../config/util/Database.properties"));
-    	} catch (IOException e) {
-    	
-    	}
-        // Load the oracle driver
-        try {
-            Class.forName(DB_CLASS_NAME);
-        } catch (Exception e) {
-            throw new DatabaseException(
-                    "Failed to load MySQL driver (" + e.toString() + ")");
-        }
-        
-        try {
-            // Make a mConnection handle to the database
-            mConnection = DriverManager.getConnection(
-                                mConfigFile.getProperty("url"), 
-                                mConfigFile.getProperty("DB_USER"), 
-                                mConfigFile.getProperty("DB_PASSWORD"));
-            mConnection.setAutoCommit(true);
-        } catch(Exception e) {
-        	throw new DatabaseException(
-        			"Connection to database failed: " + e.getMessage());
-        }
-        prepareStatements();
-    }
-
-    private void prepareStatements() throws DatabaseException {
-        try {
-            mSelectUserStatement = mConnection.prepareStatement(
-                "SELECT id, password FROM user " +
-                "WHERE username = ?");    
-            mAddUserStatement = mConnection.prepareStatement(
-                "INSERT INTO user (username, password, email, sms) " +
-                "VALUES (?, ?, ?, ?)");
-            mUpdateUserLastLoginStatement = mConnection.prepareStatement(
-                "UPDATE user " +
-                "SET last_login = NOW() " +
-                "WHERE username = ?");
-            mDeleteUserStatement = mConnection.prepareStatement(
-                "DELETE FROM user " +
-                "WHERE username = ?");
-            mAddParentObjectStatement = mConnection.prepareStatement(
-                "INSERT INTO object (owner, parent, velocity_magnitude, " +
-	                "velocity_vector_x, velocity_vector_y, velocity_vector_z, "+
-	                "accel_magnitude, accel_vector_x, accel_vector_y, " +
-	                "accel_vector_z, color, type) " +
-	            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            mAddGalaxyStatement = mConnection.prepareStatement(
-                "INSERT INTO galaxy (id, shape, mass, density) " +
-                "VALUES (?, ?, ?, ?)");
-            mAddPlanetarySystemStatement = mConnection.prepareStatement(
-                "INSERT INTO planetary_system (id, centerid, density) " +
-                "VALUES (?, ?, ?)");
-            mAddManmadeBodyStatement = mConnection.prepareStatement(
-                "INSERT INTO manmade (id) " +
-                "VALUES (?)");
-            mGetGalaxiesStatement = mConnection.prepareStatement(
-                "SELECT * FROM object, galaxy, galaxy_shapes, colors, user" +
-                "WHERE object.id = galaxy.id " +
-                	"AND galaxy.shape = galaxy_shapes.id" +
-                	"AND object.color = colors.id" +
-                	"AND object.owner = user.id");
-            mGetPlanetarySystemsStatement = mConnection.prepareStatement(
-            	"SELECT * FROM object, planetary_system, colors, user " +
-		            "WHERE object.id = planetary_system.id " +
-		        	"AND object.color = colors.id" +
-		        	"AND object.owner = user.id");
-            mGetManmadeBodiesStatement = mConnection.prepareStatement(
-            	"SELECT * FROM object, manmade, colors, user " +
-		            "WHERE object.id = body.id " +
-		        	"AND object.color = colors.id" +
-		        	"AND object.owner = user.id");
-            mUpdateSimDataStatement = mConnection.prepareStatement(
-                "UPDATE object " +
-                "SET velocity_magnitude = ?," +
-                	"velocity_vector_x = ?, " +
-                	"velocity_vector_y = ?, " +
-                	"velocity_vector_z = ?, " +
-                	"accel_magnitude = ?, " +
-                	"accel_vector_x = ?, " +
-                	"accel_vector_y = ?, " +
-                	"accel_vector_z = ?," +
-                	"x = ?, " +
-                	"y = ?, " +
-                	"z = ? " +
-            	"WHERE id = ?");
-            mUpdateGalaxyStatement = mConnection.prepareStatement(
-        		"UPDATE galaxy " +
-                "SET shape = ?," +
-                	"mass = ?, " +
-                	"density = ? " +                	
-            	"WHERE id = ?");
-            mUpdatePlanetarySystemStatement = mConnection.prepareStatement(
-            		"UPDATE galaxy " +
-                    "SET centerid = ?," +
-                    	"density = ? " +                	
-                	"WHERE id = ?");
-            mGetColorsStatement = mConnection.prepareStatement(
-            	"SELECT * FROM colors");
-        } catch (SQLException e) {
-            throw new DatabaseException("Couldn't prepare statements: " + e.getMessage());
-        }
-    }
-
-    private void closeConnection() throws java.sql.SQLException {
-        if (mConnection != null) mConnection.close();
-    }
-
-    private void unexpectedError(String message, Throwable e) {
-            System.err.println("***ERROR: " + message);
-            e.printStackTrace();
-    }
-
+ 
     /*
         
         try {
@@ -363,4 +365,29 @@ public class Database {
             return false;
         }
        */
+    private static final String DB_CLASS_NAME = "com.mysql.jdbc.Driver";
+    private Connection mConnection = null;
+    private Properties mConfigFile;
+    private PreparedStatement mSelectUserStatement;
+    private PreparedStatement mAddUserStatement;
+    private PreparedStatement mUpdateUserLastLoginStatement;
+    private PreparedStatement mUpdateUserPreferenceStatement;
+    private PreparedStatement mDeleteUserStatement; //cascade update
+    private PreparedStatement mAddParentObjectStatement;
+    private PreparedStatement mAddGalaxyStatement;
+    private PreparedStatement mAddPlanetarySystemStatement;
+    private PreparedStatement mAddManmadeBodyStatement;
+    //private PreparedStatement mAddPhenomenonStatement;
+    private PreparedStatement mGetGalaxiesStatement;
+    private PreparedStatement mGetPlanetarySystemsStatement;
+    private PreparedStatement mGetManmadeBodiesStatement;
+    //private PreparedStatement mGetPhenomenonStatement;
+    private PreparedStatement mUpdateSimDataStatement;
+    private PreparedStatement mUpdateGalaxyStatement;
+    private PreparedStatement mUpdatePlanetarySystemStatement;
+    private PreparedStatement mUpdatePhenomenonStatement;
+    private PreparedStatement mGetColorsStatement;
+    
+    //private PreparedStatement mGetObjectParentStatement;
+    //private PreparedStatement mGetObjectChildrenStatement;
 }

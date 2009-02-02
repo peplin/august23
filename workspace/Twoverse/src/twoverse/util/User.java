@@ -3,7 +3,7 @@ package twoverse.util;
 import jbcrypt.BCrypt;
 
 public class User {
-	public User(String username, String hashedPassword, int id, 
+	public User(int id, String username, String hashedPassword, 
 						String email, String phone, int points) {
 		
 	}

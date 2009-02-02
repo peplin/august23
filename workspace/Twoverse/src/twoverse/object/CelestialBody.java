@@ -20,35 +20,35 @@ public abstract class CelestialBody {
 	}
 	
 
-    int getId() {
+    public int getId() {
         return mId;
     }
 
-    User getOwner() {
+    public User getOwner() {
         return mOwner;
     }
 
-    Time getBirthTime() {
+    public Time getBirthTime() {
         return mBirthTime;
     }
 
-    Time getDeathTime() {
+    public Time getDeathTime() {
         return mBirthTime;
     }
 
-    CelestialBody getParent() {
+    public CelestialBody getParent() {
         return mParent;
     }
 
-    PhysicsVector3d getVelocity() {
+    public PhysicsVector3d getVelocity() {
         return mVelocity;
     }
 
-    PhysicsVector3d getAcceleration() {
+    public PhysicsVector3d getAcceleration() {
         return mAcceleration;
     }
 
-    Color getColor() {
+    public Color getColor() {
         return mColor;
     }
 

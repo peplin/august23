@@ -11,7 +11,7 @@ public class TwoverseServer {
 	public static void main(String[] args) {
 		try {
 			Database database = new Database();
-			ObjectManager objectManager = new ObjectManager(database);
+			ObjectManager objectManager = new ObjectManagerServer(database);
 			SessionManager sessionManager
 					= new SessionManager(database, objectManager);
 			SimulationRunner simulation = new SimulationRunner(objectManager);

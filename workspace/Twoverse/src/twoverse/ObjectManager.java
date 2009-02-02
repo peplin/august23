@@ -10,11 +10,19 @@ import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
 
+class UnhandledCelestialBodyException extends Exception{
+	public UnhandledCelestialBodyException() {
+		
+	}
+}
+
 public abstract class ObjectManager extends Thread {
 
 	public ObjectManager(Database database) {
 		// TODO Auto-generated constructor stub
 	}
+	
+	public abstract void run();
 
 	public ArrayList<CelestialBody> getAllBodies() {
 		ArrayList<CelestialBody> allBodies = new ArrayList<CelestialBody>();
@@ -40,29 +48,54 @@ public abstract class ObjectManager extends Thread {
 		
 	}
 	
-	public void add(CelestialBody body) {
-		if(body.getClass().toString() == "Galaxy") {
-			addGalaxy((Galaxy) body);
-		} else if(body.getClass().toString() == "PlanetarySystem") {
-			addPlanetarySystem((PlanetarySystem) body);
-		} else if(body.getClass().toString() == "ManmadeBody") {
-			addManmadeBody((ManmadeBody) body);
+	public Galaxy getGalaxy(int id) {
+		return mGalaxies.get(id);
+	}
+	
+	public PlanetarySystem getPlanetarySystem(int id) {
+		return mPlanetarySystems.get(id);
+	}
+	
+	public ManmadeBody getManmadeBody(int id) {
+		return mManmadeBodies.get(id);
+	}
+	
+	/**
+	 * If body exists, replaces with updatedBody. If not, inserts it in the
+	 * ObjectManager.
+	 * 
+	 * So, if this is a new object coming in over an XML feed, i need to match
+	 * it with its ID. Okay.
+	 * 
+	 * TODO How do I make sure this doesn't replace some metadata update that's
+	 * already happened?
+	 * @param updatedBody
+	 * @throws UnhandledCelestialBodyException
+	 */
+	public void updateBody(CelestialBody updatedBody)
+							throws UnhandledCelestialBodyException {
+		if(updatedBody.getClass().toString() == "Galaxy") {
+			updateGalaxy((Galaxy) updatedBody);
+		} else if(updatedBody.getClass().toString() == "PlanetarySystem") {
+			updatePlanetarySystem((PlanetarySystem) updatedBody);
+		} else if(updatedBody.getClass().toString() == "ManmadeBody") {
+			updateManmadeBody((ManmadeBody) updatedBody);
+		} else {
+			throw new UnhandledCelestialBodyException();
 		}
 	}
-	
-	private void addGalaxy(Galaxy galaxy) {
-		
+
+	public void updateGalaxy(Galaxy newGalaxy) {
+		mGalaxies.put(newGalaxy.getId(), newGalaxy);
 	}
 	
-	private void addPlanetarySystem(PlanetarySystem system) {
-		
+	public void updatePlanetarySystem(PlanetarySystem newSystem) {
+		mPlanetarySystems.put(newSystem.getId(), newSystem);
 	}
 	
-	private void addManmadeBody(ManmadeBody body) {
-		
+	public void updateManmadeBody(ManmadeBody newManmadeBody) {
+		mManmadeBodies.put(newManmadeBody.getId(), newManmadeBody);
 	}
-	
-	
 	
 	HashMap<Integer, Galaxy> mGalaxies;
 	HashMap<Integer, PlanetarySystem> mPlanetarySystems;
