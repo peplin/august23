@@ -1,8 +1,0 @@
-package twoverse.object;
-
-public class GenericBody extends CelestialBody {
-	GenericBody() {
-		super();
-	}
-}
-
