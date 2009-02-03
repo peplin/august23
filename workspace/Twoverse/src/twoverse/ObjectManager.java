@@ -69,31 +69,16 @@ public abstract class ObjectManager extends Thread {
 	 * 
 	 * TODO How do I make sure this doesn't replace some metadata update that's
 	 * already happened?
-	 * @param updatedBody
-	 * @throws UnhandledCelestialBodyException
 	 */
-	public void updateBody(CelestialBody updatedBody)
-							throws UnhandledCelestialBodyException {
-		if(updatedBody.getClass().toString() == "Galaxy") {
-			updateGalaxy((Galaxy) updatedBody);
-		} else if(updatedBody.getClass().toString() == "PlanetarySystem") {
-			updatePlanetarySystem((PlanetarySystem) updatedBody);
-		} else if(updatedBody.getClass().toString() == "ManmadeBody") {
-			updateManmadeBody((ManmadeBody) updatedBody);
-		} else {
-			throw new UnhandledCelestialBodyException();
-		}
-	}
-
-	public void updateGalaxy(Galaxy newGalaxy) {
+	public void update(Galaxy newGalaxy) {
 		mGalaxies.put(newGalaxy.getId(), newGalaxy);
 	}
 	
-	public void updatePlanetarySystem(PlanetarySystem newSystem) {
+	public void update(PlanetarySystem newSystem) {
 		mPlanetarySystems.put(newSystem.getId(), newSystem);
 	}
 	
-	public void updateManmadeBody(ManmadeBody newManmadeBody) {
+	public void update(ManmadeBody newManmadeBody) {
 		mManmadeBodies.put(newManmadeBody.getId(), newManmadeBody);
 	}
 	

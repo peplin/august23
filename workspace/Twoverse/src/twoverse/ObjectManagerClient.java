@@ -1,7 +1,13 @@
 package twoverse;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
+
+import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.client.XmlRpcClient;
+import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -27,12 +33,59 @@ public class ObjectManagerClient extends ObjectManager {
     	} catch (IOException e) {
     	
     	}
+    	
+        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+        try {
+			config.setServerURL(
+					new URL(mConfigFile.getProperty("XMLRPCSERVER")));
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		config.setEnabledForExtensions(true);
+		config.setConnectionTimeout(60 * 1000);
+        config.setReplyTimeout(60 * 1000);
+        mXmlRpcClient = new XmlRpcClient();
+        mXmlRpcClient.setConfig(config);
 	}
 
 	public void run() {
 		
 	}
+	// TODO need to confirm they don't exist, since we're not going to let the 
+	// client modify anything for the time being
+	// TODO will overloaded method get picked up with serialized object?
+	// TODO any way stop the duplication?
 	
+	private void updateXmlRpc(Object[] parameters) {
+		try {
+			mXmlRpcClient.execute("ObjectManager.update", parameters);
+		} catch (XmlRpcException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void update(Galaxy newGalaxy) {
+		mGalaxies.put(newGalaxy.getId(), newGalaxy);
+		Object[] parameters = new Object[] { newGalaxy };
+		updateXmlRpc(parameters);
+	}
+	
+	public void update(PlanetarySystem newSystem) {
+		mPlanetarySystems.put(newSystem.getId(), newSystem);
+		Object[] parameters = new Object[] { newSystem };
+		updateXmlRpc(parameters);
+	}
+	
+	public void update(ManmadeBody newManmadeBody) {
+		mManmadeBodies.put(newManmadeBody.getId(), newManmadeBody);
+		Object[] parameters = new Object[] { newManmadeBody };
+		updateXmlRpc(parameters);
+	}
+	
+	// TODO FIX ALL STRING COMPARES!!!!
 	public void pullFeed() {
 		try {
 			Document doc = mParser.build(mConfigFile.getProperty("FEED"));
@@ -49,4 +102,5 @@ public class ObjectManagerClient extends ObjectManager {
 	
 	private Builder mParser;
     private Properties mConfigFile;
+    private XmlRpcClient mXmlRpcClient;
 }

@@ -1,6 +1,12 @@
 package twoverse.util;
 
-public class GalaxyShape {
+import java.io.Serializable;
+
+public class GalaxyShape implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6779708232529398026L;
 	public GalaxyShape() {
 		
 	}

@@ -1,13 +1,18 @@
 package twoverse.object;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.sql.Time;
 
 import twoverse.util.GalaxyShape;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.User;
 
-public class Galaxy extends CelestialBody {
+public class Galaxy extends CelestialBody implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4163663398347532933L;
 	public Galaxy(int id, 
 			User owner, 
 			Time birthTime, 
