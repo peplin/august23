@@ -1,30 +1,23 @@
 package twoverse;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.common.XmlRpcHttpRequestConfig;
 import org.apache.xmlrpc.server.AbstractReflectiveHandlerMapping;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
+import org.apache.xmlrpc.webserver.ServletWebServer;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
-public class RequestHandlerServer extends XmlRpcServlet implements TwoversePublicApi { 
+public class RequestHandlerServer
+					extends XmlRpcServlet implements TwoversePublicApi { 
     public RequestHandlerServer(ObjectManager objectManager,
                             SessionManager sessionManager) {
-        XmlRpcServlet servlet = new XmlRpcServlet();
-        ServletWebServer webServer;
-		try {
-			webServer = new ServletWebServer(servlet, 8080);
-		} catch (ServletException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        try {
-			webServer.start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 
     }
 

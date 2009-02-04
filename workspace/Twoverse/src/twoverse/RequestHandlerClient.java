@@ -8,6 +8,8 @@ import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
+import twoverse.util.Session;
+
 public class RequestHandlerClient implements TwoversePublicApi { 
     public RequestHandlerClient(ObjectManager objectManager,
                             SessionManager sessionManager) {
