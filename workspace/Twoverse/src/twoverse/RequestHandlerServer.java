@@ -11,6 +11,21 @@ import org.apache.xmlrpc.webserver.XmlRpcServlet;
 public class RequestHandlerServer extends XmlRpcServlet implements TwoversePublicApi { 
     public RequestHandlerServer(ObjectManager objectManager,
                             SessionManager sessionManager) {
+        XmlRpcServlet servlet = new XmlRpcServlet();
+        ServletWebServer webServer;
+		try {
+			webServer = new ServletWebServer(servlet, 8080);
+		} catch (ServletException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        try {
+			webServer.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
     }
 
     public boolean login(String username, String password) {
