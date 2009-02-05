@@ -7,12 +7,32 @@ public interface TwoversePublicApi {
 
     public void refreshUser(String username, int session);
 
-    // TODO double all of these, one accepts serialized object
-    public void addGalaxy();
+    public void addGalaxy(Galaxy galaxy);
+    public void addPlanetarySystem(PlanetarySystem system);
+    public void addManmadeBody(ManmadeBody body);
 
-    public void addPlanetarySystem();
-
-    public void addManmadeBody();
+    /** 
+     * Methods for creating via Javascript web interface - 
+     * can't use Serialized Java objects, so we give explicit constructor
+     * looking things
+     *
+     * TODO do we need owner here, or can it use the currently authenticated
+     * user over HTTP?
+     */
+    public void addGalaxy(User owner, CelestialBody parent, 
+                            PhysicsVector3d velocity, 
+                            PhysicsVector3d acceleration, 
+                            Color color,
+                            GalaxyShape shape);
+    public void addPlanetarySystem(User owner, CelestialBody parent, 
+                            PhysicsVector3d velocity, 
+                            PhysicsVector3d acceleration, 
+                            Color color,
+                            Star center);
+    public void addManmadeBody(User owner, CelestialBody parent, 
+                            PhysicsVector3d velocity, 
+                            PhysicsVector3d acceleration, 
+                            Color color);
 
     public void changeName(int objectId);
 }

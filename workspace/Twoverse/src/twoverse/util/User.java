@@ -5,7 +5,12 @@ import jbcrypt.BCrypt;
 public class User {
     public User(int id, String username, String hashedPassword, String email,
             String phone, int points) {
-
+        setId(id);
+        setUsername(username);
+        setEmail(email);
+        setPhone(phone);
+        setPoints(points);
+        setHashedPassword(hashedPassword);
     }
 
     public void setUsername(String username) {
@@ -16,8 +21,12 @@ public class User {
         return mUsername;
     }
 
-    public void setPassword(String plaintextPassword) {
+    public void setPlaintestPassword(String plaintextPassword) {
         mHashedPassword = BCrypt.hashpw(plaintextPassword, BCrypt.gensalt());
+    }
+
+    public void setHashedPassword(String hashedPassword) {
+        mHashedPassword = hashedPassword;
     }
 
     public boolean validatePassword(String plaintextPassword) {
@@ -28,6 +37,10 @@ public class User {
         return false;
     }
 
+    public String getHashedPassword() {
+        return mHashedPassword;
+    }
+
     public void setPoints(int points) {
         mPoints = points;
     }
@@ -36,7 +49,7 @@ public class User {
         mPoints -= withdrawl;
     }
 
-    public void addPoints(int deposit) {
+    public void earnPoints(int deposit) {
         mPoints += deposit;
     }
 

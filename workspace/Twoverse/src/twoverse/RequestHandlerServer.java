@@ -44,6 +44,14 @@ public class RequestHandlerServer extends XmlRpcServlet implements
 
     }
 
+    public GalaxyShape[] getGalaxyShapes() {
+
+    }
+
+    public Color[] getColors() {
+
+    }
+
     private boolean isAuthenticated(String username, String password) {
         return false;
     }

@@ -22,28 +22,21 @@ class InvalidUserException extends Exception {
 public class Database {
     public Database() throws DatabaseException {
         try {
+            // Load properties file
             mConfigFile = new Properties();
             mConfigFile.load(this.getClass().getClassLoader()
                     .getResourceAsStream("twoverse/conf/Database.properties"));
+
+            // Load the oracle driver
+            Class.forName(DB_CLASS_NAME);
         } catch (IOException e) {
             throw new DatabaseException("Unable to load config file");
-        }
-        /*
-         * catch (Exception e) { throw new
-         * DatabaseException("Unable to load config file" + e.getMessage()); }
-         */
-        // Load the oracle driver
-        try {
-            Class.forName(DB_CLASS_NAME);
-        } catch (Exception e) {
-            System.out.print(e);
-            
+        } catch (SQLException e) {
             throw new DatabaseException("Failed to load MySQL driver ("
                     + e.toString() + ")");
         }
 
         try {
-            // Make a mConnection handle to the database
             mConnection = DriverManager.getConnection(mConfigFile
                     .getProperty("CONNECTION"), mConfigFile
                     .getProperty("DB_USER"), mConfigFile
@@ -54,6 +47,7 @@ public class Database {
             throw new DatabaseException("Connection to database failed: "
                     + e.getMessage());
         }
+
         prepareStatements();
     }
 
@@ -158,29 +152,150 @@ public class Database {
             e.printStackTrace();
         }
         return requestedUser;
-
     }
 
     public void addUser(User user) {
+        try {
+            mAddUserStatement.setString(1, user.getUserame());
+            mAddUserStatement.setString(2, user.getHashedPassword());
+            mAddUserStatement.setString(3, user.getEmail());
+            mAddUserStatement.setString(4, user.getPhone());
+            assert(mAddUserStatement.executeQuery() == 1);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
+    }
+    
+    // TODO more graceful error handlings...what happens on update of bad
+    // username - I guess that shouldn't happen, else it's a problem in my
+    // server, so maybe assert is okay
+    public void updateLoginTime(User user) {
+        try {
+            mUpdateUserLastLoginStatement.setString(1, user.getUsername());
+            assert(mAddUserStatement.executeQuery() == 1);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void deleteUser(User user) {
-
+        try {
+            mDeleteUserStatement.setString(1, user.getUserame());
+            assert(mAddUserStatement.executeQuery() == 1);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
-    public void updateLoginTime(User user, Time time) {
-
-    }
 
     public Galaxy[] getGalaxies() {
-        return null;
+        ArrayList<Galaxy> galaxies = new ArrayList<Galaxy>();
+        try {
+            ResultSet resultSet = mGetGalaxiesStatement.executeQuery();
+            while(resultSet.next()) {
+                Galaxy galaxy = new Galaxy(
+                            resultSet.getInt("object.id"),
+                            resultSet.getString("users.username"),
+                            resultSet.getTimestamp("birth"),
+                            resultSet.getInt("parent"),
+                            new Point(
+                                resultSet.getInt("x"),
+                                resultSet.getInt("y"),
+                                resultSet.getInt("z")),
+                            new PhysicsVector3d(
+                                resultSet.getDouble("velocity_vector_x"),
+                                resultSet.getDouble("velocity_vector_y"),
+                                resultSet.getDouble("velocity_vector_z"),
+                                resultSet.getDouble("velocity_magnitude")),
+                            new PhysicsVector3d(
+                                resultSet.getDouble("accel_vector_x"),
+                                resultSet.getDouble("accel_vector_y"),
+                                resultSet.getDouble("accel_vector_z"),
+                                resultSet.getDouble("accel_magnitude")),
+                            // TODO rather than create one for each, why not
+                            // share? could be very specific
+                            // maybe drop color/shape for now
+                            new Color(
+                                resultSet.getInt("colors.id"),
+                                resultSet.getString("colors.name"),
+                                resultSet.getInt("colors.r"),
+                                resultSet.getInt("colors.g"),
+                                resultSet.getInt("colors.b")),
+                            // TODO these should probably share
+                            new GalaxyShape(
+                                resultSet.getInt("galaxy_shapes.id"),
+                                resultSet.getString("galaxy_shapes.name"),
+                                resultSet.getString("galaxy_shapes.texture")),
+                            resultSet.getDouble("mass"),
+                            resultSet.getDouble("density"));
 
+                if(resultSet.getTimestamp("death") != null) {
+                    galaxy.setDeathTime(resultSet.getTimestamp("death"));
+                }
+
+                galaxies.add(galaxy);
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return galaxies.toArray();
     }
 
     public PlanetarySystem[] getPlanetarySystems() {
-        return null;
+        ArrayList<PlanetarySystem> systems = new ArrayList<PlanetarySystem>();
+        try {
+            ResultSet resultSet = mGetPlanetarySystemsStatement.executeQuery();
+            while(resultSet.next()) {
+                // TODO lots of repeated code...what if
+                // we have a generic method to construct the CelestialBody
+                // and each subtype has a constructor that accepts the
+                // parent type
+                PlanetarySystem system = new PlanetarySystem(
+                            resultSet.getInt("object.id"),
+                            resultSet.getString("users.username"),
+                            resultSet.getTimestamp("birth"),
+                            resultSet.getInt("parent"),
+                            new Point(
+                                resultSet.getInt("x"),
+                                resultSet.getInt("y"),
+                                resultSet.getInt("z")),
+                            new PhysicsVector3d(
+                                resultSet.getDouble("velocity_vector_x"),
+                                resultSet.getDouble("velocity_vector_y"),
+                                resultSet.getDouble("velocity_vector_z"),
+                                resultSet.getDouble("velocity_magnitude")),
+                            new PhysicsVector3d(
+                                resultSet.getDouble("accel_vector_x"),
+                                resultSet.getDouble("accel_vector_y"),
+                                resultSet.getDouble("accel_vector_z"),
+                                resultSet.getDouble("accel_magnitude")),
+                            new Color(
+                                resultSet.getInt("colors.id"),
+                                resultSet.getString("colors.name"),
+                                resultSet.getInt("colors.r"),
+                                resultSet.getInt("colors.g"),
+                                resultSet.getInt("colors.b")),
+                            resultSet.getInt("center"),
+                            resultSet.getDouble("mass"));
 
+                if(resultSet.getTimestamp("death") != null) {
+                    system.setDeathTime(resultSet.getTimestamp("death"));
+                }
+
+                systems.add(system);
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return systems.toArray();
     }
 
     public ManmadeBody[] getManmadeBodies() {
