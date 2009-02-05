@@ -3,38 +3,40 @@ package twoverse.util;
 import java.io.Serializable;
 
 public class GalaxyShape implements Serializable {
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6779708232529398026L;
-	public GalaxyShape() {
-		
-	}
+    private static final long serialVersionUID = 6779708232529398026L;
 
-	public void setId(int id) {
-		mId = id;
-	}
-	public int getId() {
-		return mId;
-	}
+    public GalaxyShape() {
 
-	public void setName(String name) {
-		mName = name;
-	}
+    }
 
-	public String getName() {
-		return mName;
-	}
+    public void setId(int id) {
+        mId = id;
+    }
 
-	public void setTextureFile(String textureFile) {
-		mTextureFile = textureFile;
-	}
+    public int getId() {
+        return mId;
+    }
 
-	public String getTextureFile() {
-		return mTextureFile;
-	}
+    public void setName(String name) {
+        mName = name;
+    }
 
-	private int mId;
-	private String mName;
-	private String mTextureFile;
+    public String getName() {
+        return mName;
+    }
+
+    public void setTextureFile(String textureFile) {
+        mTextureFile = textureFile;
+    }
+
+    public String getTextureFile() {
+        return mTextureFile;
+    }
+
+    private int mId;
+    private String mName;
+    private String mTextureFile;
 }

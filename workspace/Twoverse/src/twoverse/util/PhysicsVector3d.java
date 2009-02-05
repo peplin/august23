@@ -7,11 +7,11 @@ public class PhysicsVector3d {
     private double magnitude;
 
     public double getUnitDirection() {
-    	return 0;
+        return 0;
 
     }
 
     public double getMagnitude() {
-    	return 0;
+        return 0;
     }
 }

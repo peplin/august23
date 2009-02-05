@@ -1,24 +1,17 @@
 package twoverse.object;
 
 import java.awt.Color;
-import java.sql.Time;
-//import javax.vecmath.GVector;
+import java.sql.Time; //import javax.vecmath.GVector;
 
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.User;
 
 public abstract class CelestialBody {
-	public CelestialBody(int id, 
-						User owner, 
-						Time birthTime, 
-						Time deathTime, 
-						CelestialBody parent, 
-						PhysicsVector3d velocity,
-						PhysicsVector3d acceleration,
-						Color color) {
-		
-	}
-	
+    public CelestialBody(int id, User owner, Time birthTime, Time deathTime,
+            CelestialBody parent, PhysicsVector3d velocity,
+            PhysicsVector3d acceleration, Color color) {
+
+    }
 
     public int getId() {
         return mId;
@@ -52,7 +45,6 @@ public abstract class CelestialBody {
         return mColor;
     }
 
-    
     private int mId;
     private User mOwner;
     private Time mBirthTime;

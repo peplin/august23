@@ -8,5 +8,8 @@
 	<classpathentry kind="lib" path="/usr/share/java/xmlrpc-common-3.1.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/xmlrpc-server-3.1.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/servlet-api.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/mysql.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/commons-logging.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/ws-commons-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

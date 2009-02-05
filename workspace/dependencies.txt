@@ -1,0 +1,6 @@
+libxom-java
+junit
+libxmlrcp3-client-java
+libxmlrcp3-server-java
+libjcommon-serializer-java
+libmsql-java
