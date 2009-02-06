@@ -7,37 +7,32 @@ import twoverse.util.PhysicsVector3d;
 import twoverse.util.User;
 
 public class PlanetarySystem extends CelestialBody {
-	public PlanetarySystem(int id, 
-			User owner, 
-			Time birthTime, 
-			Time deathTime, 
-			CelestialBody parent, 
-			PhysicsVector3d velocity,
-			PhysicsVector3d acceleration,
-			Color color,
-			ManmadeBody center,
-			double mass) {
-		super(id, owner, birthTime, deathTime, parent, 
-				velocity, acceleration, color);
-	}
-	
-	public void setCenter(ManmadeBody center) {
-		mCenter = center;
-	}
-	public ManmadeBody getCenter() {
-		return mCenter;
-	}
+    // TODO maybe deathtime could just be null for alive bodies?
+    public PlanetarySystem(int id, User owner, Time birthTime, Time deathTime,
+            CelestialBody parent, Point center, PhysicsVector3d velocity,
+            PhysicsVector3d acceleration, Color color, Star centerStarId,
+            double mass) {
+        super(id, owner, birthTime, deathTime, parent, center, velocity, acceleration,
+                color);
+    }
 
-	public void setMass(double mass) {
-		mMass = mass;
-	}
+    public void setCenter(Star center) {
+        mCenter = center;
+    }
 
-	public double getMass() {
-		return mMass;
-	}
+    public Star getCenter() {
+        return mCenter;
+    }
 
-	private ManmadeBody mCenter;
-	private double mMass;
-	
+    public void setMass(double mass) {
+        mMass = mass;
+    }
+
+    public double getMass() {
+        return mMass;
+    }
+
+    private Star mCenter;
+    private double mMass;
+
 }
-
