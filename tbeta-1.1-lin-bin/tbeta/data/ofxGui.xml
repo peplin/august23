@@ -26,7 +26,7 @@
         <SLIDERCOLOR>FF0000CC</SLIDERCOLOR>
         <AXISCOLOR>00FF00FF</AXISCOLOR>
         <HANDLECOLOR>000000FF</HANDLECOLOR>
-        <BUTTONCOLOR>E6FF00CC</BUTTONCOLOR>
+        <BUTTONCOLOR>E5FF00CC</BUTTONCOLOR>
         <CURVECOLOR>FF9900FF</CURVECOLOR>
         <SCOPECOLOR>FF9900FF</SCOPECOLOR>
         <ACTIVECOLOR>FF0000FF</ACTIVECOLOR>
@@ -68,7 +68,7 @@
             <MODE>2</MODE>
             <DISPLAY>2</DISPLAY>
             <STEPS>0</STEPS>
-            <VALUE>0</VALUE>
+            <VALUE>1</VALUE>
         </OBJECT>
         <OBJECT>
             <ID>2</ID>
@@ -244,7 +244,7 @@
             <STEPS>0</STEPS>
             <MIN>0.000000</MIN>
             <MAX>255.000000</MAX>
-            <VALUE>30.000000</VALUE>
+            <VALUE>95.199997</VALUE>
         </OBJECT>
     </OBJECT>
     <OBJECT>
@@ -392,7 +392,7 @@
             <STEPS>0</STEPS>
             <MIN>0.000000</MIN>
             <MAX>15.000000</MAX>
-            <VALUE>1.909091</VALUE>
+            <VALUE>5.000000</VALUE>
         </OBJECT>
     </OBJECT>
     <OBJECT>
@@ -434,7 +434,7 @@
             <STEPS>0</STEPS>
             <MIN>0.000000</MIN>
             <MAX>200.000000</MAX>
-            <VALUE>45.000000</VALUE>
+            <VALUE>7.272727</VALUE>
         </OBJECT>
         <OBJECT>
             <ID>29</ID>
@@ -449,7 +449,7 @@
             <STEPS>0</STEPS>
             <MIN>0.000000</MIN>
             <MAX>30.000000</MAX>
-            <VALUE>4.000000</VALUE>
+            <VALUE>1.363636</VALUE>
         </OBJECT>
     </OBJECT>
     <OBJECT>
@@ -491,7 +491,7 @@
             <STEPS>0</STEPS>
             <MIN>0.000000</MIN>
             <MAX>300.000000</MAX>
-            <VALUE>19.000000</VALUE>
+            <VALUE>27.272728</VALUE>
         </OBJECT>
     </OBJECT>
 </UI>

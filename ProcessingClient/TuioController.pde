@@ -24,17 +24,10 @@ void rotations(){
 
   if(fingerDown) {
     if(fingerMoved) {
-      /*System.out.println("Previous Finger X: " + previousFingerX);
-       System.out.println("Previous Finger X: " + previousFingerY);
-       System.out.println("Finger X: " + fingerX);
-       System.out.println("Finger Y: " + fingerY);
-       */
-      vX += (fingerY - previousFingerY) * .001;
-      vZ += (fingerX - previousFingerX) * .001;
-    } else {
-       previousFingerY = previousFingerX = -1; 
-    }
-  }
+      vX += (fingerY - previousFingerY) * .01;
+      vZ += (fingerX - previousFingerX) * .01;
+    }  
+}
 
   rotateX( radians(-rX) );  
   rotateZ( radians(- rZ) );  
@@ -67,10 +60,11 @@ void keyPressed(){
 void addTuioCursor(TuioCursor tcur) {
   if(!fingerDown) { // if we have no others, this the new primary
     primaryFingerId = tcur.getFingerID();
-  }
-  fingerDown = true;
-  fingerX = tcur.getX() * screen.width;
-  fingerY = tcur.getY() * screen.width;
+  
+    fingerDown = true;
+    fingerX = previousFingerX = tcur.getX() * screen.width;
+    fingerY = previousFingerY = tcur.getY() * screen.width;
+    }
 }
 
 // called when a cursor is moved
@@ -86,15 +80,16 @@ void updateTuioCursor (TuioCursor tcur) {
 
 // called when a cursor is removed from the scene
 void removeTuioCursor(TuioCursor tcur) {
-  TuioCursor[] cursors = tuioClient.getTuioCursors();
-  if(cursors.length == 0) { // no other fingers down
+  //TuioCursor[] cursors = tuioClient.getTuioCursors();
+  //if(cursors.length == 0) { // no other fingers down
     fingerDown = false;
     fingerMoved = false;
-  } 
-  else { // new primary finger
-    primaryFingerId = cursors[0].getFingerID();
-  }
-  fingerMoved = false;
+    
+  //} 
+  //else { // new primary finger
+  //  primaryFingerId = cursors[0].getFingerID();
+  //}
+  //fingerMoved = false;
 }
 
 // called when an object is added to the scene
