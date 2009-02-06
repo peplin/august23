@@ -1,4 +1,4 @@
-package twoverse.util;
+package twoverse;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -191,52 +191,71 @@ public class Database {
         }
     }
 
+    public void loadBodies(ObjectManager manager) {
+    // how to find parent object? maybe run obj.linkParent(map[id]) after
+    // coming back from parseCelestialBodies
+
+    }
+
+    public CelestialBody[] parseCelestialBodies(ResultSet resultSet) {
+        ArrayList<CelestialBody> bodies = new ArrayList<CelestialBodies>();
+        while(resultSet.next()) {
+            CelestialBody body = new CelestialBody(
+                        resultSet.getInt("object.id"),
+                        resultSet.getString("users.username"),
+                        resultSet.getTimestamp("birth"),
+                        resultSet.getInt("parent"),
+                        new Point(
+                            resultSet.getInt("x"),
+                            resultSet.getInt("y"),
+                            resultSet.getInt("z")),
+                        new PhysicsVector3d(
+                            resultSet.getDouble("velocity_vector_x"),
+                            resultSet.getDouble("velocity_vector_y"),
+                            resultSet.getDouble("velocity_vector_z"),
+                            resultSet.getDouble("velocity_magnitude")),
+                        new PhysicsVector3d(
+                            resultSet.getDouble("accel_vector_x"),
+                            resultSet.getDouble("accel_vector_y"),
+                            resultSet.getDouble("accel_vector_z"),
+                            resultSet.getDouble("accel_magnitude")),
+                        // TODO rather than create one for each, why not
+                        // share? could be very specific
+                        // maybe drop color/shape for now
+                        new Color(
+                            resultSet.getInt("colors.id"),
+                            resultSet.getString("colors.name"),
+                            resultSet.getInt("colors.r"),
+                            resultSet.getInt("colors.g"),
+                            resultSet.getInt("colors.b")));
+
+            if(resultSet.getTimestamp("death") != null) {
+                body.setDeathTime(resultSet.getTimestamp("death"));
+            }
+
+            body.add(galaxy);
+        }
+        resultSet.close();
+        return bodies.toArray();
+    }
 
     public Galaxy[] getGalaxies() {
         ArrayList<Galaxy> galaxies = new ArrayList<Galaxy>();
         try {
             ResultSet resultSet = mGetGalaxiesStatement.executeQuery();
-            while(resultSet.next()) {
+            CelestialBodies[] bodies = parseCelestialBodies(resultSet);
+            resultSet.first();
+            for(CelestialBody body : bodies) {
+                resultSet.next();
                 Galaxy galaxy = new Galaxy(
-                            resultSet.getInt("object.id"),
-                            resultSet.getString("users.username"),
-                            resultSet.getTimestamp("birth"),
-                            resultSet.getInt("parent"),
-                            new Point(
-                                resultSet.getInt("x"),
-                                resultSet.getInt("y"),
-                                resultSet.getInt("z")),
-                            new PhysicsVector3d(
-                                resultSet.getDouble("velocity_vector_x"),
-                                resultSet.getDouble("velocity_vector_y"),
-                                resultSet.getDouble("velocity_vector_z"),
-                                resultSet.getDouble("velocity_magnitude")),
-                            new PhysicsVector3d(
-                                resultSet.getDouble("accel_vector_x"),
-                                resultSet.getDouble("accel_vector_y"),
-                                resultSet.getDouble("accel_vector_z"),
-                                resultSet.getDouble("accel_magnitude")),
-                            // TODO rather than create one for each, why not
-                            // share? could be very specific
-                            // maybe drop color/shape for now
-                            new Color(
-                                resultSet.getInt("colors.id"),
-                                resultSet.getString("colors.name"),
-                                resultSet.getInt("colors.r"),
-                                resultSet.getInt("colors.g"),
-                                resultSet.getInt("colors.b")),
-                            // TODO these should probably share
+                            body,
                             new GalaxyShape(
                                 resultSet.getInt("galaxy_shapes.id"),
                                 resultSet.getString("galaxy_shapes.name"),
                                 resultSet.getString("galaxy_shapes.texture")),
                             resultSet.getDouble("mass"),
                             resultSet.getDouble("density"));
-
-                if(resultSet.getTimestamp("death") != null) {
-                    galaxy.setDeathTime(resultSet.getTimestamp("death"));
-                }
-
+            }
                 galaxies.add(galaxy);
             }
             resultSet.close();

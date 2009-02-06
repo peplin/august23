@@ -6,7 +6,7 @@ import java.sql.Time; //import javax.vecmath.GVector;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.User;
 
-public abstract class CelestialBody {
+public class CelestialBody {
     public CelestialBody(int id, User owner, Timestamp birthTime, Time deathTime,
             CelestialBody parent, Point center, PhysicsVector3d velocity,
             PhysicsVector3d acceleration, Color color) {

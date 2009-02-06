@@ -3,31 +3,31 @@ package twoverse.util;
 // TODO What does this class need to have for our simulation? 
 public class PhysicsVector3d {
     public PhysicsVector3d(double x, double x, double z, double magnitude) {
-        setDirection(x, y, z);
+        setDirection(new Point(x, y, z));
         setMagnitude(magnitude);
     }
 
-    public void setDirection(double x, double y, double x) {
-        mX = x;
-        mY = y;
-        mZ = z;
+    public PhysicsVector3d(Point unitDirection, double magnitude) {
+        setDirection(unitDirection);
+        setMagnitude(magnitude);
     }
 
-    public void setMagnitude(doube magnitude) {
+    public void setDirection(Point newDirection) {
+        mUnitVectorPoint = newDirection;
+    }
+
+    public void setMagnitude(double magnitude) {
         mMagnitude = magnitude;
     }
 
-    public double getUnitDirection() {
-        return 0;
-
+    public Point getUnitDirection() {
+        return mUnitVectorPoint;
     }
 
     public double getMagnitude() {
         return mMagnitude;
     }
 
-    private double mX;
-    private double mY;
-    private double mZ;
+    private Point mUnitVectorPoint;
     private double mMagnitude;
 }
