@@ -16,7 +16,7 @@ import nu.xom.ParsingException;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
-import twoverse.util.Database;
+import twoverse.Database;
 
 public class ObjectManagerClient extends ObjectManager {
 

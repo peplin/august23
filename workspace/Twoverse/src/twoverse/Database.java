@@ -6,15 +6,22 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 
+import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
+import twoverse.util.GalaxyShape;
+import twoverse.util.PhysicsVector3d;
+import twoverse.util.Point;
+import twoverse.util.User;
 
 class InvalidUserException extends Exception {
     public InvalidUserException(String e) {
+        super(e);
 
     }
 }
@@ -27,13 +34,12 @@ public class Database {
             mConfigFile.load(this.getClass().getClassLoader()
                     .getResourceAsStream("twoverse/conf/Database.properties"));
 
-            // Load the oracle driver
             Class.forName(DB_CLASS_NAME);
         } catch (IOException e) {
             throw new DatabaseException("Unable to load config file");
-        } catch (SQLException e) {
-            throw new DatabaseException("Failed to load MySQL driver ("
-                    + e.toString() + ")");
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         try {
@@ -43,7 +49,6 @@ public class Database {
                     .getProperty("DB_PASSWORD"));
             mConnection.setAutoCommit(true);
         } catch (Exception e) {
-            System.out.print(e.getMessage());
             throw new DatabaseException("Connection to database failed: "
                     + e.getMessage());
         }
@@ -65,6 +70,8 @@ public class Database {
             mDeleteUserStatement = mConnection
                     .prepareStatement("DELETE FROM user "
                             + "WHERE username = ?");
+            mSelectAllUsersStatement = mConnection
+                    .prepareStatement("SELECT * FROM user");
             mAddParentObjectStatement = mConnection
                     .prepareStatement("INSERT INTO object (owner, parent, velocity_magnitude, "
                             + "velocity_vector_x, velocity_vector_y, velocity_vector_z, "
@@ -81,18 +88,18 @@ public class Database {
                     .prepareStatement("INSERT INTO manmade (id) "
                             + "VALUES (?)");
             mGetGalaxiesStatement = mConnection
-                    .prepareStatement("SELECT * FROM object, galaxy, galaxy_shapes, colors, user"
+                    .prepareStatement("SELECT * FROM object, galaxy, galaxy_shapes, colors "
                             + "WHERE object.id = galaxy.id "
                             + "AND galaxy.shape = galaxy_shapes.id"
                             + "AND object.color = colors.id"
                             + "AND object.owner = user.id");
             mGetPlanetarySystemsStatement = mConnection
-                    .prepareStatement("SELECT * FROM object, planetary_system, colors, user "
+                    .prepareStatement("SELECT * FROM object, planetary_system, colors "
                             + "WHERE object.id = planetary_system.id "
                             + "AND object.color = colors.id"
                             + "AND object.owner = user.id");
             mGetManmadeBodiesStatement = mConnection
-                    .prepareStatement("SELECT * FROM object, manmade, colors, user "
+                    .prepareStatement("SELECT * FROM object, manmade, colors "
                             + "WHERE object.id = body.id "
                             + "AND object.color = colors.id"
                             + "AND object.owner = user.id");
@@ -129,52 +136,48 @@ public class Database {
         e.printStackTrace();
     }
 
-    public User getUser(String username) throws InvalidUserException {
-        User requestedUser = null;
+    public HashMap<Integer, User> getUsers() throws InvalidUserException {
+        HashMap<Integer, User> users = new HashMap<Integer, User>();
         try {
-            mSelectUserStatement.setString(1, username);
-
-            ResultSet resultSet = mSelectUserStatement.executeQuery();
-            if (resultSet.next()) {
-                requestedUser = new User(resultSet.getInt("id"), resultSet
+            ResultSet resultSet = mSelectAllUsersStatement.executeQuery();
+            while (resultSet.next()) {
+                User user = new User(resultSet.getInt("id"), resultSet
                         .getString("username"),
                         resultSet.getString("password"), resultSet
                                 .getString("email"),
                         resultSet.getString("sms"), resultSet.getInt("points"));
-                resultSet.close();
-                return requestedUser;
-            } else {
-                // TODO problem, no user
-                throw new InvalidUserException("No user " + username);
+
+                users.put(user.getId(), user);
             }
+            resultSet.close();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return requestedUser;
+        return users;
     }
 
     public void addUser(User user) {
         try {
-            mAddUserStatement.setString(1, user.getUserame());
+            mAddUserStatement.setString(1, user.getUsername());
             mAddUserStatement.setString(2, user.getHashedPassword());
             mAddUserStatement.setString(3, user.getEmail());
             mAddUserStatement.setString(4, user.getPhone());
-            assert(mAddUserStatement.executeQuery() == 1);
+            assert (mAddUserStatement.executeUpdate() == 1);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
     }
-    
+
     // TODO more graceful error handlings...what happens on update of bad
     // username - I guess that shouldn't happen, else it's a problem in my
     // server, so maybe assert is okay
     public void updateLoginTime(User user) {
         try {
             mUpdateUserLastLoginStatement.setString(1, user.getUsername());
-            assert(mAddUserStatement.executeQuery() == 1);
+            assert (mAddUserStatement.executeUpdate() == 1);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -183,146 +186,125 @@ public class Database {
 
     public void deleteUser(User user) {
         try {
-            mDeleteUserStatement.setString(1, user.getUserame());
-            assert(mAddUserStatement.executeQuery() == 1);
+            mDeleteUserStatement.setString(1, user.getUsername());
+            assert (mAddUserStatement.executeUpdate() == 1);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    public void loadBodies(ObjectManager manager) {
-    // how to find parent object? maybe run obj.linkParent(map[id]) after
-    // coming back from parseCelestialBodies
+    private CelestialBody[] parseCelestialBodies(ResultSet resultSet,
+            HashMap<Integer, User> users) {
+        ArrayList<CelestialBody> bodies = new ArrayList<CelestialBody>();
+        try {
+            while (resultSet.next()) {
+                // TODO need to look up User object
+                CelestialBody body;
 
-    }
+                body = new CelestialBody(resultSet.getInt("object.id"), users
+                        .get(resultSet.getInt("object.owner")), resultSet
+                        .getTimestamp("birth"),
+                        resultSet.getTimestamp("death"), resultSet
+                                .getInt("parent"), new Point(resultSet
+                                .getInt("x"), resultSet.getInt("y"), resultSet
+                                .getInt("z")), new PhysicsVector3d(resultSet
+                                .getDouble("velocity_vector_x"), resultSet
+                                .getDouble("velocity_vector_y"), resultSet
+                                .getDouble("velocity_vector_z"), resultSet
+                                .getDouble("velocity_magnitude")),
+                        new PhysicsVector3d(resultSet
+                                .getDouble("accel_vector_x"), resultSet
+                                .getDouble("accel_vector_y"), resultSet
+                                .getDouble("accel_vector_z"), resultSet
+                                .getDouble("accel_magnitude")));
 
-    public CelestialBody[] parseCelestialBodies(ResultSet resultSet) {
-        ArrayList<CelestialBody> bodies = new ArrayList<CelestialBodies>();
-        while(resultSet.next()) {
-            CelestialBody body = new CelestialBody(
-                        resultSet.getInt("object.id"),
-                        resultSet.getString("users.username"),
-                        resultSet.getTimestamp("birth"),
-                        resultSet.getInt("parent"),
-                        new Point(
-                            resultSet.getInt("x"),
-                            resultSet.getInt("y"),
-                            resultSet.getInt("z")),
-                        new PhysicsVector3d(
-                            resultSet.getDouble("velocity_vector_x"),
-                            resultSet.getDouble("velocity_vector_y"),
-                            resultSet.getDouble("velocity_vector_z"),
-                            resultSet.getDouble("velocity_magnitude")),
-                        new PhysicsVector3d(
-                            resultSet.getDouble("accel_vector_x"),
-                            resultSet.getDouble("accel_vector_y"),
-                            resultSet.getDouble("accel_vector_z"),
-                            resultSet.getDouble("accel_magnitude")),
-                        // TODO rather than create one for each, why not
-                        // share? could be very specific
-                        // maybe drop color/shape for now
-                        new Color(
-                            resultSet.getInt("colors.id"),
-                            resultSet.getString("colors.name"),
-                            resultSet.getInt("colors.r"),
-                            resultSet.getInt("colors.g"),
-                            resultSet.getInt("colors.b")));
-
-            if(resultSet.getTimestamp("death") != null) {
-                body.setDeathTime(resultSet.getTimestamp("death"));
+                // TODO rather than create one for each, why not
+                // share? could be very specific
+                // maybe drop color/shape for now
+                /*
+                 * new Color(resultSet.getInt("colors.id"), resultSet
+                 * .getString("colors.name"), resultSet .getInt("colors.r"),
+                 * resultSet.getInt("colors.g"), resultSet.getInt("colors.b")));
+                 */
+                bodies.add(body);
             }
-
-            body.add(galaxy);
+            resultSet.close();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        resultSet.close();
-        return bodies.toArray();
+
+        return (CelestialBody[]) bodies.toArray();
     }
 
-    public Galaxy[] getGalaxies() {
-        ArrayList<Galaxy> galaxies = new ArrayList<Galaxy>();
+    public HashMap<Integer, Galaxy> getGalaxies(HashMap<Integer, User> users) {
+        HashMap<Integer, Galaxy> galaxies = new HashMap<Integer, Galaxy>();
         try {
             ResultSet resultSet = mGetGalaxiesStatement.executeQuery();
-            CelestialBodies[] bodies = parseCelestialBodies(resultSet);
+            CelestialBody[] bodies = parseCelestialBodies(resultSet, users);
             resultSet.first();
-            for(CelestialBody body : bodies) {
+            for (CelestialBody body : bodies) {
                 resultSet.next();
-                Galaxy galaxy = new Galaxy(
-                            body,
-                            new GalaxyShape(
-                                resultSet.getInt("galaxy_shapes.id"),
-                                resultSet.getString("galaxy_shapes.name"),
-                                resultSet.getString("galaxy_shapes.texture")),
-                            resultSet.getDouble("mass"),
-                            resultSet.getDouble("density"));
-            }
-                galaxies.add(galaxy);
+                Galaxy galaxy = new Galaxy(body, new GalaxyShape(resultSet
+                        .getInt("galaxy_shapes.id"), resultSet
+                        .getString("galaxy_shapes.name"), resultSet
+                        .getString("galaxy_shapes.texture")), resultSet
+                        .getDouble("mass"), resultSet.getDouble("density"));
+                galaxies.put(galaxy.getId(), galaxy);
             }
             resultSet.close();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return galaxies.toArray();
+        return galaxies;
     }
 
-    public PlanetarySystem[] getPlanetarySystems() {
-        ArrayList<PlanetarySystem> systems = new ArrayList<PlanetarySystem>();
+    public HashMap<Integer, PlanetarySystem> getPlanetarySystems(
+            HashMap<Integer, User> users) {
+        HashMap<Integer, PlanetarySystem> systems = new HashMap<Integer, PlanetarySystem>();
         try {
             ResultSet resultSet = mGetPlanetarySystemsStatement.executeQuery();
-            while(resultSet.next()) {
-                // TODO lots of repeated code...what if
-                // we have a generic method to construct the CelestialBody
-                // and each subtype has a constructor that accepts the
-                // parent type
-                PlanetarySystem system = new PlanetarySystem(
-                            resultSet.getInt("object.id"),
-                            resultSet.getString("users.username"),
-                            resultSet.getTimestamp("birth"),
-                            resultSet.getInt("parent"),
-                            new Point(
-                                resultSet.getInt("x"),
-                                resultSet.getInt("y"),
-                                resultSet.getInt("z")),
-                            new PhysicsVector3d(
-                                resultSet.getDouble("velocity_vector_x"),
-                                resultSet.getDouble("velocity_vector_y"),
-                                resultSet.getDouble("velocity_vector_z"),
-                                resultSet.getDouble("velocity_magnitude")),
-                            new PhysicsVector3d(
-                                resultSet.getDouble("accel_vector_x"),
-                                resultSet.getDouble("accel_vector_y"),
-                                resultSet.getDouble("accel_vector_z"),
-                                resultSet.getDouble("accel_magnitude")),
-                            new Color(
-                                resultSet.getInt("colors.id"),
-                                resultSet.getString("colors.name"),
-                                resultSet.getInt("colors.r"),
-                                resultSet.getInt("colors.g"),
-                                resultSet.getInt("colors.b")),
-                            resultSet.getInt("center"),
-                            resultSet.getDouble("mass"));
-
-                if(resultSet.getTimestamp("death") != null) {
-                    system.setDeathTime(resultSet.getTimestamp("death"));
-                }
-
-                systems.add(system);
+            CelestialBody[] bodies = parseCelestialBodies(resultSet, users);
+            resultSet.first();
+            for (CelestialBody body : bodies) {
+                resultSet.next();
+                PlanetarySystem system = new PlanetarySystem(body,
+                        resultSet.getInt("center"), 
+                        resultSet.getDouble("mass"));
+                systems.put(system.getId(), system);
             }
             resultSet.close();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return systems.toArray();
+        return systems;
     }
 
-    public ManmadeBody[] getManmadeBodies() {
-        return null;
-
+    public HashMap<Integer, ManmadeBody> getManmadeBodies(
+            HashMap<Integer, User> users) {
+        HashMap<Integer, ManmadeBody> manmadeBodies = new HashMap<Integer, ManmadeBody>();
+        try {
+            ResultSet resultSet = mGetManmadeBodiesStatement.executeQuery();
+            CelestialBody[] bodies = parseCelestialBodies(resultSet, users);
+            resultSet.first();
+            for (CelestialBody body : bodies) {
+                resultSet.next();
+                ManmadeBody manmadeBody = new ManmadeBody(body);
+                manmadeBodies.put(manmadeBody.getId(), manmadeBody);
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return manmadeBodies;
     }
 
     public void insertGalaxies(Galaxy[] galaxies) {
+        //TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -339,6 +321,7 @@ public class Database {
     }
 
     public void insertPlanetarySystems(PlanetarySystem[] systems) {
+        //TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -355,6 +338,7 @@ public class Database {
     }
 
     public void insertManmadeBodies(ManmadeBody[] bodies) {
+        //TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -371,6 +355,7 @@ public class Database {
     }
 
     public void updateSimulationData(Object[] objects) {
+        //TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -387,6 +372,7 @@ public class Database {
     }
 
     public void updateGalaxies(Galaxy[] galaxies) {
+        //TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -403,6 +389,7 @@ public class Database {
     }
 
     public void updatePlanetarySystems(PlanetarySystem[] systems) {
+        //TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -419,6 +406,7 @@ public class Database {
     }
 
     public void updateManmadeBodies(ManmadeBody[] bodes) {
+        //TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -434,43 +422,6 @@ public class Database {
         }
     }
 
-    /*
-     * 
-     * try { mConnection.setAutoCommit(false);
-     * 
-     * selectFileSt.setString(1, filename); ResultSet rs =
-     * selectFileSt.executeQuery(); if (rs.next()) { // The file already exists
-     * int fileid = rs.getInt("fileid"); String previousOwner =
-     * rs.getString("ownerid"); rs.close();
-     * 
-     * if (!owner.equals(previousOwner)) { transferOwnershipSt.setString(1,
-     * owner); transferOwnershipSt.setInt(2, fileid);
-     * 
-     * int rc = transferOwnershipSt.executeUpdate(); assert rc == 1; }
-     * 
-     * clearWordsSt.setInt(1, fileid); clearWordsSt.executeUpdate();
-     * 
-     * addWordSt.setInt(1, fileid); for (Map.Entry<String, Integer> entry :
-     * words.entrySet()) { addWordSt.setString(2, entry.getKey());
-     * addWordSt.setInt(3, entry.getValue()); int rc =
-     * addWordSt.executeUpdate(); assert rc == 1; }
-     * 
-     * } else { // The file does not exist rs.close();
-     * 
-     * addFileSt.setString(1, filename); addFileSt.setString(2, owner);
-     * addFileSt.executeUpdate();
-     * 
-     * for (Map.Entry<String, Integer> entry : words.entrySet()) {
-     * addWordNewFileSt.setString(1, entry.getKey()); addWordNewFileSt.setInt(2,
-     * entry.getValue()); int rc = addWordNewFileSt.executeUpdate(); assert rc
-     * == 1; } }
-     * 
-     * mConnection.commit(); mConnection.setAutoCommit(true); } catch
-     * (SQLException e) { if (e.getErrorCode() != FOREIGN_KEY_CONSTRAINT)
-     * unexpectedError("Could not add file", e); try { mConnection.rollback();
-     * mConnection.setAutoCommit(true); } catch (SQLException e2) {
-     * unexpectedError("Could not rollback", e2); } return false; }
-     */
     private static final String DB_CLASS_NAME = "com.mysql.jdbc.Driver";
     private Connection mConnection = null;
     private Properties mConfigFile;
@@ -479,6 +430,7 @@ public class Database {
     private PreparedStatement mUpdateUserLastLoginStatement;
     private PreparedStatement mUpdateUserPreferenceStatement;
     private PreparedStatement mDeleteUserStatement; // cascade update
+    private PreparedStatement mSelectAllUsersStatement;
     private PreparedStatement mAddParentObjectStatement;
     private PreparedStatement mAddGalaxyStatement;
     private PreparedStatement mAddPlanetarySystemStatement;

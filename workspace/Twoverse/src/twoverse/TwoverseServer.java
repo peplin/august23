@@ -1,16 +1,20 @@
 package twoverse;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.servlet.ServletException;
 
 import org.apache.xmlrpc.webserver.ServletWebServer;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
-import twoverse.util.Database;
-import twoverse.util.DatabaseException;
-
+import twoverse.Database;
+import twoverse.DatabaseException;
 
 public class TwoverseServer {
+    private static Logger sLogger = Logger.getLogger(TwoverseServer.class
+            .getName());
 
     /**
      * @param args
@@ -20,24 +24,22 @@ public class TwoverseServer {
             // TODO make all managers thread safe
             Database database = new Database();
             ObjectManager objectManager = new ObjectManagerServer(database);
-            SessionManager sessionManager = new SessionManager(database,
-                    objectManager);
+            SessionManager sessionManager = new SessionManager(database);
             SimulationRunner simulation = new SimulationRunner(objectManager);
 
             XmlRpcServlet servlet = new RequestHandlerServer(objectManager,
                     sessionManager);
-
             ServletWebServer webServer;
             webServer = new ServletWebServer(servlet, 8080);
-            webServer.start();
+
+            simulation.start(); // run simulation
+            webServer.start(); // accept requests
         } catch (DatabaseException e) {
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, e.getMessage(), e);
         } catch (ServletException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.SEVERE, "Unable to create or start servlet", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 }

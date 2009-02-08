@@ -3,7 +3,7 @@ package twoverse;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import twoverse.util.Database;
+import twoverse.Database;
 import twoverse.util.User;
 import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
@@ -85,5 +85,6 @@ public abstract class ObjectManager extends Thread {
     HashMap<Integer, Galaxy> mGalaxies;
     HashMap<Integer, PlanetarySystem> mPlanetarySystems;
     HashMap<Integer, ManmadeBody> mManmadeBodies;
+    
     Database mDatabase;
 }

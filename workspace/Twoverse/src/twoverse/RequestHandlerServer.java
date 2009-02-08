@@ -1,5 +1,7 @@
 package twoverse;
 
+import java.awt.Color;
+
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.common.XmlRpcHttpRequestConfig;
@@ -8,8 +10,20 @@ import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
+import twoverse.object.CelestialBody;
+import twoverse.object.Galaxy;
+import twoverse.object.ManmadeBody;
+import twoverse.object.PlanetarySystem;
+import twoverse.object.Star;
+import twoverse.util.GalaxyShape;
+import twoverse.util.PhysicsVector3d;
+import twoverse.util.User;
+
 public class RequestHandlerServer extends XmlRpcServlet implements
         TwoversePublicApi {
+    private ObjectManagerServer objectManager;
+    private SessionManager sessionManager;
+    
     public RequestHandlerServer(ObjectManager objectManager,
             SessionManager sessionManager) {
 
@@ -45,10 +59,12 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     }
 
     public GalaxyShape[] getGalaxyShapes() {
+        return null;
 
     }
 
     public Color[] getColors() {
+        return null;
 
     }
 
@@ -72,6 +88,45 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         return mapping;
     }
 
-    private ObjectManagerServer objectManager;
-    private SessionManager sessionManager;
+
+    @Override
+    public void addGalaxy(Galaxy galaxy) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void addGalaxy(User owner, CelestialBody parent,
+            PhysicsVector3d velocity, PhysicsVector3d acceleration,
+            Color color, GalaxyShape shape) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void addManmadeBody(ManmadeBody body) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void addManmadeBody(User owner, CelestialBody parent,
+            PhysicsVector3d velocity, PhysicsVector3d acceleration, Color color) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void addPlanetarySystem(PlanetarySystem system) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void addPlanetarySystem(User owner, CelestialBody parent,
+            PhysicsVector3d velocity, PhysicsVector3d acceleration,
+            Color color, Star center) {
+        // TODO Auto-generated method stub
+        
+    }
 }

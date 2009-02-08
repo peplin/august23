@@ -1,5 +1,16 @@
 package twoverse;
 
+import java.awt.Color;
+
+import twoverse.object.CelestialBody;
+import twoverse.object.Galaxy;
+import twoverse.object.ManmadeBody;
+import twoverse.object.PlanetarySystem;
+import twoverse.object.Star;
+import twoverse.util.GalaxyShape;
+import twoverse.util.PhysicsVector3d;
+import twoverse.util.User;
+
 public interface TwoversePublicApi {
     public boolean login(String username, String password);
 

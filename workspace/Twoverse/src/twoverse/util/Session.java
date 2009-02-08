@@ -1,10 +1,6 @@
 package twoverse.util;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.Time;
-import java.util.Properties;
+import java.sql.Timestamp;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
@@ -26,11 +22,34 @@ class BadPasswordException extends Exception {
 }
 
 public class Session {
-    public Session(String username, Time loginTime) {
+    public Session(String username, Timestamp loginTime) {
 
     }
 
+    public void setUser(User user) {
+        mUser = user;
+    }
+    public User getUser() {
+        return mUser;
+    }
+
+    public void setId(int sessionId) {
+        mId = sessionId;
+    }
+
+    public int getId() {
+        return mId;
+    }
+
+    public void setLastRefresh(Timestamp lastRefresh) {
+        mLastRefresh = lastRefresh;
+    }
+
+    public Timestamp getLastRefresh() {
+        return mLastRefresh;
+    }
+
     private User mUser;
-    private int mSessionId;
-    private Time mLastRefresh;
+    private int mId;
+    private Timestamp mLastRefresh;
 }

@@ -5,10 +5,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
 
 import nu.xom.Document;
 import nu.xom.Element;
-import twoverse.util.Database;
+import twoverse.Database;
+import twoverse.object.Galaxy;
+import twoverse.object.ManmadeBody;
+import twoverse.object.PlanetarySystem;
+import twoverse.util.User;
 
 public class ObjectManagerServer extends ObjectManager {
 
@@ -38,6 +43,17 @@ public class ObjectManagerServer extends ObjectManager {
         } catch (IOException ex) {
             System.err.println(ex);
         }
+    }
+    
+    public void initialize(HashMap<Integer, User> users) {
+        // how to find parent object? maybe run obj.linkParent(map[id]) after
+        // coming back from parseCelestialBodies
+        
+        mGalaxies.putAll(mDatabase.getGalaxies(users));
+        
+        mPlanetarySystems.putAll(mDatabase.getPlanetarySystems(users));
+        mManmadeBodies.putAll(mDatabase.getManmadeBodies(users));
+
     }
 
 }

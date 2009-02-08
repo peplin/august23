@@ -1,11 +1,12 @@
 package twoverse.object;
 
-import java.awt.Color;
 import java.io.Serializable;
 import java.sql.Time;
+import java.sql.Timestamp;
 
 import twoverse.util.GalaxyShape;
 import twoverse.util.PhysicsVector3d;
+import twoverse.util.Point;
 import twoverse.util.User;
 
 public class Galaxy extends CelestialBody implements Serializable {
@@ -14,21 +15,21 @@ public class Galaxy extends CelestialBody implements Serializable {
 	 */
     private static final long serialVersionUID = 4163663398347532933L;
 
-    // TODO point class
-    public Galaxy(int id, User owner, Timestamp birthTime, Time deathTime,
-            CelestialBody parent, Point center, PhysicsVector3d velocity,
-            PhysicsVector3d acceleration, Color color, GalaxyShape shape,
+    public Galaxy(int id, User owner, Timestamp birthTime, Timestamp deathTime,
+            int parentId, Point position, PhysicsVector3d velocity,
+            PhysicsVector3d acceleration, GalaxyShape shape,
             double mass, double density) {
-        super(id, owner, birthTime, deathTime, parent, velocity, acceleration,
-                color);
+        super(id, owner, birthTime, deathTime, parentId, position, velocity,
+                acceleration);
     }
 
-    public Galaxy(int id, User owner, Timestamp birthTime,
-            CelestialBody parent, Point center, PhysicsVector3d velocity,
-            PhysicsVector3d acceleration, Color color, GalaxyShape shape,
-            double mass, double density) {
-        super(id, owner, birthTime, parent, velocity, acceleration,
-                color);
+    public Galaxy(CelestialBody body, GalaxyShape shape, double mass,
+            double density) {
+        super(body);
+        setShape(shape);
+        setMass(mass);
+        setDensity(density);
+
     }
 
     public void setShape(GalaxyShape shape) {
