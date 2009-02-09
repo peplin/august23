@@ -2,6 +2,7 @@ package twoverse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import twoverse.Database;
 import twoverse.util.User;
@@ -10,19 +11,20 @@ import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
 
+@SuppressWarnings("serial")
 class UnhandledCelestialBodyException extends Exception {
-    public UnhandledCelestialBodyException() {
-
+    public UnhandledCelestialBodyException(String msg) {
+        super(msg);
     }
 }
 
 public abstract class ObjectManager extends Thread {
+    protected static Logger sLogger = Logger.getLogger(ObjectManager.class
+            .getName());
 
     public ObjectManager(Database database) {
-        // TODO Auto-generated constructor stub
+        mDatabase = database;
     }
-
-    public abstract void run();
 
     public ArrayList<CelestialBody> getAllBodies() {
         ArrayList<CelestialBody> allBodies = new ArrayList<CelestialBody>();
@@ -44,6 +46,19 @@ public abstract class ObjectManager extends Thread {
         return new ArrayList<ManmadeBody>(mManmadeBodies.values());
     }
 
+    public CelestialBody getCelestialBody(int objectId)
+            throws UnhandledCelestialBodyException {
+        if (mGalaxies.containsKey(objectId)) {
+            return mGalaxies.get(objectId);
+        } else if (mPlanetarySystems.containsKey(objectId)) {
+            return mPlanetarySystems.get(objectId);
+        } else if (mManmadeBodies.containsKey(objectId)) {
+            return mManmadeBodies.get(objectId);
+        } else {
+            throw new UnhandledCelestialBodyException("No such object ID");
+        }
+    }
+
     public void getOwnedBodies(User user) {
 
     }
@@ -59,32 +74,45 @@ public abstract class ObjectManager extends Thread {
     public ManmadeBody getManmadeBody(int id) {
         return mManmadeBodies.get(id);
     }
+    
+    public synchronized int add(Galaxy galaxy) {
+        mGalaxies.put(galaxy.getId(), galaxy);
+        return 0;
+    }
+
+    public synchronized int add(PlanetarySystem system) {
+        mPlanetarySystems.put(system.getId(), system);
+        return 0;
+    }
+
+    public synchronized int add(ManmadeBody manmadeBody) {
+        mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
+        return 0;
+    }
 
     /**
-     * If body exists, replaces with updatedBody. If not, inserts it in the
-     * ObjectManager.
      * 
      * So, if this is a new object coming in over an XML feed, i need to match
      * it with its ID. Okay.
      * 
-     * TODO How do I make sure this doesn't replace some metadata update that's
-     * already happened?
+     * TODO This overwrites - is that okay? No...need ID for objects sent from
+     * client, so need to insert into database first.
      */
-    public void update(Galaxy newGalaxy) {
-        mGalaxies.put(newGalaxy.getId(), newGalaxy);
+    public synchronized void update(Galaxy galaxy) {
+        mGalaxies.put(galaxy.getId(), galaxy);
     }
 
-    public void update(PlanetarySystem newSystem) {
-        mPlanetarySystems.put(newSystem.getId(), newSystem);
+    public synchronized void update(PlanetarySystem system) {
+        mPlanetarySystems.put(system.getId(), system);
     }
 
-    public void update(ManmadeBody newManmadeBody) {
-        mManmadeBodies.put(newManmadeBody.getId(), newManmadeBody);
+    public synchronized void update(ManmadeBody manmadeBody) {
+        mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
     }
 
     HashMap<Integer, Galaxy> mGalaxies;
     HashMap<Integer, PlanetarySystem> mPlanetarySystems;
     HashMap<Integer, ManmadeBody> mManmadeBodies;
-    
+
     Database mDatabase;
 }

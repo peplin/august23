@@ -1,7 +1,6 @@
 package twoverse.object;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 import twoverse.util.GalaxyShape;
@@ -15,11 +14,11 @@ public class Galaxy extends CelestialBody implements Serializable {
 	 */
     private static final long serialVersionUID = 4163663398347532933L;
 
-    public Galaxy(int id, User owner, Timestamp birthTime, Timestamp deathTime,
+    public Galaxy(int id, User owner, String name, Timestamp birthTime, Timestamp deathTime,
             int parentId, Point position, PhysicsVector3d velocity,
             PhysicsVector3d acceleration, GalaxyShape shape,
             double mass, double density) {
-        super(id, owner, birthTime, deathTime, parentId, position, velocity,
+        super(id, owner, name, birthTime, deathTime, parentId, position, velocity,
                 acceleration);
     }
 

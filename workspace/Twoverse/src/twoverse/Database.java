@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
@@ -19,6 +21,7 @@ import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 import twoverse.util.User;
 
+@SuppressWarnings("serial")
 class InvalidUserException extends Exception {
     public InvalidUserException(String e) {
         super(e);
@@ -27,6 +30,34 @@ class InvalidUserException extends Exception {
 }
 
 public class Database {
+    private static final String DB_CLASS_NAME = "com.mysql.jdbc.Driver";
+    private Connection mConnection = null;
+    private Properties mConfigFile;
+    private PreparedStatement mSelectUserStatement;
+    private PreparedStatement mAddUserStatement;
+    private PreparedStatement mUpdateUserLastLoginStatement;
+    private PreparedStatement mUpdateUserPreferenceStatement;
+    private PreparedStatement mDeleteUserStatement; // cascade update
+    private PreparedStatement mSelectAllUsersStatement;
+    private PreparedStatement mAddParentObjectStatement;
+    private PreparedStatement mAddGalaxyStatement;
+    private PreparedStatement mAddPlanetarySystemStatement;
+    private PreparedStatement mAddManmadeBodyStatement;
+    // private PreparedStatement mAddPhenomenonStatement;
+    private PreparedStatement mGetGalaxiesStatement;
+    private PreparedStatement mGetPlanetarySystemsStatement;
+    private PreparedStatement mGetManmadeBodiesStatement;
+    // private PreparedStatement mGetPhenomenonStatement;
+    private PreparedStatement mUpdateSimDataStatement;
+    private PreparedStatement mUpdateGalaxyStatement;
+    private PreparedStatement mUpdatePlanetarySystemStatement;
+    private PreparedStatement mUpdatePhenomenonStatement;
+    private PreparedStatement mGetColorsStatement;
+    private static Logger sLogger = Logger.getLogger(Database.class.getName());
+
+    // private PreparedStatement mGetObjectParentStatement;
+    // private PreparedStatement mGetObjectChildrenStatement;
+
     public Database() throws DatabaseException {
         try {
             // Load properties file
@@ -36,10 +67,12 @@ public class Database {
 
             Class.forName(DB_CLASS_NAME);
         } catch (IOException e) {
-            throw new DatabaseException("Unable to load config file");
+            sLogger.log(Level.SEVERE, e.getMessage(), e);
+            throw new DatabaseException("Unable to load config file: "
+                    + e.getMessage());
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.SEVERE, e.getMessage(), e);
+            throw new DatabaseException("Unable to load JDBC class driver");
         }
 
         try {
@@ -49,11 +82,21 @@ public class Database {
                     .getProperty("DB_PASSWORD"));
             mConnection.setAutoCommit(true);
         } catch (Exception e) {
+            sLogger.log(Level.SEVERE, "Connection to database failed", e);
             throw new DatabaseException("Connection to database failed: "
                     + e.getMessage());
         }
 
         prepareStatements();
+    }
+
+    public void finalize() {
+        try {
+            closeConnection();
+        } catch (SQLException e) {
+            sLogger.log(Level.SEVERE,
+                    "Failed while closing database connection", e);
+        }
     }
 
     private void prepareStatements() throws DatabaseException {
@@ -131,13 +174,8 @@ public class Database {
             mConnection.close();
     }
 
-    private void unexpectedError(String message, Throwable e) {
-        System.err.println("***ERROR: " + message);
-        e.printStackTrace();
-    }
-
-    public HashMap<Integer, User> getUsers() throws InvalidUserException {
-        HashMap<Integer, User> users = new HashMap<Integer, User>();
+    public HashMap<String, User> getUsers() {
+        HashMap<String, User> users = new HashMap<String, User>();
         try {
             ResultSet resultSet = mSelectAllUsersStatement.executeQuery();
             while (resultSet.next()) {
@@ -147,40 +185,38 @@ public class Database {
                                 .getString("email"),
                         resultSet.getString("sms"), resultSet.getInt("points"));
 
-                users.put(user.getId(), user);
+                users.put(user.getUsername(), user);
             }
             resultSet.close();
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, "Select users query failed", e);
         }
         return users;
     }
 
-    public void addUser(User user) {
+    public int addUser(User user) {
         try {
             mAddUserStatement.setString(1, user.getUsername());
             mAddUserStatement.setString(2, user.getHashedPassword());
             mAddUserStatement.setString(3, user.getEmail());
             mAddUserStatement.setString(4, user.getPhone());
             assert (mAddUserStatement.executeUpdate() == 1);
+            // TODO grab id given to inserted row - can i use
+            // statement.executeQuery()?
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, "Add user query failed for user: "
+                    + user, e);
         }
+        return user.getId();
 
     }
 
-    // TODO more graceful error handlings...what happens on update of bad
-    // username - I guess that shouldn't happen, else it's a problem in my
-    // server, so maybe assert is okay
     public void updateLoginTime(User user) {
         try {
             mUpdateUserLastLoginStatement.setString(1, user.getUsername());
             assert (mAddUserStatement.executeUpdate() == 1);
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, "Add users query failed", e);
         }
     }
 
@@ -189,8 +225,8 @@ public class Database {
             mDeleteUserStatement.setString(1, user.getUsername());
             assert (mAddUserStatement.executeUpdate() == 1);
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, "Delete user query failed for user: "
+                    + user, e);
         }
     }
 
@@ -199,11 +235,11 @@ public class Database {
         ArrayList<CelestialBody> bodies = new ArrayList<CelestialBody>();
         try {
             while (resultSet.next()) {
-                // TODO need to look up User object
                 CelestialBody body;
 
                 body = new CelestialBody(resultSet.getInt("object.id"), users
                         .get(resultSet.getInt("object.owner")), resultSet
+                        .getString("object.name"), resultSet
                         .getTimestamp("birth"),
                         resultSet.getTimestamp("death"), resultSet
                                 .getInt("parent"), new Point(resultSet
@@ -218,21 +254,13 @@ public class Database {
                                 .getDouble("accel_vector_y"), resultSet
                                 .getDouble("accel_vector_z"), resultSet
                                 .getDouble("accel_magnitude")));
-
-                // TODO rather than create one for each, why not
-                // share? could be very specific
-                // maybe drop color/shape for now
-                /*
-                 * new Color(resultSet.getInt("colors.id"), resultSet
-                 * .getString("colors.name"), resultSet .getInt("colors.r"),
-                 * resultSet.getInt("colors.g"), resultSet.getInt("colors.b")));
-                 */
                 bodies.add(body);
             }
             resultSet.close();
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING,
+                    "Unable to parse celestial bodies from set: " + resultSet,
+                    e);
         }
 
         return (CelestialBody[]) bodies.toArray();
@@ -255,8 +283,7 @@ public class Database {
             }
             resultSet.close();
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, "Unable to get galaxies", e);
         }
         return galaxies;
     }
@@ -270,15 +297,13 @@ public class Database {
             resultSet.first();
             for (CelestialBody body : bodies) {
                 resultSet.next();
-                PlanetarySystem system = new PlanetarySystem(body,
-                        resultSet.getInt("center"), 
-                        resultSet.getDouble("mass"));
+                PlanetarySystem system = new PlanetarySystem(body, resultSet
+                        .getInt("center"), resultSet.getDouble("mass"));
                 systems.put(system.getId(), system);
             }
             resultSet.close();
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, "Unable to get planetary systems", e);
         }
         return systems;
     }
@@ -297,14 +322,14 @@ public class Database {
             }
             resultSet.close();
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, "Unable to get manmade bodies", e);
+            ;
         }
         return manmadeBodies;
     }
 
     public void insertGalaxies(Galaxy[] galaxies) {
-        //TODO
+        // TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -314,14 +339,16 @@ public class Database {
                 mConnection.rollback();
                 mConnection.setAutoCommit(true);
             } catch (SQLException e2) {
-                unexpectedError("Could not roll back", e);
+                sLogger
+                        .log(Level.WARNING, "Could not roll back transaction",
+                                e);
             }
-            unexpectedError("Could not add galaxies", e);
+            sLogger.log(Level.WARNING, "Could not add galaxies", e);
         }
     }
 
     public void insertPlanetarySystems(PlanetarySystem[] systems) {
-        //TODO
+        // TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -331,14 +358,16 @@ public class Database {
                 mConnection.rollback();
                 mConnection.setAutoCommit(true);
             } catch (SQLException e2) {
-                unexpectedError("Could not roll back", e);
+                sLogger
+                        .log(Level.WARNING, "Could not roll back transaction",
+                                e);
             }
-            unexpectedError("Could not add planetary systems", e);
+            sLogger.log(Level.WARNING, "Could not add planetary systems", e);
         }
     }
 
     public void insertManmadeBodies(ManmadeBody[] bodies) {
-        //TODO
+        // TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -348,14 +377,16 @@ public class Database {
                 mConnection.rollback();
                 mConnection.setAutoCommit(true);
             } catch (SQLException e2) {
-                unexpectedError("Could not roll back", e);
+                sLogger
+                        .log(Level.WARNING, "Could not roll back transaction",
+                                e);
             }
-            unexpectedError("Could not add bodies", e);
+            sLogger.log(Level.WARNING, "Could not add manmade bodies", e);
         }
     }
 
     public void updateSimulationData(Object[] objects) {
-        //TODO
+        // TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -365,14 +396,16 @@ public class Database {
                 mConnection.rollback();
                 mConnection.setAutoCommit(true);
             } catch (SQLException e2) {
-                unexpectedError("Could not roll back", e);
+                sLogger
+                        .log(Level.WARNING, "Could not roll back transaction",
+                                e);
             }
-            unexpectedError("Could not update simulation data", e);
+            sLogger.log(Level.WARNING, "Could not update simulation data", e);
         }
     }
 
     public void updateGalaxies(Galaxy[] galaxies) {
-        //TODO
+        // TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -382,14 +415,16 @@ public class Database {
                 mConnection.rollback();
                 mConnection.setAutoCommit(true);
             } catch (SQLException e2) {
-                unexpectedError("Could not roll back", e);
+                sLogger
+                        .log(Level.WARNING, "Could not roll back transaction",
+                                e);
             }
-            unexpectedError("Could not update galaxies", e);
+            sLogger.log(Level.WARNING, "Could not update galaxies", e);
         }
     }
 
     public void updatePlanetarySystems(PlanetarySystem[] systems) {
-        //TODO
+        // TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -399,14 +434,16 @@ public class Database {
                 mConnection.rollback();
                 mConnection.setAutoCommit(true);
             } catch (SQLException e2) {
-                unexpectedError("Could not roll back", e);
+                sLogger
+                        .log(Level.WARNING, "Could not roll back transaction",
+                                e);
             }
-            unexpectedError("Could not update planetary systems", e);
+            sLogger.log(Level.WARNING, "Could not update planetary systems", e);
         }
     }
 
     public void updateManmadeBodies(ManmadeBody[] bodes) {
-        //TODO
+        // TODO
         try {
             mConnection.setAutoCommit(false);
             mConnection.commit();
@@ -416,36 +453,13 @@ public class Database {
                 mConnection.rollback();
                 mConnection.setAutoCommit(true);
             } catch (SQLException e2) {
-                unexpectedError("Could not roll back", e);
+                sLogger
+                        .log(Level.WARNING, "Could not roll back transaction",
+                                e);
             }
-            unexpectedError("Could not update bodies", e);
+            sLogger.log(Level.WARNING, "Could not update manmade bodies", e);
+            ;
         }
     }
 
-    private static final String DB_CLASS_NAME = "com.mysql.jdbc.Driver";
-    private Connection mConnection = null;
-    private Properties mConfigFile;
-    private PreparedStatement mSelectUserStatement;
-    private PreparedStatement mAddUserStatement;
-    private PreparedStatement mUpdateUserLastLoginStatement;
-    private PreparedStatement mUpdateUserPreferenceStatement;
-    private PreparedStatement mDeleteUserStatement; // cascade update
-    private PreparedStatement mSelectAllUsersStatement;
-    private PreparedStatement mAddParentObjectStatement;
-    private PreparedStatement mAddGalaxyStatement;
-    private PreparedStatement mAddPlanetarySystemStatement;
-    private PreparedStatement mAddManmadeBodyStatement;
-    // private PreparedStatement mAddPhenomenonStatement;
-    private PreparedStatement mGetGalaxiesStatement;
-    private PreparedStatement mGetPlanetarySystemsStatement;
-    private PreparedStatement mGetManmadeBodiesStatement;
-    // private PreparedStatement mGetPhenomenonStatement;
-    private PreparedStatement mUpdateSimDataStatement;
-    private PreparedStatement mUpdateGalaxyStatement;
-    private PreparedStatement mUpdatePlanetarySystemStatement;
-    private PreparedStatement mUpdatePhenomenonStatement;
-    private PreparedStatement mGetColorsStatement;
-
-    // private PreparedStatement mGetObjectParentStatement;
-    // private PreparedStatement mGetObjectChildrenStatement;
 }

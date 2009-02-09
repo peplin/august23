@@ -7,26 +7,28 @@ import twoverse.util.Point;
 import twoverse.util.User;
 
 public class CelestialBody {
-    public CelestialBody(int id, User owner, Timestamp birthTime,
+    public CelestialBody(int id, User owner, String name, Timestamp birthTime,
             Timestamp deathTime, int parentId, Point position,
             PhysicsVector3d velocity, PhysicsVector3d acceleration) {
-        initialize(id, owner, birthTime, deathTime, parentId, position,
+        initialize(id, owner, name, birthTime, deathTime, parentId, position,
                 velocity, acceleration);
         setDeathTime(deathTime);
 
     }
 
     public CelestialBody(CelestialBody body) {
-        initialize(body.getId(), body.getOwner(), body.getBirthTime(), body
-                .getDeathTime(), body.getParentId(), body.getPosition(), body
-                .getVelocity(), body.getAcceleration());
+        initialize(body.getId(), body.getOwner(), body.getName(), body
+                .getBirthTime(), body.getDeathTime(), body.getParentId(), body
+                .getPosition(), body.getVelocity(), body.getAcceleration());
     }
 
-    private void initialize(int id, User owner, Timestamp birthTime,
-            Timestamp deathTime, int parentId, Point position,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration) {
+    private void initialize(int id, User owner, String name,
+            Timestamp birthTime, Timestamp deathTime, int parentId,
+            Point position, PhysicsVector3d velocity,
+            PhysicsVector3d acceleration) {
         setId(id);
         setOwner(owner);
+        setName(name);
         setBirthTime(birthTime);
         setDeathTime(deathTime);
         setParentId(parentId);
@@ -60,7 +62,7 @@ public class CelestialBody {
         mOwner = owner;
     }
 
-    private void setId(int id) {
+    public void setId(int id) {
         mId = id;
     }
 
@@ -108,6 +110,14 @@ public class CelestialBody {
         return mPosition;
     }
 
+    public void setName(String name) {
+        mName = name;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
     private int mId;
     private User mOwner;
     private Timestamp mBirthTime;
@@ -117,5 +127,6 @@ public class CelestialBody {
     private PhysicsVector3d mAcceleration;
     // private Color mColor;
     private Point mPosition;
+    private String mName;
 
 }

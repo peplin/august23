@@ -1,26 +1,30 @@
 package twoverse;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
-import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
-import twoverse.object.Star;
-import twoverse.util.GalaxyShape;
-import twoverse.util.PhysicsVector3d;
 import twoverse.util.Session;
-import twoverse.util.User;
 
+//TODO need to add user/password to all request configs
 public class RequestHandlerClient implements TwoversePublicApi {
+    private ObjectManagerClient mObjectManager;
+    private Session mSession;
+    private Properties mConfigFile;
+    private XmlRpcClient mXmlRpcClient;
+    private static Logger sLogger = Logger.getLogger(RequestHandlerClient.class
+            .getName());
+
     public RequestHandlerClient(ObjectManager objectManager,
             SessionManager sessionManager) {
         try {
@@ -37,8 +41,9 @@ public class RequestHandlerClient implements TwoversePublicApi {
                     .setServerURL(new URL(mConfigFile
                             .getProperty("XMLRPCSERVER")));
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING,
+                    "Unable to parse URL for XML-RPC server: "
+                            + mConfigFile.getProperty("XMLRPCSERVER"), e);
         }
 
         config.setEnabledForExtensions(true);
@@ -48,107 +53,45 @@ public class RequestHandlerClient implements TwoversePublicApi {
         mXmlRpcClient.setConfig(config);
     }
 
-    public boolean login(String username, String plaintextPassword) {
-        // if good, set login time
-        Object[] parameters = new Object[] { username, plaintextPassword };
-        try {
-            mXmlRpcClient.execute("SessionManager.login", parameters);
-        } catch (XmlRpcException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        // TODO check return value
-        return true;
-    }
-
-    public boolean logout(String username, int session) {
+    public void logout(int session) {
         // logout
         Object[] parameters = new Object[] { mSession.getUser().getUsername(),
                 mSession.getId() };
         try {
             mXmlRpcClient.execute("SessionManager.logout", parameters);
         } catch (XmlRpcException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        //TODO check return value
-        return false;
-    }
-
-    public void refreshUser(String username, int session) {
-        Object[] parameters = new Object[] { mSession.getUser().getUsername(),
-                mSession.getId() };
-        try {
-            mXmlRpcClient.execute("SessionManager.refresh", parameters);
-        } catch (XmlRpcException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, "Unable to execute RPC logout", e);
         }
     }
 
-    // TODO double all of these, one accepts serialized object
-    public void addGalaxy() {
+    public void changeName(int objectId, String newName) {
 
-    }
-
-    public void addPlanetarySystem() {
-
-    }
-
-    public void addManmadeBody() {
-
-    }
-
-    public void changeName(int objectId) {
-
-    }
-
-    private boolean isAuthenticated(String username, String password) {
-        return false;
-    }
-
-    private ObjectManagerClient mObjectManager;
-    private Session mSession;
-    private Properties mConfigFile;
-    private XmlRpcClient mXmlRpcClient;
-    @Override
-    public void addGalaxy(Galaxy galaxy) {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override
-    public void addGalaxy(User owner, CelestialBody parent,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            Color color, GalaxyShape shape) {
+    public int addGalaxy(Galaxy galaxy) {
         // TODO Auto-generated method stub
-        
+        return galaxy.getId();
     }
 
     @Override
-    public void addManmadeBody(ManmadeBody body) {
+    public int addManmadeBody(ManmadeBody body) {
         // TODO Auto-generated method stub
-        
+        return body.getId();
     }
 
     @Override
-    public void addManmadeBody(User owner, CelestialBody parent,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration, Color color) {
+    public int addPlanetarySystem(PlanetarySystem system) {
         // TODO Auto-generated method stub
-        
+        return system.getId();
+
     }
 
     @Override
-    public void addPlanetarySystem(PlanetarySystem system) {
+    public int createAccount(String username, String hashedPassword,
+            String email, String phone) {
         // TODO Auto-generated method stub
-        
+        return 0;
     }
 
-    @Override
-    public void addPlanetarySystem(User owner, CelestialBody parent,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            Color color, Star center) {
-        // TODO Auto-generated method stub
-        
-    }
 }

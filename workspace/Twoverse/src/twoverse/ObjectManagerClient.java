@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
@@ -13,6 +14,7 @@ import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
+import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
@@ -22,7 +24,6 @@ public class ObjectManagerClient extends ObjectManager {
 
     public ObjectManagerClient(Database database) {
         super(database);
-        // TODO Auto-generated constructor stub
         mParser = new Builder();
 
         try {
@@ -39,8 +40,7 @@ public class ObjectManagerClient extends ObjectManager {
                     .setServerURL(new URL(mConfigFile
                             .getProperty("XMLRPCSERVER")));
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, e.getMessage(), e);
         }
 
         config.setEnabledForExtensions(true);
@@ -50,52 +50,51 @@ public class ObjectManagerClient extends ObjectManager {
         mXmlRpcClient.setConfig(config);
     }
 
-    public void run() {
-
-    }
-
-    // TODO need to confirm they don't exist, since we're not going to let the
-    // client modify anything for the time being
-    // TODO will overloaded method get picked up with serialized object?
-    // TODO any way stop the duplication?
-
-    private void updateXmlRpc(Object[] parameters) {
+    /**
+     * These objects all have a -1 or null ID - the new iD is set by the
+     * database, and returned by the function call. We save it to the object
+     * itself, and return nothing.
+     * 
+     * @param parameters
+     */
+    private void addXmlRpc(CelestialBody body) {
         try {
-            mXmlRpcClient.execute("ObjectManager.update", parameters);
+            Object[] parameters = new Object[] { body };
+            int newId = (Integer) mXmlRpcClient.execute("ObjectManager.add",
+                    parameters);
+            body.setId(newId);
         } catch (XmlRpcException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sLogger.log(Level.WARNING, e.getMessage(), e);
         }
     }
 
-    public void update(Galaxy newGalaxy) {
-        mGalaxies.put(newGalaxy.getId(), newGalaxy);
-        Object[] parameters = new Object[] { newGalaxy };
-        updateXmlRpc(parameters);
+    public int add(Galaxy newGalaxy) {
+        super.add(newGalaxy);
+        addXmlRpc(newGalaxy);
+        return 0;
     }
 
-    public void update(PlanetarySystem newSystem) {
-        mPlanetarySystems.put(newSystem.getId(), newSystem);
-        Object[] parameters = new Object[] { newSystem };
-        updateXmlRpc(parameters);
+    public int add(PlanetarySystem newSystem) {
+        super.add(newSystem);
+        addXmlRpc(newSystem);
+        return 0;
     }
 
-    public void update(ManmadeBody newManmadeBody) {
-        mManmadeBodies.put(newManmadeBody.getId(), newManmadeBody);
-        Object[] parameters = new Object[] { newManmadeBody };
-        updateXmlRpc(parameters);
+    public int add(ManmadeBody newManmadeBody) {
+        super.add(newManmadeBody);
+        addXmlRpc(newManmadeBody);
+        return 0;
     }
 
-    // TODO FIX ALL STRING COMPARES!!!!
     public void pullFeed() {
         try {
             Document doc = mParser.build(mConfigFile.getProperty("FEED"));
             Elements children = doc.getRootElement().getChildElements();
             // TODO design feed, figure out how to parse it
-        } catch (ParsingException ex) {
-            System.err.println("Feed is malformed");
-        } catch (IOException ex) {
-            System.err.println("Unable to connect to feed");
+        } catch (ParsingException e) {
+            sLogger.log(Level.WARNING, "Feed may be malformed", e);
+        } catch (IOException e) {
+            sLogger.log(Level.WARNING, "Unable to connect to feed", e);
         }
     }
 

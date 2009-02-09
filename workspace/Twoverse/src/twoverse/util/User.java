@@ -12,6 +12,15 @@ public class User {
         setPoints(points);
         setHashedPassword(hashedPassword);
     }
+    
+    public User(String username, String hashedPassword, String email,
+            String phone, int points) {
+        setUsername(username);
+        setEmail(email);
+        setPhone(phone);
+        setPoints(points);
+        setHashedPassword(hashedPassword);
+    }
 
     public void setUsername(String username) {
         mUsername = username;
@@ -79,6 +88,10 @@ public class User {
 
     public int getId() {
         return mId;
+    }
+    
+    public boolean equals(User other) { 
+        return mUsername.equals(other.mUsername);
     }
 
     private String mUsername;

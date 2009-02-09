@@ -6,24 +6,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import nu.xom.Document;
 import nu.xom.Element;
 import twoverse.Database;
-import twoverse.object.Galaxy;
-import twoverse.object.ManmadeBody;
-import twoverse.object.PlanetarySystem;
 import twoverse.util.User;
 
 public class ObjectManagerServer extends ObjectManager {
 
     public ObjectManagerServer(Database database) {
         super(database);
-        // TODO Auto-generated constructor stub
-
     }
 
     public void run() {
+        //TODO continuously update feed
 
     }
 
@@ -40,17 +37,16 @@ public class ObjectManagerServer extends ObjectManager {
             outStream.write(doc.toXML());
             outStream.flush();
             outStream.close();
-        } catch (IOException ex) {
-            System.err.println(ex);
+        } catch (IOException e) {
+            sLogger.log(Level.WARNING, e.getMessage(), e);
         }
     }
-    
+
     public void initialize(HashMap<Integer, User> users) {
         // how to find parent object? maybe run obj.linkParent(map[id]) after
         // coming back from parseCelestialBodies
-        
+
         mGalaxies.putAll(mDatabase.getGalaxies(users));
-        
         mPlanetarySystems.putAll(mDatabase.getPlanetarySystems(users));
         mManmadeBodies.putAll(mDatabase.getManmadeBodies(users));
 

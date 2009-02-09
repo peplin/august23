@@ -1,6 +1,7 @@
 package twoverse;
 
-import java.awt.Color;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.XmlRpcRequest;
@@ -10,66 +11,66 @@ import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
-import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
-import twoverse.object.Star;
-import twoverse.util.GalaxyShape;
-import twoverse.util.PhysicsVector3d;
-import twoverse.util.User;
 
+@SuppressWarnings("serial")
 public class RequestHandlerServer extends XmlRpcServlet implements
         TwoversePublicApi {
-    private ObjectManagerServer objectManager;
-    private SessionManager sessionManager;
-    
-    public RequestHandlerServer(ObjectManager objectManager,
+    private ObjectManagerServer mObjectManager;
+    private SessionManager mSessionManager;
+    private static Logger sLogger = Logger.getLogger(RequestHandlerServer.class
+            .getName());
+
+    public RequestHandlerServer(ObjectManagerServer objectManager,
             SessionManager sessionManager) {
-
+        mObjectManager = objectManager;
+        mSessionManager = sessionManager;
     }
 
-    public boolean login(String username, String password) {
-        return false;
+    @Override
+    public void logout(int session) {
+        mSessionManager.logout(session);
     }
 
-    public boolean logout(String username, int session) {
-        return false;
+    @Override
+    public int createAccount(String username, String hashedPassword,
+            String email, String phone) {
+        return mSessionManager.createAccount(username, hashedPassword, email,
+                phone, 0);
     }
 
-    public void refreshUser(String username, int session) {
-
+    @Override
+    public void changeName(int objectId, String newName) {
+        try {
+            mObjectManager.getCelestialBody(objectId).setName(newName);
+        } catch (UnhandledCelestialBodyException e) {
+            sLogger.log(Level.WARNING, e.getMessage(), e);
+        }
     }
 
-    // TODO double all of these, one accepts serialized object
-    public void addGalaxy() {
-
+    @Override
+    public int addGalaxy(Galaxy galaxy) {
+        return mObjectManager.add(galaxy);
     }
 
-    public void addPlanetarySystem() {
-
+    @Override
+    public int addManmadeBody(ManmadeBody body) {
+        return mObjectManager.add(body);
     }
 
-    public void addManmadeBody() {
-
+    @Override
+    public int addPlanetarySystem(PlanetarySystem system) {
+        return mObjectManager.add(system);
     }
 
-    public void changeName(int objectId) {
-
-    }
-
-    public GalaxyShape[] getGalaxyShapes() {
-        return null;
-
-    }
-
-    public Color[] getColors() {
-        return null;
-
-    }
-
-    private boolean isAuthenticated(String username, String password) {
-        return false;
+    /**
+     * Check that a user exists, confirm the password is correct. If so, create
+     * a new session and return true to the client.
+     */
+    private boolean isAuthenticated(String username, String plaintextPassword) {
+        return mSessionManager.login(username, plaintextPassword);
     }
 
     protected XmlRpcHandlerMapping newXmlRpcHandlerMapping()
@@ -88,45 +89,4 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         return mapping;
     }
 
-
-    @Override
-    public void addGalaxy(Galaxy galaxy) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void addGalaxy(User owner, CelestialBody parent,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            Color color, GalaxyShape shape) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void addManmadeBody(ManmadeBody body) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void addManmadeBody(User owner, CelestialBody parent,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration, Color color) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void addPlanetarySystem(PlanetarySystem system) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void addPlanetarySystem(User owner, CelestialBody parent,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            Color color, Star center) {
-        // TODO Auto-generated method stub
-        
-    }
 }

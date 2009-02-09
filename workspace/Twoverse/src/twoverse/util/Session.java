@@ -2,28 +2,30 @@ package twoverse.util;
 
 import java.sql.Timestamp;
 
-import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
-
+@SuppressWarnings("serial")
 class TimedOutException extends Exception {
     TimedOutException(String message) {
     }
 }
 
+@SuppressWarnings("serial")
 class BadUsernameException extends Exception {
     BadUsernameException(String message) {
     }
 }
 
+@SuppressWarnings("serial")
 class BadPasswordException extends Exception {
     BadPasswordException(String message) {
     }
 }
 
 public class Session {
-    public Session(String username, Timestamp loginTime) {
-
+    public Session(User user) {
+        java.util.Date now = new java.util.Date();
+        mLastRefresh = new Timestamp(now.getTime());
+        
+        mUser = user;
     }
 
     public void setUser(User user) {
@@ -41,8 +43,9 @@ public class Session {
         return mId;
     }
 
-    public void setLastRefresh(Timestamp lastRefresh) {
-        mLastRefresh = lastRefresh;
+    public void refresh() {
+        java.util.Date now = new java.util.Date();
+        mLastRefresh = new Timestamp(now.getTime());
     }
 
     public Timestamp getLastRefresh() {
