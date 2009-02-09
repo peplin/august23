@@ -11,6 +11,7 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
+import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
@@ -25,9 +26,9 @@ public class RequestHandlerClient implements TwoversePublicApi {
     private static Logger sLogger = Logger.getLogger(RequestHandlerClient.class
             .getName());
 
-    public RequestHandlerClient(ObjectManager objectManager,
-            SessionManager sessionManager) {
+    public RequestHandlerClient(ObjectManagerClient objectManager) {
         try {
+            mConfigFile = new Properties();
             mConfigFile.load(this.getClass().getClassLoader()
                     .getResourceAsStream(
                             "twoverse/conf/RequestHandlerClient.properties"));
@@ -68,21 +69,39 @@ public class RequestHandlerClient implements TwoversePublicApi {
 
     }
 
+    /**
+     * These objects all have a -1 or null ID - the new iD is set by the
+     * database, and returned by the function call. We save it to the object
+     * itself, and return nothing.
+     * 
+     * @param parameters
+     */
+    private void addXmlRpc(CelestialBody body) {
+        try {
+            Object[] parameters = new Object[] { body };
+            int newId = (Integer) mXmlRpcClient.execute("RequestHandler.add",
+                    parameters);
+            body.setId(newId);
+        } catch (XmlRpcException e) {
+            sLogger.log(Level.WARNING, e.getMessage(), e);
+        }
+    }
+
     @Override
-    public int addGalaxy(Galaxy galaxy) {
-        // TODO Auto-generated method stub
+    public int add(Galaxy galaxy) {
+        addXmlRpc(galaxy);
         return galaxy.getId();
     }
 
     @Override
-    public int addManmadeBody(ManmadeBody body) {
-        // TODO Auto-generated method stub
+    public int add(ManmadeBody body) {
+        addXmlRpc(body);
         return body.getId();
     }
 
     @Override
-    public int addPlanetarySystem(PlanetarySystem system) {
-        // TODO Auto-generated method stub
+    public int add(PlanetarySystem system) {
+        addXmlRpc(system);
         return system.getId();
 
     }

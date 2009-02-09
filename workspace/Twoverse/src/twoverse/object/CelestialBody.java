@@ -55,6 +55,9 @@ public class CelestialBody {
     }
 
     private void setBirthTime(Timestamp birthTime) {
+        if(birthTime == null) {
+            //TODO get now time here
+        }
         mBirthTime = birthTime;
     }
 

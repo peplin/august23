@@ -51,17 +51,17 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     }
 
     @Override
-    public int addGalaxy(Galaxy galaxy) {
+    public int add(Galaxy galaxy) {
         return mObjectManager.add(galaxy);
     }
 
     @Override
-    public int addManmadeBody(ManmadeBody body) {
+    public int add(ManmadeBody body) {
         return mObjectManager.add(body);
     }
 
     @Override
-    public int addPlanetarySystem(PlanetarySystem system) {
+    public int add(PlanetarySystem system) {
         return mObjectManager.add(system);
     }
 

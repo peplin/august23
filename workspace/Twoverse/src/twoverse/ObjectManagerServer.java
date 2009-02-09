@@ -14,9 +14,11 @@ import twoverse.Database;
 import twoverse.util.User;
 
 public class ObjectManagerServer extends ObjectManager {
+    Database mDatabase;
 
     public ObjectManagerServer(Database database) {
-        super(database);
+        super();
+        mDatabase = database;
     }
 
     public void run() {

@@ -35,21 +35,21 @@ public interface TwoversePublicApi {
      * @param galaxy
      * @return ID for new object
      */
-    public int addGalaxy(Galaxy galaxy);
+    public int add(Galaxy galaxy);
 
     /**
      * 
      * @param system
      * @return ID for new object
      */
-    public int addPlanetarySystem(PlanetarySystem system);
+    public int add(PlanetarySystem system);
 
     /**
      * 
      * @param body
      * @return ID for new object
      */
-    public int addManmadeBody(ManmadeBody body);
+    public int add(ManmadeBody body);
 
     /**
      * Methods for creating via Javascript web interface - can't use Serialized

@@ -19,11 +19,13 @@ class UnhandledCelestialBodyException extends Exception {
 }
 
 public abstract class ObjectManager extends Thread {
+    HashMap<Integer, Galaxy> mGalaxies;
+    HashMap<Integer, PlanetarySystem> mPlanetarySystems;
+    HashMap<Integer, ManmadeBody> mManmadeBodies;
     protected static Logger sLogger = Logger.getLogger(ObjectManager.class
             .getName());
 
-    public ObjectManager(Database database) {
-        mDatabase = database;
+    public ObjectManager() {
     }
 
     public ArrayList<CelestialBody> getAllBodies() {
@@ -110,9 +112,4 @@ public abstract class ObjectManager extends Thread {
         mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
     }
 
-    HashMap<Integer, Galaxy> mGalaxies;
-    HashMap<Integer, PlanetarySystem> mPlanetarySystems;
-    HashMap<Integer, ManmadeBody> mManmadeBodies;
-
-    Database mDatabase;
 }

@@ -14,12 +14,12 @@ public class Galaxy extends CelestialBody implements Serializable {
 	 */
     private static final long serialVersionUID = 4163663398347532933L;
 
-    public Galaxy(int id, User owner, String name, Timestamp birthTime, Timestamp deathTime,
-            int parentId, Point position, PhysicsVector3d velocity,
-            PhysicsVector3d acceleration, GalaxyShape shape,
-            double mass, double density) {
-        super(id, owner, name, birthTime, deathTime, parentId, position, velocity,
-                acceleration);
+    public Galaxy(int id, User owner, String name, Timestamp birthTime,
+            Timestamp deathTime, int parentId, Point position,
+            PhysicsVector3d velocity, PhysicsVector3d acceleration,
+            GalaxyShape shape, double mass, double density) {
+        super(id, owner, name, birthTime, deathTime, parentId, position,
+                velocity, acceleration);
     }
 
     public Galaxy(CelestialBody body, GalaxyShape shape, double mass,
