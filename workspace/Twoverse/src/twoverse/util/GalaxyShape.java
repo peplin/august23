@@ -2,6 +2,9 @@ package twoverse.util;
 
 import java.io.Serializable;
 
+import nu.xom.Attribute;
+import nu.xom.Element;
+
 public class GalaxyShape implements Serializable {
     private static final long serialVersionUID = 6779708232529398026L;
 
@@ -33,6 +36,14 @@ public class GalaxyShape implements Serializable {
 
     public String getTextureFile() {
         return mTextureFile;
+    }
+
+    public Element toXmlElement() {
+        Element root = new Element("galaxy_shape");
+        root.addAttribute(new Attribute("id", String.valueOf(mId)));
+        root.addAttribute(new Attribute("name", mName));
+        root.addAttribute(new Attribute("texture", mTextureFile));
+        return root;
     }
 
     private int mId;

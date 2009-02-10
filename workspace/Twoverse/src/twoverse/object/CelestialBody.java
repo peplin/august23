@@ -2,6 +2,9 @@ package twoverse.object;
 
 import java.sql.Timestamp;
 
+import nu.xom.Attribute;
+import nu.xom.Element;
+
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 import twoverse.util.User;
@@ -119,6 +122,40 @@ public class CelestialBody {
 
     public String getName() {
         return mName;
+    }
+
+    public void appendXmlAttributes(Element element) {
+        element.addAttribute(new Attribute("id", String.valueOf(mId)));
+        element.addAttribute(new Attribute("name", mName));
+        element.addAttribute(
+                new Attribute("ownerId", String.valueOf(mOwner.getId())));
+        element.addAttribute(
+                new Attribute("birth", String.valueOf(mBirthTime.getTime())));
+        element.addAttribute(
+                new Attribute("death", String.valueOf(mDeathTime.getTime())));
+        element.addAttribute(
+                new Attribute("parentId", String.valueOf(mParentId)));
+
+
+        // TODO is this the best way to do this? think about how parsing will 
+        // work, that will point in the right direction
+        Element velocityElement = mVelocity.toXmlElement();
+        velocityElement.addAttribute(new Attribute("name", "velocity"));
+        element.appendChild(velocityElement);
+        
+        Element accelerationElement = mAcceleration.toXmlElement();
+        accelerationElement.addAttribute(new Attribute("name", "acceleration"));
+        element.appendChild(accelerationElement);
+        
+        Element positionElement = mPosition.toXmlElement();
+        positionElement.addAttribute(new Attribute("name", "position"));
+        element.appendChild(positionElement);
+    }
+
+    public Element toXmlElement() {
+        Element root = new Element("celestial_body");
+        appendXmlAttributes(root);
+        return root;
     }
 
     private int mId;

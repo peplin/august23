@@ -3,6 +3,9 @@ package twoverse.object;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import nu.xom.Attribute;
+import nu.xom.Element;
+
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 import twoverse.util.User;
@@ -38,9 +41,15 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
         return mMass;
     }
 
+    public Element toXmlElement() {
+        Element root = new Element("planetary_system");
+        super.appendXmlAttributes(root);
+        root.addAttribute(new Attribute("mass", String.valueOf(mMass)));
+        root.addAttribute(new Attribute("center_id", String.valueOf(mCenterId)));
+        return root;
+    }
+
     private int mCenterId;
-    //TODO pointless to serialize a Star pointer....
-    private Star mCenter;
     private double mMass;
 
 }
