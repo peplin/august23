@@ -22,6 +22,58 @@ public class CelestialBody {
                 .getPosition(), body.getVelocity(), body.getAcceleration());
     }
 
+    //TODO currently, no error checking for missing attributes
+    public CelestialBody(Element root) {
+        assert(root.getLocalName().equals("celestial_body"));
+        Elements positionElements = root.getChildElements("point");
+        Element vectorElements = root.getChildElements("vector");
+
+        Point position;
+        for(int i = 0; i < positionElements.size(); i++) {
+            Element element = pointElements.get(i);
+            if(element.getAtttribute("name").equals("position")) {
+                position = new Point(element.getAttribute("x"),
+                                    element.getAttribute("y"),
+                                    element.getAttribute("z"));
+                break; // only looking for one point at the moment
+            }
+        }
+
+        PhysicsVector3d velocityVector = null;
+        PhysicsVector3d accelerationVector = null;
+        for(int i = 0; i < vectorElements.size() 
+                            && (velocityVector == null 
+                                || accelerationVector == null); i++) {
+            Element element = vectorElements.get(i);
+            Elements directionElements = element.getChildElements("point");
+            assert(direction.size() == 1);
+            Element directionElement = directionElements.get(0);
+            assert(directionElement.getAttribute("name").equals("direction"));
+            Point direction = new Point(directionElement.getAttribute("x"),
+                                    directionElement.getAttribute("y"),
+                                    directionElement.getAttribute("z"));
+            if(element.getAttribute("name").equals("velocity")) {
+                velocityVector = new PhysicsVector3d(direction, 
+                                            element.getAttribute("magnitude"));
+            } else if(element.getAttribute("name").equals("acceleration")) {
+                velocityVector = new PhysicsVector3d(direction, 
+                                            element.getAttribute("magnitude"));
+            } else {
+                throw new UnhandledXmlAttribute();
+            }
+        }
+
+        initialize(root.getAttribute("id"),
+                    root.getAttribute("owner"),
+                    root.getAttribute("name"),
+                    root.getAttribute("birth"),
+                    root.getAttribute("death"),
+                    root.getAttribute("parentId"),
+                    position,
+                    velocityVector,
+                    accelerationVector);
+    }
+
     private void initialize(int id, User owner, String name,
             Timestamp birthTime, Timestamp deathTime, int parentId,
             Point position, PhysicsVector3d velocity,
