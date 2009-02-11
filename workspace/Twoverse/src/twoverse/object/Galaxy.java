@@ -3,15 +3,18 @@ package twoverse.object;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import nu.xom.Attribute;
+import nu.xom.Element;
+
 import twoverse.util.GalaxyShape;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 import twoverse.util.User;
 
 public class Galaxy extends CelestialBody implements Serializable {
-    /**
-	 * 
-	 */
+    private GalaxyShape mShape;
+    private double mMass;
+    private double mDensity;
     private static final long serialVersionUID = 4163663398347532933L;
 
     public Galaxy(int id, User owner, String name, Timestamp birthTime,
@@ -55,7 +58,12 @@ public class Galaxy extends CelestialBody implements Serializable {
         return mDensity;
     }
 
-    private GalaxyShape mShape;
-    private double mMass;
-    private double mDensity;
+    public Element toXmlElement() {
+        Element root = new Element("Galaxy");
+        super.appendXmlAttributes(root);
+        root.addAttribute(new Attribute("mass", String.valueOf(mMass)));
+        root.addAttribute(new Attribute("density", String.valueOf(mDensity)));
+        root.appendChild(mShape.toXmlElement());
+        return root;
+    }
 }
