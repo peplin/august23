@@ -10,8 +10,10 @@ boolean locked = false;
 
 void setup()
 {
-  size(200, 200);
+  size(500, 500);
   smooth();
+
+  frameRate(30);
 
   color baseColor = color(102);
   currentcolor = baseColor;
@@ -20,27 +22,27 @@ void setup()
   color buttoncolor = color(204);
   color highlight = color(153);
   ellipseMode(CENTER);
-  circle1 = new CircleButton(30, 100, 100, buttoncolor, highlight);
+  circle1 = new CircleButton(30, 100, 300, buttoncolor, highlight);
 
   // Define and create circle button
   buttoncolor = color(204);
   highlight = color(153); 
-  circle2 = new CircleButton(130, 110, 24, buttoncolor, highlight);
+  circle2 = new CircleButton(330, 110, 150, buttoncolor, highlight);
 
   // Define and create circle button
   buttoncolor = color(153);
   highlight = color(102); 
-  circle3 = new CircleButton(130, 140, 24, buttoncolor, highlight);
+  circle3 = new CircleButton(330, 240, 150, buttoncolor, highlight);
 
   // Define and create rectangle button
   buttoncolor = color(102);
   highlight = color(51); 
-  rect1 = new RectButton(150, 20, 100, buttoncolor, highlight);
+  rect1 = new RectButton(150, 320, 300, buttoncolor, highlight);
 
   // Define and create rectangle button
   buttoncolor = color(51);
   highlight = color(0); 
-  rect2 = new RectButton(90, 20, 50, buttoncolor, highlight);
+  rect2 = new RectButton(90, 20, 100, buttoncolor, highlight);
 
   tuioClient = new TuioClient(this);
 }
@@ -54,6 +56,12 @@ void draw() {
   circle3.display();
   rect1.display();
   rect2.display();
+  
+   TuioCursor[] tuioCursorList = tuioClient.getTuioCursors();
+  for(int i = 0; i < tuioCursorList.length; i++) {
+    rect(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height), 10, 10);
+    
+  }
 }
 
 void updateButtons()
@@ -86,6 +94,7 @@ void updateButtons()
     else if(rect2.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
       currentcolor = rect2.basecolor;
     }
+    
   }
 }
 
@@ -151,7 +160,7 @@ class CircleButton extends Button {
     currentcolor = basecolor;
   }
 
-  boolean pressed(int cursorX, int cursorY) {
+  boolean over(int cursorX, int cursorY) {
     if( overCircle(cursorX, cursorY, x, y, size) ) {
       pressed = true;
       return true;
@@ -179,7 +188,7 @@ class RectButton extends Button {
     currentcolor = basecolor;
   }
 
-  boolean pressed(int cursorX, int cursorY) {
+  boolean over(int cursorX, int cursorY) {
     if( overRect(cursorX, cursorY, x, y, size, size) ) {
       pressed = true;
       return true;
@@ -197,3 +206,40 @@ class RectButton extends Button {
   }
 }
 
+// called when an object is added to the scene
+void addTuioObject(TuioObject tobj) {
+ // println("add object "+tobj.getFiducialID()+" ("+tobj.getSessionID()+") "+tobj.getX()+" "+tobj.getY()+" "+tobj.getAngle());
+}
+
+// called when an object is removed from the scene
+void removeTuioObject(TuioObject tobj) {
+  //println("remove object "+tobj.getFiducialID()+" ("+tobj.getSessionID()+")");
+}
+
+// called when an object is moved
+void updateTuioObject (TuioObject tobj) {
+  //println("update object "+tobj.getFiducialID()+" ("+tobj.getSessionID()+") "+tobj.getX()+" "+tobj.getY()+" "+tobj.getAngle()
+  //        +" "+tobj.getMotionSpeed()+" "+tobj.getRotationSpeed()+" "+tobj.getMotionAccel()+" "+tobj.getRotationAccel());
+}
+
+// called when a cursor is added to the scene
+void addTuioCursor(TuioCursor tcur) {
+  //println("add cursor "+tcur.getFingerID()+" ("+tcur.getSessionID()+ ") " +tcur.getX()+" "+tcur.getY());
+}
+
+// called when a cursor is moved
+void updateTuioCursor (TuioCursor tcur) {
+ // println("update cursor "+tcur.getFingerID()+" ("+tcur.getSessionID()+ ") " +tcur.getX()+" "+tcur.getY()
+ //         +" "+tcur.getMotionSpeed()+" "+tcur.getMotionAccel());
+}
+
+// called when a cursor is removed from the scene
+void removeTuioCursor(TuioCursor tcur) {
+  //println("remove cursor "+tcur.getFingerID()+" ("+tcur.getSessionID()+")");
+}
+
+// called after each message bundle
+// representing the end of an image frame
+void refresh(long timestamp) { 
+  //redraw();
+}
