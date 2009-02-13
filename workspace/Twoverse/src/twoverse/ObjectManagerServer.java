@@ -26,20 +26,15 @@ public class ObjectManagerServer extends ObjectManager {
 
     @Override
     public void run() {
-        // TODO continuously update feed
         while (true) {
             publishFeed();
             try {
                 sleep(5000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            } catch (InterruptedException e) {}
         }
     }
 
     public void publishFeed() {
-        // TODO new object types need to be added here
         Element root = new Element("August");
         Element galaxies = new Element("Galaxies");
         Element planetarySystems = new Element("PlanetarySystems");
@@ -91,14 +86,9 @@ public class ObjectManagerServer extends ObjectManager {
     }
 
     public void initialize(HashMap<Integer, User> users) {
-        // TODO how to find parent object? maybe run obj.linkParent(map[id])
-        // after
-        // coming back from parseCelestialBodies...Do we need parent beyond ID?
-        // easy to find in HashMap with id...
-
-        mGalaxies.putAll(mDatabase.getGalaxies(users));
-        mPlanetarySystems.putAll(mDatabase.getPlanetarySystems(users));
-        mManmadeBodies.putAll(mDatabase.getManmadeBodies(users));
+        mGalaxies.putAll(mDatabase.getGalaxies());
+        mPlanetarySystems.putAll(mDatabase.getPlanetarySystems());
+        mManmadeBodies.putAll(mDatabase.getManmadeBodies());
 
     }
 

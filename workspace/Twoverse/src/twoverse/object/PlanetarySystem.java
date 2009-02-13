@@ -29,7 +29,7 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
         mCenterId = center;
     }
 
-    public int getCenter() {
+    public int getCenterId() {
         return mCenterId;
     }
 

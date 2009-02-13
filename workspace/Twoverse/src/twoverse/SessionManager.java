@@ -1,6 +1,7 @@
 package twoverse;
 
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import twoverse.util.Session;
@@ -25,7 +26,7 @@ public class SessionManager extends Thread {
 
     public int createAccount(String username, String hashedPassword,
                              String salt, String email, String phone, int points) {
-        if (!mUsers.containsKey(username)) {
+        if(!mUsers.containsKey(username)) {
             User user = new User(username, email, phone, points);
             user.setHashedPassword(hashedPassword);
             mUsers.put(username, user);
@@ -44,10 +45,11 @@ public class SessionManager extends Thread {
     public boolean login(String username, String plaintextPassword) {
         User user = mUsers.get(username);
         try {
-            if (user != null && user.validatePassword(plaintextPassword)) {
+            if(user != null && user.validatePassword(plaintextPassword)) {
                 Session userSession = mSessions.get(username);
+                mDatabase.updateLoginTime(user);
 
-                if (userSession == null) {
+                if(userSession == null) {
                     mSessions.put(username, new Session(user));
                 } else {
                     mSessions.get(username).refresh();
@@ -55,7 +57,8 @@ public class SessionManager extends Thread {
                 return true;
             }
         } catch (UnsetPasswordException e) {
-            // TODO Auto-generated catch block
+            sLogger.log(Level.INFO,
+                "Tried to login with user with uninitialized password", e);
             return false;
         }
         return false;

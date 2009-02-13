@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
@@ -31,11 +32,13 @@ public class Database {
     private PreparedStatement mUpdateUserPreferenceStatement;
     private PreparedStatement mDeleteUserStatement; // cascade update
     private PreparedStatement mSelectAllUsersStatement;
-    private PreparedStatement mAddParentObjectStatement;
+    private PreparedStatement mAddCelestialBodyStatement;
     private PreparedStatement mAddGalaxyStatement;
     private PreparedStatement mAddPlanetarySystemStatement;
     private PreparedStatement mAddManmadeBodyStatement;
+    private PreparedStatement mDeleteObjectStatement;
     // private PreparedStatement mAddPhenomenonStatement;
+    private PreparedStatement mGetCelestialBodyStatement;
     private PreparedStatement mGetGalaxiesStatement;
     private PreparedStatement mGetPlanetarySystemsStatement;
     private PreparedStatement mGetManmadeBodiesStatement;
@@ -49,6 +52,46 @@ public class Database {
 
     // private PreparedStatement mGetObjectParentStatement;
     // private PreparedStatement mGetObjectChildrenStatement;
+
+    private ArrayList<CelestialBody> parseCelestialBodies(ResultSet resultSet) {
+        ArrayList<CelestialBody> bodies = new ArrayList<CelestialBody>();
+        try {
+            while (resultSet.next()) {
+                CelestialBody body;
+
+                body =
+                        new CelestialBody(
+                                resultSet.getInt("object.id"),
+                                resultSet.getInt("object.owner"),
+                                resultSet.getString("object.name"),
+                                resultSet.getTimestamp("birth"),
+                                resultSet.getTimestamp("death"),
+                                resultSet.getInt("parent"),
+                                new Point(resultSet.getInt("x"), resultSet
+                                        .getInt("y"), resultSet.getInt("z")),
+                                new PhysicsVector3d(
+                                        resultSet
+                                                .getDouble("velocity_vector_x"),
+                                        resultSet
+                                                .getDouble("velocity_vector_y"),
+                                        resultSet
+                                                .getDouble("velocity_vector_z"),
+                                        resultSet
+                                                .getDouble("velocity_magnitude")),
+                                new PhysicsVector3d(resultSet
+                                        .getDouble("accel_vector_x"), resultSet
+                                        .getDouble("accel_vector_y"), resultSet
+                                        .getDouble("accel_vector_z"), resultSet
+                                        .getDouble("accel_magnitude")));
+                bodies.add(body);
+            }
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING,
+                "Unable to parse celestial bodies from set: " + resultSet, e);
+        }
+
+        return bodies;
+    }
 
     public Database() throws DatabaseException {
         try {
@@ -109,43 +152,48 @@ public class Database {
                         + "WHERE id = ?");
             mSelectAllUsersStatement =
                     mConnection.prepareStatement("SELECT * FROM user");
-            mAddParentObjectStatement =
+            mAddCelestialBodyStatement =
                     mConnection
-                            .prepareStatement("INSERT INTO object (owner, parent, velocity_magnitude, "
+                            .prepareStatement("INSERT INTO object (name, owner, parent, x, y, z, velocity_magnitude, "
                                 + "velocity_vector_x, velocity_vector_y, velocity_vector_z, "
                                 + "accel_magnitude, accel_vector_x, accel_vector_y, "
-                                + "accel_vector_z, color, type) "
-                                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                                + "accel_vector_z) "
+                                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             mAddGalaxyStatement =
                     mConnection
                             .prepareStatement("INSERT INTO galaxy (id, shape, mass, density) "
                                 + "VALUES (?, ?, ?, ?)");
             mAddPlanetarySystemStatement =
                     mConnection
-                            .prepareStatement("INSERT INTO planetary_system (id, centerid, density) "
+                            .prepareStatement("INSERT INTO planetary_system (id, centerid, mass) "
                                 + "VALUES (?, ?, ?)");
             mAddManmadeBodyStatement =
                     mConnection.prepareStatement("INSERT INTO manmade (id) "
                         + "VALUES (?)");
+            mDeleteObjectStatement =
+                    mConnection.prepareStatement("DELETE FROM object "
+                        + "WHERE id = ?");
+            mGetCelestialBodyStatement =
+                    mConnection.prepareStatement("SELECT * FROM object "
+                        + "WHERE object.id = ?");
             mGetGalaxiesStatement =
-                    mConnection
-                            .prepareStatement("SELECT * FROM object, galaxy, galaxy_shapes, colors "
-                                + "WHERE object.id = galaxy.id "
-                                + "AND galaxy.shape = galaxy_shapes.id"
-                                + "AND object.color = colors.id"
-                                + "AND object.owner = user.id");
+                    mConnection.prepareStatement("SELECT * FROM object "
+                        + "LEFT JOIN (galaxy, galaxy_shape, user) "
+                        + "ON (object.id = galaxy.id "
+                        + " AND galaxy.shape = galaxy_shape.id "
+                        + " AND object.owner = user.id)");
             mGetPlanetarySystemsStatement =
                     mConnection
-                            .prepareStatement("SELECT * FROM object, planetary_system, colors "
-                                + "WHERE object.id = planetary_system.id "
-                                + "AND object.color = colors.id"
-                                + "AND object.owner = user.id");
+                            .prepareStatement("SELECT * FROM object "
+                                + "LEFT JOIN (user, planetary_system) "
+                                + "ON (object.id = planetary_system.id "
+                                + "     AND object.owner = user.id)");
             mGetManmadeBodiesStatement =
                     mConnection
-                            .prepareStatement("SELECT * FROM object, manmade, colors "
-                                + "WHERE object.id = body.id "
-                                + "AND object.color = colors.id"
-                                + "AND object.owner = user.id");
+                            .prepareStatement("SELECT * FROM object " +
+                            		"LEFT JOIN (user, manmade) " +
+                            		"ON (object.id = manmade.id " +
+                            		"     AND object.owner = user.id)");
             mUpdateSimDataStatement =
                     mConnection.prepareStatement("UPDATE object "
                         + "SET velocity_magnitude = ?,"
@@ -172,7 +220,7 @@ public class Database {
     }
 
     private void closeConnection() throws java.sql.SQLException {
-        if (mConnection != null)
+        if(mConnection != null)
             mConnection.close();
     }
 
@@ -198,7 +246,7 @@ public class Database {
         return users;
     }
 
-    public int addUser(User user) {
+    public synchronized int addUser(User user) {
         try {
             mAddUserStatement.setString(1, user.getUsername());
             mAddUserStatement.setString(2, user.getHashedPassword());
@@ -217,7 +265,6 @@ public class Database {
     }
 
     public void updateLoginTime(User user) {
-        // TODO this is not working, although the SQL seems correct
         try {
             mUpdateUserLastLoginStatement.setInt(1, user.getId());
             mUpdateUserLastLoginStatement.executeUpdate();
@@ -236,61 +283,22 @@ public class Database {
         }
     }
 
-    private CelestialBody[] parseCelestialBodies(ResultSet resultSet,
-                                                 HashMap<Integer, User> users) {
-        ArrayList<CelestialBody> bodies = new ArrayList<CelestialBody>();
-        try {
-            while (resultSet.next()) {
-                CelestialBody body;
-
-                body =
-                        new CelestialBody(
-                                resultSet.getInt("object.id"),
-                                resultSet.getInt("object.owner"),
-                                resultSet.getString("object.name"),
-                                resultSet.getTimestamp("birth"),
-                                resultSet.getTimestamp("death"),
-                                resultSet.getInt("parent"),
-                                new Point(resultSet.getInt("x"), resultSet
-                                        .getInt("y"), resultSet.getInt("z")),
-                                new PhysicsVector3d(
-                                        resultSet
-                                                .getDouble("velocity_vector_x"),
-                                        resultSet
-                                                .getDouble("velocity_vector_y"),
-                                        resultSet
-                                                .getDouble("velocity_vector_z"),
-                                        resultSet
-                                                .getDouble("velocity_magnitude")),
-                                new PhysicsVector3d(resultSet
-                                        .getDouble("accel_vector_x"), resultSet
-                                        .getDouble("accel_vector_y"), resultSet
-                                        .getDouble("accel_vector_z"), resultSet
-                                        .getDouble("accel_magnitude")));
-                bodies.add(body);
-            }
-            resultSet.close();
-        } catch (SQLException e) {
-            sLogger.log(Level.WARNING,
-                "Unable to parse celestial bodies from set: " + resultSet, e);
-        }
-
-        return (CelestialBody[]) bodies.toArray();
-    }
-
-    public HashMap<Integer, Galaxy> getGalaxies(HashMap<Integer, User> users) {
+    public HashMap<Integer, Galaxy> getGalaxies() {
         HashMap<Integer, Galaxy> galaxies = new HashMap<Integer, Galaxy>();
         try {
             ResultSet resultSet = mGetGalaxiesStatement.executeQuery();
-            CelestialBody[] bodies = parseCelestialBodies(resultSet, users);
-            resultSet.first();
+            ArrayList<CelestialBody> bodies = parseCelestialBodies(resultSet);
+            resultSet.beforeFirst();
             for (CelestialBody body : bodies) {
-                resultSet.next();
+                if(!resultSet.next()) {
+                    throw new SQLException(
+                            "Mismatch between galaxies and celestial bodies");
+                }
                 Galaxy galaxy =
                         new Galaxy(body, new GalaxyShape(resultSet
-                                .getInt("galaxy_shapes.id"), resultSet
-                                .getString("galaxy_shapes.name"), resultSet
-                                .getString("galaxy_shapes.texture")), resultSet
+                                .getInt("galaxy_shape.id"), resultSet
+                                .getString("galaxy_shape.name"), resultSet
+                                .getString("galaxy_shape.texture")), resultSet
                                 .getDouble("mass"), resultSet
                                 .getDouble("density"));
                 galaxies.put(galaxy.getId(), galaxy);
@@ -302,18 +310,20 @@ public class Database {
         return galaxies;
     }
 
-    public HashMap<Integer, PlanetarySystem> getPlanetarySystems(
-                                                                 HashMap<Integer, User> users) {
+    public HashMap<Integer, PlanetarySystem> getPlanetarySystems() {
         HashMap<Integer, PlanetarySystem> systems =
                 new HashMap<Integer, PlanetarySystem>();
         try {
             ResultSet resultSet = mGetPlanetarySystemsStatement.executeQuery();
-            CelestialBody[] bodies = parseCelestialBodies(resultSet, users);
-            resultSet.first();
+            ArrayList<CelestialBody> bodies = parseCelestialBodies(resultSet);
+            resultSet.beforeFirst();
             for (CelestialBody body : bodies) {
-                resultSet.next();
+                if(!resultSet.next()) {
+                    throw new SQLException(
+                            "Mismatch between systems and celestial bodies");
+                }
                 PlanetarySystem system =
-                        new PlanetarySystem(body, resultSet.getInt("center"),
+                        new PlanetarySystem(body, resultSet.getInt("centerid"),
                                 resultSet.getDouble("mass"));
                 systems.put(system.getId(), system);
             }
@@ -324,16 +334,18 @@ public class Database {
         return systems;
     }
 
-    public HashMap<Integer, ManmadeBody> getManmadeBodies(
-                                                          HashMap<Integer, User> users) {
+    public HashMap<Integer, ManmadeBody> getManmadeBodies() {
         HashMap<Integer, ManmadeBody> manmadeBodies =
                 new HashMap<Integer, ManmadeBody>();
         try {
             ResultSet resultSet = mGetManmadeBodiesStatement.executeQuery();
-            CelestialBody[] bodies = parseCelestialBodies(resultSet, users);
-            resultSet.first();
+            ArrayList<CelestialBody> bodies = parseCelestialBodies(resultSet);
+            resultSet.beforeFirst();
             for (CelestialBody body : bodies) {
-                resultSet.next();
+                if(!resultSet.next()) {
+                    throw new SQLException(
+                            "Mismatch between manmade and celestial bodies");
+                }
                 ManmadeBody manmadeBody = new ManmadeBody(body);
                 manmadeBodies.put(manmadeBody.getId(), manmadeBody);
             }
@@ -345,10 +357,124 @@ public class Database {
         return manmadeBodies;
     }
 
-    public void insertGalaxies(Galaxy[] galaxies) {
-        // TODO
+    private synchronized void addCelestialBody(CelestialBody body)
+            throws SQLException {
+        try {
+            mAddCelestialBodyStatement.setString(1, body.getName());
+
+            if(body.getOwnerId() != -1) {
+                mAddCelestialBodyStatement.setInt(2, body.getOwnerId());
+            } else {
+                mAddCelestialBodyStatement.setNull(2, Types.INTEGER);
+            }
+
+            if(body.getParentId() != -1) {
+                mAddCelestialBodyStatement.setInt(3, body.getParentId());
+            } else {
+                mAddCelestialBodyStatement.setNull(3, Types.INTEGER);
+            }
+            mAddCelestialBodyStatement.setDouble(4, body.getPosition().getX());
+            mAddCelestialBodyStatement.setDouble(5, body.getPosition().getY());
+            mAddCelestialBodyStatement.setDouble(6, body.getPosition().getZ());
+            mAddCelestialBodyStatement.setDouble(7, body.getVelocity()
+                    .getMagnitude());
+            mAddCelestialBodyStatement.setDouble(8, body.getVelocity()
+                    .getUnitDirection().getX());
+            mAddCelestialBodyStatement.setDouble(9, body.getVelocity()
+                    .getUnitDirection().getY());
+            mAddCelestialBodyStatement.setDouble(10, body.getVelocity()
+                    .getUnitDirection().getZ());
+            mAddCelestialBodyStatement.setDouble(11, body.getAcceleration()
+                    .getMagnitude());
+            mAddCelestialBodyStatement.setDouble(12, body.getAcceleration()
+                    .getUnitDirection().getX());
+            mAddCelestialBodyStatement.setDouble(13, body.getAcceleration()
+                    .getUnitDirection().getY());
+            mAddCelestialBodyStatement.setDouble(14, body.getAcceleration()
+                    .getUnitDirection().getZ());
+            mAddCelestialBodyStatement.executeUpdate();
+            ResultSet keySet = mAddCelestialBodyStatement.getGeneratedKeys();
+            if(!keySet.next()) {
+                throw new SQLException(
+                        "Couldn't find key of object we just added");
+            }
+            body.setId(keySet.getInt(1));
+            keySet.close();
+            mGetCelestialBodyStatement.setInt(1, body.getId());
+            ResultSet resultSet = mGetCelestialBodyStatement.executeQuery();
+            if(!resultSet.next()) {
+                throw new SQLException("Couldn't find object we just added");
+            }
+            body.setBirthTime(resultSet.getTimestamp("birth"));
+            resultSet.close();
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING,
+                "Add celestial body query failed for body: " + body, e);
+            throw new SQLException("Add celestial body query failed for body: "
+                + body);
+        }
+    }
+
+    public void addGalaxy(Galaxy galaxy) {
+        try {
+            addCelestialBody(galaxy);
+
+            mAddGalaxyStatement.setInt(1, galaxy.getId());
+            mAddGalaxyStatement.setInt(2, galaxy.getShape().getId());
+            mAddGalaxyStatement.setDouble(3, galaxy.getMass());
+            mAddGalaxyStatement.setDouble(4, galaxy.getDensity());
+            mAddGalaxyStatement.executeUpdate();
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING, "Could not add galaxy " + galaxy, e);
+        }
+    }
+
+    public void addPlanetarySystem(PlanetarySystem system) {
+        try {
+            addCelestialBody(system);
+
+            mAddPlanetarySystemStatement.setInt(1, system.getId());
+
+            if(system.getCenterId() != -1) {
+                mAddPlanetarySystemStatement.setInt(2, system.getCenterId());
+            } else {
+                mAddPlanetarySystemStatement.setNull(2, Types.INTEGER);
+            }
+
+            mAddPlanetarySystemStatement.setDouble(3, system.getMass());
+            mAddPlanetarySystemStatement.executeUpdate();
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING, "Could not add system " + system, e);
+        }
+    }
+
+    public void addManmadeBody(ManmadeBody manmadeBody) {
+        try {
+            addCelestialBody(manmadeBody);
+
+            mAddManmadeBodyStatement.setInt(1, manmadeBody.getId());
+            mAddManmadeBodyStatement.executeUpdate();
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING, "Could not add manmade body "
+                + manmadeBody, e);
+        }
+    }
+
+    public void deleteObject(CelestialBody body) {
+        try {
+            mDeleteObjectStatement.setInt(1, body.getId());
+            mDeleteObjectStatement.executeUpdate();
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING, "Could not delete body " + body, e);
+        }
+    }
+
+    public void addGalaxies(Galaxy[] galaxies) {
         try {
             mConnection.setAutoCommit(false);
+            for (Galaxy galaxy : galaxies) {
+                addGalaxy(galaxy);
+            }
             mConnection.commit();
             mConnection.setAutoCommit(true);
         } catch (SQLException e) {
@@ -364,10 +490,12 @@ public class Database {
         }
     }
 
-    public void insertPlanetarySystems(PlanetarySystem[] systems) {
-        // TODO
+    public void addPlanetarySystems(PlanetarySystem[] systems) {
         try {
             mConnection.setAutoCommit(false);
+            for (PlanetarySystem system : systems) {
+                addPlanetarySystem(system);
+            }
             mConnection.commit();
             mConnection.setAutoCommit(true);
         } catch (SQLException e) {
@@ -383,10 +511,12 @@ public class Database {
         }
     }
 
-    public void insertManmadeBodies(ManmadeBody[] bodies) {
-        // TODO
+    public void addManmadeBodies(ManmadeBody[] bodies) {
         try {
             mConnection.setAutoCommit(false);
+            for (ManmadeBody body : bodies) {
+                addManmadeBody(body);
+            }
             mConnection.commit();
             mConnection.setAutoCommit(true);
         } catch (SQLException e) {

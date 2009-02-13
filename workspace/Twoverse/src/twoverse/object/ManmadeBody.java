@@ -7,6 +7,8 @@ import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 
 public class ManmadeBody extends CelestialBody implements Serializable {
+    // This class stands for both satellites and deep space probes - one
+    // is just orbiting
     public ManmadeBody(int id, int ownerId, String name, Timestamp birthTime,
                        Timestamp deathTime, int parentId, Point position,
                        PhysicsVector3d velocity, PhysicsVector3d acceleration) {

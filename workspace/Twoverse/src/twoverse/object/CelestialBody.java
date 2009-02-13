@@ -11,13 +11,12 @@ import twoverse.util.Point;
 import twoverse.util.User;
 
 public class CelestialBody {
+    // TODO need simpler constructors for most cases
     public CelestialBody(int id, int ownerId, String name, Timestamp birthTime,
                          Timestamp deathTime, int parentId, Point position,
                          PhysicsVector3d velocity, PhysicsVector3d acceleration) {
         initialize(id, ownerId, name, birthTime, deathTime, parentId, position,
             velocity, acceleration);
-        setDeathTime(deathTime);
-
     }
 
     public CelestialBody(CelestialBody body) {
@@ -26,7 +25,6 @@ public class CelestialBody {
                 .getPosition(), body.getVelocity(), body.getAcceleration());
     }
 
-    // TODO currently, no error checking for missing attributes
     public CelestialBody(Element root) throws XMLException {
         if (!root.getLocalName().equals("celestial_body")) {
             throw new XMLException("Element is not a celestial body");
@@ -109,12 +107,7 @@ public class CelestialBody {
         setPosition(position);
         setVelocity(velocity);
         setAcceleration(acceleration);
-        // setColor(color);
     }
-
-    /*
-     * private void setColor(Color color) { mColor = color; }
-     */
 
     private void setAcceleration(PhysicsVector3d acceleration) {
         mAcceleration = acceleration;
@@ -128,10 +121,7 @@ public class CelestialBody {
         mParentId = parentId;
     }
 
-    private void setBirthTime(Timestamp birthTime) {
-        if (birthTime == null) {
-            // TODO get now time here
-        }
+    public void setBirthTime(Timestamp birthTime) {
         mBirthTime = birthTime;
     }
 
@@ -247,7 +237,6 @@ public class CelestialBody {
     private int mParentId;
     private PhysicsVector3d mVelocity;
     private PhysicsVector3d mAcceleration;
-    // private Color mColor;
     private Point mPosition;
     private String mName;
 
