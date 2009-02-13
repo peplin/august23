@@ -3,16 +3,16 @@ package twoverse;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import twoverse.Database;
 import twoverse.util.Session;
 import twoverse.util.User;
+import twoverse.util.User.UnsetPasswordException;
 
 public class SessionManager extends Thread {
     private HashMap<String, Session> mSessions; // username to session obj
     private HashMap<String, User> mUsers; // username to user obj
     private Database mDatabase;
-    private static Logger sLogger = Logger.getLogger(SessionManager.class
-            .getName());
+    private static Logger sLogger =
+            Logger.getLogger(SessionManager.class.getName());
 
     public SessionManager(Database database) {
         mDatabase = database;
@@ -24,10 +24,11 @@ public class SessionManager extends Thread {
     }
 
     public int createAccount(String username, String hashedPassword,
-            String email, String phone, int points) {
+                             String salt, String email, String phone, int points) {
         if (!mUsers.containsKey(username)) {
-            mUsers.put(username, new User(username, hashedPassword, email,
-                    phone, points));
+            User user = new User(username, email, phone, points);
+            user.setHashedPassword(hashedPassword);
+            mUsers.put(username, user);
         }
         return -1;
     }
@@ -42,15 +43,20 @@ public class SessionManager extends Thread {
      */
     public boolean login(String username, String plaintextPassword) {
         User user = mUsers.get(username);
-        if (user != null && user.validatePassword(plaintextPassword)) {
-            Session userSession = mSessions.get(username);
+        try {
+            if (user != null && user.validatePassword(plaintextPassword)) {
+                Session userSession = mSessions.get(username);
 
-            if (userSession == null) {
-                mSessions.put(username, new Session(user));
-            } else {
-                mSessions.get(username).refresh();
+                if (userSession == null) {
+                    mSessions.put(username, new Session(user));
+                } else {
+                    mSessions.get(username).refresh();
+                }
+                return true;
             }
-            return true;
+        } catch (UnsetPasswordException e) {
+            // TODO Auto-generated catch block
+            return false;
         }
         return false;
     }

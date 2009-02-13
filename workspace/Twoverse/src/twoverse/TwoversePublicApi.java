@@ -1,5 +1,6 @@
 package twoverse;
 
+import twoverse.Database.InvalidUserException;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
@@ -16,7 +17,8 @@ public interface TwoversePublicApi {
      * @return ID for new user account
      */
     public int createAccount(String username, String hashedPassword,
-            String email, String phone) throws InvalidUserException;
+                             String salt, String email, String phone)
+            throws InvalidUserException;
 
     /**
      * Unregisters a currently active session. Confirm that session number

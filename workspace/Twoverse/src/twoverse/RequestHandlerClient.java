@@ -23,15 +23,15 @@ public class RequestHandlerClient implements TwoversePublicApi {
     private Session mSession;
     private Properties mConfigFile;
     private XmlRpcClient mXmlRpcClient;
-    private static Logger sLogger = Logger.getLogger(RequestHandlerClient.class
-            .getName());
+    private static Logger sLogger =
+            Logger.getLogger(RequestHandlerClient.class.getName());
 
     public RequestHandlerClient(ObjectManagerClient objectManager) {
         try {
             mConfigFile = new Properties();
             mConfigFile.load(this.getClass().getClassLoader()
                     .getResourceAsStream(
-                            "twoverse/conf/RequestHandlerClient.properties"));
+                        "twoverse/conf/RequestHandlerClient.properties"));
         } catch (IOException e) {
 
         }
@@ -43,8 +43,8 @@ public class RequestHandlerClient implements TwoversePublicApi {
                             .getProperty("XMLRPCSERVER")));
         } catch (MalformedURLException e) {
             sLogger.log(Level.WARNING,
-                    "Unable to parse URL for XML-RPC server: "
-                            + mConfigFile.getProperty("XMLRPCSERVER"), e);
+                "Unable to parse URL for XML-RPC server: "
+                    + mConfigFile.getProperty("XMLRPCSERVER"), e);
         }
 
         config.setEnabledForExtensions(true);
@@ -56,8 +56,9 @@ public class RequestHandlerClient implements TwoversePublicApi {
 
     public void logout(int session) {
         // logout
-        Object[] parameters = new Object[] { mSession.getUser().getUsername(),
-                mSession.getId() };
+        Object[] parameters =
+                new Object[] { mSession.getUser().getUsername(),
+                    mSession.getId() };
         try {
             mXmlRpcClient.execute("SessionManager.logout", parameters);
         } catch (XmlRpcException e) {
@@ -79,8 +80,9 @@ public class RequestHandlerClient implements TwoversePublicApi {
     private void addXmlRpc(CelestialBody body) {
         try {
             Object[] parameters = new Object[] { body };
-            int newId = (Integer) mXmlRpcClient.execute("RequestHandler.add",
-                    parameters);
+            int newId =
+                    (Integer) mXmlRpcClient.execute("RequestHandler.add",
+                        parameters);
             body.setId(newId);
         } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
@@ -108,7 +110,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
 
     @Override
     public int createAccount(String username, String hashedPassword,
-            String email, String phone) {
+                             String salt, String email, String phone) {
         // TODO Auto-generated method stub
         return 0;
     }

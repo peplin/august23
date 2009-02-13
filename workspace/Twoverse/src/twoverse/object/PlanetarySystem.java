@@ -5,18 +5,18 @@ import java.sql.Timestamp;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
-import twoverse.util.User;
 
 public class PlanetarySystem extends CelestialBody implements Serializable {
-    public PlanetarySystem(int id, User owner, String name, Timestamp birthTime,
-            Timestamp deathTime, int parentId, Point position,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            int centerStarId, double mass) {
-        super(id, owner, name, birthTime, deathTime, parentId, position, velocity,
-                acceleration);
+    public PlanetarySystem(int id, int ownerId, String name,
+                           Timestamp birthTime, Timestamp deathTime,
+                           int parentId, Point position,
+                           PhysicsVector3d velocity,
+                           PhysicsVector3d acceleration, int centerStarId,
+                           double mass) {
+        super(id, ownerId, name, birthTime, deathTime, parentId, position,
+                velocity, acceleration);
     }
 
     public PlanetarySystem(CelestialBody body, int centerStarId, double mass) {
@@ -41,11 +41,14 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
         return mMass;
     }
 
+    @Override
     public Element toXmlElement() {
         Element root = new Element("planetary_system");
         super.appendXmlAttributes(root);
         root.addAttribute(new Attribute("mass", String.valueOf(mMass)));
-        root.addAttribute(new Attribute("center_id", String.valueOf(mCenterId)));
+        root
+                .addAttribute(new Attribute("center_id", String
+                        .valueOf(mCenterId)));
         return root;
     }
 

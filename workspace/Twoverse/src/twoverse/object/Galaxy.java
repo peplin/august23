@@ -5,11 +5,9 @@ import java.sql.Timestamp;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-
 import twoverse.util.GalaxyShape;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
-import twoverse.util.User;
 
 public class Galaxy extends CelestialBody implements Serializable {
     private GalaxyShape mShape;
@@ -17,16 +15,16 @@ public class Galaxy extends CelestialBody implements Serializable {
     private double mDensity;
     private static final long serialVersionUID = 4163663398347532933L;
 
-    public Galaxy(int id, User owner, String name, Timestamp birthTime,
-            Timestamp deathTime, int parentId, Point position,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            GalaxyShape shape, double mass, double density) {
-        super(id, owner, name, birthTime, deathTime, parentId, position,
+    public Galaxy(int id, int ownerId, String name, Timestamp birthTime,
+                  Timestamp deathTime, int parentId, Point position,
+                  PhysicsVector3d velocity, PhysicsVector3d acceleration,
+                  GalaxyShape shape, double mass, double density) {
+        super(id, ownerId, name, birthTime, deathTime, parentId, position,
                 velocity, acceleration);
     }
 
     public Galaxy(CelestialBody body, GalaxyShape shape, double mass,
-            double density) {
+                  double density) {
         super(body);
         setShape(shape);
         setMass(mass);
@@ -58,6 +56,7 @@ public class Galaxy extends CelestialBody implements Serializable {
         return mDensity;
     }
 
+    @Override
     public Element toXmlElement() {
         Element root = new Element("Galaxy");
         super.appendXmlAttributes(root);

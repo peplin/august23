@@ -3,23 +3,25 @@ package twoverse.util;
 import jbcrypt.BCrypt;
 
 public class User {
-    public User(int id, String username, String hashedPassword, String email,
-            String phone, int points) {
+    public class UnsetPasswordException extends Exception {
+        UnsetPasswordException(String e) {
+            super(e);
+        }
+    }
+
+    public User(int id, String username, String email, String phone, int points) {
         setId(id);
         setUsername(username);
         setEmail(email);
         setPhone(phone);
         setPoints(points);
-        setHashedPassword(hashedPassword);
     }
-    
-    public User(String username, String hashedPassword, String email,
-            String phone, int points) {
+
+    public User(String username, String email, String phone, int points) {
         setUsername(username);
         setEmail(email);
         setPhone(phone);
         setPoints(points);
-        setHashedPassword(hashedPassword);
     }
 
     public void setUsername(String username) {
@@ -30,7 +32,7 @@ public class User {
         return mUsername;
     }
 
-    public void setPlaintestPassword(String plaintextPassword) {
+    public void setPlaintextPassword(String plaintextPassword) {
         mHashedPassword = BCrypt.hashpw(plaintextPassword, BCrypt.gensalt());
     }
 
@@ -38,10 +40,13 @@ public class User {
         mHashedPassword = hashedPassword;
     }
 
-    public boolean validatePassword(String plaintextPassword) {
-        String candidate = BCrypt.hashpw(plaintextPassword, BCrypt.gensalt());
+    public boolean validatePassword(String plaintextCandidate)
+            throws UnsetPasswordException {
+        if (getHashedPassword() == null) {
+            throw new UnsetPasswordException("Password is not set");
+        }
 
-        if (BCrypt.checkpw(candidate, mHashedPassword))
+        if (BCrypt.checkpw(plaintextCandidate, getHashedPassword()))
             return true;
         return false;
     }
@@ -89,9 +94,21 @@ public class User {
     public int getId() {
         return mId;
     }
-    
-    public boolean equals(User other) { 
-        return mUsername.equals(other.mUsername);
+
+    public boolean equals(User other) {
+        return mUsername.equals(other.mUsername)
+            && mHashedPassword.equals(other.mHashedPassword)
+            && mId == other.mId && mEmail.equals(other.mEmail)
+            && mPhone.equals(other.mPhone) && mPoints == other.mPoints;
+    }
+
+    @Override
+    public String toString() {
+        String result =
+                "[" + getId() + ", " + getUsername() + ", "
+                    + getHashedPassword() + ", " + getEmail() + ", "
+                    + getPhone() + ", " + getPoints() + "]";
+        return result;
     }
 
     private String mUsername;

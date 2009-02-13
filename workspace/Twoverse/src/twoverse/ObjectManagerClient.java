@@ -1,23 +1,15 @@
 package twoverse;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Level;
-
-import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
-import twoverse.object.CelestialBody;
-import twoverse.object.Galaxy;
-import twoverse.object.ManmadeBody;
-import twoverse.object.PlanetarySystem;
+
+import org.apache.xmlrpc.client.XmlRpcClient;
 
 public class ObjectManagerClient extends ObjectManager {
     private Builder mParser;
@@ -32,7 +24,7 @@ public class ObjectManagerClient extends ObjectManager {
             mConfigFile = new Properties();
             mConfigFile.load(this.getClass().getClassLoader()
                     .getResourceAsStream(
-                            "twoverse/conf/ObjectManagerClient.properties"));
+                        "twoverse/conf/ObjectManagerClient.properties"));
         } catch (IOException e) {
 
         }

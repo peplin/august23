@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/usr/share/java/xom.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/xmlrpc-client-3.1.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/xmlrpc-common-3.1.jar"/>
@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="/usr/share/java/servlet-api.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/commons-logging.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/ws-commons-util.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/mysql-connector-java.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

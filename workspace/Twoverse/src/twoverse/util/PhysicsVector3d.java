@@ -35,7 +35,9 @@ public class PhysicsVector3d {
         Element root = new Element("vector");
         Element point = mUnitVectorPoint.toXmlElement();
         point.addAttribute(new Attribute("name", "direction"));
-        root.addAttribute(new Attribute("magnitude", String.valueOf(mMagnitude)));
+        root
+                .addAttribute(new Attribute("magnitude", String
+                        .valueOf(mMagnitude)));
         root.appendChild(point);
         return root;
     }

@@ -9,12 +9,11 @@ import javax.servlet.ServletException;
 import org.apache.xmlrpc.webserver.ServletWebServer;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
-import twoverse.Database;
-import twoverse.DatabaseException;
+import twoverse.Database.DatabaseException;
 
 public class TwoverseServer {
-    private static Logger sLogger = Logger.getLogger(TwoverseServer.class
-            .getName());
+    private static Logger sLogger =
+            Logger.getLogger(TwoverseServer.class.getName());
 
     /**
      * @param args
@@ -23,12 +22,13 @@ public class TwoverseServer {
         try {
             // TODO make all managers thread safe
             Database database = new Database();
-            ObjectManagerServer objectManager = new ObjectManagerServer(database);
+            ObjectManagerServer objectManager =
+                    new ObjectManagerServer(database);
             SessionManager sessionManager = new SessionManager(database);
             SimulationRunner simulation = new SimulationRunner(objectManager);
 
-            XmlRpcServlet servlet = new RequestHandlerServer(objectManager,
-                    sessionManager);
+            XmlRpcServlet servlet =
+                    new RequestHandlerServer(objectManager, sessionManager);
             ServletWebServer webServer;
             webServer = new ServletWebServer(servlet, 8080);
 

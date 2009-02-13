@@ -4,26 +4,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import twoverse.Database;
-import twoverse.util.User;
 import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
-
-@SuppressWarnings("serial")
-class UnhandledCelestialBodyException extends Exception {
-    public UnhandledCelestialBodyException(String msg) {
-        super(msg);
-    }
-}
+import twoverse.util.User;
 
 public abstract class ObjectManager extends Thread {
     HashMap<Integer, Galaxy> mGalaxies;
     HashMap<Integer, PlanetarySystem> mPlanetarySystems;
     HashMap<Integer, ManmadeBody> mManmadeBodies;
-    protected static Logger sLogger = Logger.getLogger(ObjectManager.class
-            .getName());
+    protected static Logger sLogger =
+            Logger.getLogger(ObjectManager.class.getName());
 
     public ObjectManager() {
     }
@@ -76,7 +68,7 @@ public abstract class ObjectManager extends Thread {
     public ManmadeBody getManmadeBody(int id) {
         return mManmadeBodies.get(id);
     }
-    
+
     public synchronized int add(Galaxy galaxy) {
         mGalaxies.put(galaxy.getId(), galaxy);
         return 0;
@@ -110,6 +102,13 @@ public abstract class ObjectManager extends Thread {
 
     public synchronized void update(ManmadeBody manmadeBody) {
         mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
+    }
+
+    @SuppressWarnings("serial")
+    public class UnhandledCelestialBodyException extends Exception {
+        public UnhandledCelestialBodyException(String msg) {
+            super(msg);
+        }
     }
 
 }

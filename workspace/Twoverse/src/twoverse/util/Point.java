@@ -13,6 +13,7 @@ public class Point {
     public void setX(double x) {
         mX = x;
     }
+
     public double getX() {
         return mX;
     }
