@@ -69,19 +69,16 @@ public abstract class ObjectManager extends Thread {
         return mManmadeBodies.get(id);
     }
 
-    public synchronized int add(Galaxy galaxy) {
+    public synchronized void add(Galaxy galaxy) {
         mGalaxies.put(galaxy.getId(), galaxy);
-        return 0;
     }
 
-    public synchronized int add(PlanetarySystem system) {
+    public synchronized void add(PlanetarySystem system) {
         mPlanetarySystems.put(system.getId(), system);
-        return 0;
     }
 
-    public synchronized int add(ManmadeBody manmadeBody) {
+    public synchronized void add(ManmadeBody manmadeBody) {
         mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
-        return 0;
     }
 
     /**

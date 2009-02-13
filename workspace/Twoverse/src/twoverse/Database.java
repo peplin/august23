@@ -415,7 +415,7 @@ public class Database {
         }
     }
 
-    public void addGalaxy(Galaxy galaxy) {
+    public void add(Galaxy galaxy) {
         try {
             addCelestialBody(galaxy);
 
@@ -429,7 +429,7 @@ public class Database {
         }
     }
 
-    public void addPlanetarySystem(PlanetarySystem system) {
+    public void add(PlanetarySystem system) {
         try {
             addCelestialBody(system);
 
@@ -448,7 +448,7 @@ public class Database {
         }
     }
 
-    public void addManmadeBody(ManmadeBody manmadeBody) {
+    public void add(ManmadeBody manmadeBody) {
         try {
             addCelestialBody(manmadeBody);
 
@@ -473,7 +473,7 @@ public class Database {
         try {
             mConnection.setAutoCommit(false);
             for (Galaxy galaxy : galaxies) {
-                addGalaxy(galaxy);
+                add(galaxy);
             }
             mConnection.commit();
             mConnection.setAutoCommit(true);
@@ -494,7 +494,7 @@ public class Database {
         try {
             mConnection.setAutoCommit(false);
             for (PlanetarySystem system : systems) {
-                addPlanetarySystem(system);
+                add(system);
             }
             mConnection.commit();
             mConnection.setAutoCommit(true);
@@ -515,7 +515,7 @@ public class Database {
         try {
             mConnection.setAutoCommit(false);
             for (ManmadeBody body : bodies) {
-                addManmadeBody(body);
+                add(body);
             }
             mConnection.commit();
             mConnection.setAutoCommit(true);
@@ -623,5 +623,4 @@ public class Database {
             super(message);
         }
     }
-
 }

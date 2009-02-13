@@ -31,10 +31,19 @@ public class ObjectManagerClient extends ObjectManager {
     }
 
     public void pullFeed() {
+    	/** TODO
+    	 * pull feed
+    	 * parse objects into a hash map
+    	 * match our current map to this new one
+    	 * 		update as we go, remove from the xml feed map after
+    	 * 		remove as we go if not in xml feed map
+    	 * now reverse, all remaining in xml feed map are new objs
+    	 * 	add to our map
+    	 */
         try {
             Document doc = mParser.build(mConfigFile.getProperty("FEED"));
             Elements children = doc.getRootElement().getChildElements();
-            // TODO design feed, figure out how to parse it
+            // TODO figure out how to parse feed
         } catch (ParsingException e) {
             sLogger.log(Level.WARNING, "Feed may be malformed", e);
         } catch (IOException e) {

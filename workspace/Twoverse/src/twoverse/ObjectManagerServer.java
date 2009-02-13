@@ -92,4 +92,28 @@ public class ObjectManagerServer extends ObjectManager {
 
     }
 
+    /**
+     * Modifies galaxy, sets ID and birth time
+     */
+    public synchronized void add(Galaxy galaxy) {
+        super.add(galaxy);
+        mDatabase.add(galaxy);
+    }
+    
+    /**
+     * Modifies system, sets ID and birth time
+     */
+    public synchronized void add(PlanetarySystem system) {
+        super.add(system);
+        mDatabase.add(system);
+    }
+
+    /**
+     * Modifies manmadeBody, sets ID and birth time
+     */
+    public synchronized void add(ManmadeBody manmadeBody) {
+        mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
+        mDatabase.add(manmadeBody);
+    }
+    
 }
