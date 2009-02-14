@@ -1,9 +1,10 @@
 package twoverse;
 
-import twoverse.Database.InvalidUserException;
+import twoverse.SessionManager.ExistingUserException;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
+import twoverse.util.User;
 
 public interface TwoversePublicApi {
 
@@ -15,10 +16,10 @@ public interface TwoversePublicApi {
      * @param email
      * @param phone
      * @return ID for new user account
+     * @throws  
      */
-    public int createAccount(String username, String hashedPassword,
-                             String salt, String email, String phone)
-            throws InvalidUserException;
+    public int createAccount(User user)
+            throws ExistingUserException;
 
     /**
      * Unregisters a currently active session. Confirm that session number
@@ -30,28 +31,33 @@ public interface TwoversePublicApi {
      * @param username
      * @param session
      */
-    public void logout(int session);
+    public void logout(String username, int session);
 
     /**
+     * These functions modify galaxy, but over XML-RPC that doesn't really work.
+     * Need to explicitly return the new object
+     * 
+     * These must also have explicitly different names - we can't just rely on
+     * method overloading, as parameters from XML-RPC are received as Object.
      * 
      * @param galaxy
      * @return ID for new object
      */
-    public int add(Galaxy galaxy);
+    public Galaxy addGalaxy(Galaxy galaxy);
 
     /**
      * 
      * @param system
      * @return ID for new object
      */
-    public int add(PlanetarySystem system);
+    public PlanetarySystem addPlanetarySystem(PlanetarySystem system);
 
     /**
      * 
      * @param body
      * @return ID for new object
      */
-    public int add(ManmadeBody body);
+    public ManmadeBody addManmadeBody(ManmadeBody body);
 
     /**
      * Methods for creating via Javascript web interface - can't use Serialized
@@ -69,10 +75,9 @@ public interface TwoversePublicApi {
 
     /**
      * Change the name of an existing object.
-     * 
+     *TODO this needs specific names, three functions
      * @param objectId
      * @param newName
      */
     public void changeName(int objectId, String newName);
-
 }

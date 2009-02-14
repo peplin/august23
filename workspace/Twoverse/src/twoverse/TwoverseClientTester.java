@@ -23,6 +23,6 @@ public class TwoverseClientTester {
                         44), new PhysicsVector3d(1, 2, 3, 4),
                         new PhysicsVector3d(5, 6, 7, 8), new GalaxyShape(23,
                                 "TheShape", "TheTexture"), 1000, 20);
-        System.out.println("Galaxy ID: " + requestHandler.add(galaxy));
+        System.out.println("Galaxy ID: " + requestHandler.addGalaxy(galaxy));
     }
 }

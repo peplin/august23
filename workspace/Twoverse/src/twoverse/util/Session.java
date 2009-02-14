@@ -4,10 +4,9 @@ import java.sql.Timestamp;
 
 public class Session {
     public Session(User user) {
-        java.util.Date now = new java.util.Date();
-        mLastRefresh = new Timestamp(now.getTime());
-
-        mUser = user;
+        refresh();
+        setUser(user);
+        setId(sNextId++);
     }
 
     public void setUser(User user) {
@@ -56,4 +55,5 @@ public class Session {
     private User mUser;
     private int mId;
     private Timestamp mLastRefresh;
+    private static int sNextId = 0;
 }

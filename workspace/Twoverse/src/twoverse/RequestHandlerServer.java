@@ -11,10 +11,13 @@ import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
+import twoverse.Database.InvalidUserException;
 import twoverse.ObjectManager.UnhandledCelestialBodyException;
+import twoverse.SessionManager.ExistingUserException;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
+import twoverse.util.User;
 
 @SuppressWarnings("serial")
 public class RequestHandlerServer extends XmlRpcServlet implements
@@ -31,15 +34,13 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     }
 
     @Override
-    public void logout(int session) {
-        mSessionManager.logout(session);
+    public void logout(String username, int session) {
+        mSessionManager.logout(username, session);
     }
 
     @Override
-    public int createAccount(String username, String hashedPassword,
-                             String salt, String email, String phone) {
-        return mSessionManager.createAccount(username, hashedPassword, salt,
-            email, phone, 0);
+    public int createAccount(User user) throws ExistingUserException {
+        return mSessionManager.createAccount(user);
     }
 
     @Override
@@ -52,26 +53,37 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     }
 
     @Override
-    public int add(Galaxy galaxy) {
-        return mObjectManager.add(galaxy);
+    public Galaxy addGalaxy(Galaxy galaxy) {
+        mObjectManager.add(galaxy);
+        return galaxy;
     }
 
     @Override
-    public int add(ManmadeBody body) {
-        return mObjectManager.add(body);
+    public ManmadeBody addManmadeBody(ManmadeBody body) {
+        mObjectManager.add(body);
+        return body;
     }
 
     @Override
-    public int add(PlanetarySystem system) {
-        return mObjectManager.add(system);
+    public PlanetarySystem addPlanetarySystem(PlanetarySystem system) {
+        mObjectManager.add(system);
+        return system;
+    }
+
+    public String getHashedPassword(String username) {
+        return mSessionManager.getUser(username).getHashedPassword();
     }
 
     /**
      * Check that a user exists, confirm the password is correct. If so, create
-     * a new session and return true to the client.
+     * a new session and return true to the client. TODO this will not work.
+     * Need to hash password on client, so it's not sent plaintext Need actual
+     * correct hashed password in order to hash the candidate use
+     * unauthenticated login method that returns the hashed actual, allowing
+     * correct hash to be generated. then it can be set for the config.
      */
-    private boolean isAuthenticated(String username, String plaintextPassword) {
-        return mSessionManager.login(username, plaintextPassword);
+    private boolean isAuthenticated(String username, String hashedPassword) {
+        return (mSessionManager.login(username, hashedPassword) != -1);
     }
 
     @Override

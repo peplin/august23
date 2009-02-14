@@ -51,6 +51,17 @@ public class User {
         return false;
     }
 
+    public boolean validateHashedPassword(String hashedCandidate)
+            throws UnsetPasswordException {
+        if (getHashedPassword() == null) {
+            throw new UnsetPasswordException("Password is not set");
+        }
+
+        if (hashedCandidate.equals(getHashedPassword()))
+            return true;
+        return false;
+    }
+
     public String getHashedPassword() {
         return mHashedPassword;
     }

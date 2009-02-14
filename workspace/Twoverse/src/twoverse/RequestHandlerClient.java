@@ -7,6 +7,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jbcrypt.BCrypt;
+
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
@@ -16,13 +18,15 @@ import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
 import twoverse.util.Session;
+import twoverse.util.User;
+import twoverse.util.User.UnsetPasswordException;
 
-//TODO need to add user/password to all request configs
 public class RequestHandlerClient implements TwoversePublicApi {
     private ObjectManagerClient mObjectManager;
     private Session mSession;
     private Properties mConfigFile;
     private XmlRpcClient mXmlRpcClient;
+    XmlRpcClientConfigImpl mXmlRpcConfig;
     private static Logger sLogger =
             Logger.getLogger(RequestHandlerClient.class.getName());
 
@@ -36,29 +40,49 @@ public class RequestHandlerClient implements TwoversePublicApi {
 
         }
 
-        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+        mXmlRpcConfig = new XmlRpcClientConfigImpl();
         try {
-            config
-                    .setServerURL(new URL(mConfigFile
-                            .getProperty("XMLRPCSERVER")));
+            mXmlRpcConfig.setServerURL(new URL(mConfigFile
+                    .getProperty("XMLRPCSERVER")));
         } catch (MalformedURLException e) {
             sLogger.log(Level.WARNING,
                 "Unable to parse URL for XML-RPC server: "
                     + mConfigFile.getProperty("XMLRPCSERVER"), e);
         }
 
-        config.setEnabledForExtensions(true);
-        config.setConnectionTimeout(60 * 1000);
-        config.setReplyTimeout(60 * 1000);
+        mXmlRpcConfig.setEnabledForExtensions(true);
+        mXmlRpcConfig.setConnectionTimeout(60 * 1000);
+        mXmlRpcConfig.setReplyTimeout(60 * 1000);
+        // TODO need to add user/password to all request configs
         mXmlRpcClient = new XmlRpcClient();
-        mXmlRpcClient.setConfig(config);
+        mXmlRpcClient.setConfig(mXmlRpcConfig);
     }
 
-    public void logout(int session) {
-        // logout
-        Object[] parameters =
-                new Object[] { mSession.getUser().getUsername(),
-                    mSession.getId() };
+    private void setAuthentication(String username, String hashedPassword) {
+        mXmlRpcConfig.setBasicUserName(username);
+        mXmlRpcConfig.setBasicPassword(hashedPassword);
+    }
+
+    public boolean login(String username, String plaintextPassword) {
+        Object[] parameters = new Object[] { username };
+        try {
+            String actualHash =
+                    String.valueOf(mXmlRpcClient.execute(
+                        "SessionManager.getHashedPassword", parameters));
+            if(BCrypt.checkpw(plaintextPassword, actualHash)) {
+                setAuthentication(username, actualHash);
+                return true;
+            }
+        } catch (XmlRpcException e) {
+            sLogger.log(Level.INFO, "Unknown user " + username, e);
+            return false;
+        }
+        return false;
+    }
+
+    //TODO this doesn't really need the arguments, but it's in the API
+    public void logout(String username, int session) {
+        Object[] parameters = new Object[] { username, mSession.getId() };
         try {
             mXmlRpcClient.execute("SessionManager.logout", parameters);
         } catch (XmlRpcException e) {
@@ -70,49 +94,70 @@ public class RequestHandlerClient implements TwoversePublicApi {
 
     }
 
-    /**
-     * These objects all have a -1 or null ID - the new iD is set by the
-     * database, and returned by the function call. We save it to the object
-     * itself, and return nothing.
-     * 
-     * @param parameters
-     */
-    private void addXmlRpc(CelestialBody body) {
+    // TODO do these also need to add to ObjectManager? Does OM have a ref to
+    // the request handler in the same way the ObjectManagerServer has a
+    // reference
+    // to the database? maybe not, since client can exist when not logged in
+    @Override
+    public Galaxy addGalaxy(Galaxy galaxy) {
         try {
-            Object[] parameters = new Object[] { body };
-            int newId =
-                    (Integer) mXmlRpcClient.execute("RequestHandler.add",
+            Object[] parameters = new Object[] { galaxy };
+            Galaxy returnedGalaxy =
+                    (Galaxy) mXmlRpcClient.execute("RequestHandler.addGalaxy",
                         parameters);
-            body.setId(newId);
+            galaxy.setId(returnedGalaxy.getId());
+            galaxy.setBirthTime(returnedGalaxy.getBirthTime());
         } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
+        return galaxy;
     }
 
     @Override
-    public int add(Galaxy galaxy) {
-        addXmlRpc(galaxy);
-        return galaxy.getId();
+    public ManmadeBody addManmadeBody(ManmadeBody body) {
+        try {
+            Object[] parameters = new Object[] { body };
+            ManmadeBody returnedBody =
+                    (ManmadeBody) mXmlRpcClient.execute(
+                        "RequestHandler.addManmadeBody", parameters);
+            body.setId(returnedBody.getId());
+            body.setBirthTime(returnedBody.getBirthTime());
+        } catch (XmlRpcException e) {
+            sLogger.log(Level.WARNING, e.getMessage(), e);
+        }
+        return body;
     }
 
     @Override
-    public int add(ManmadeBody body) {
-        addXmlRpc(body);
-        return body.getId();
+    public PlanetarySystem addPlanetarySystem(PlanetarySystem system) {
+        try {
+            Object[] parameters = new Object[] { system };
+            PlanetarySystem returnedSystem =
+                    (PlanetarySystem) mXmlRpcClient.execute(
+                        "RequestHandler.addPlanetarySystem", parameters);
+            system.setId(returnedSystem.getId());
+            system.setBirthTime(returnedSystem.getBirthTime());
+        } catch (XmlRpcException e) {
+            sLogger.log(Level.WARNING, e.getMessage(), e);
+        }
+        return system;
     }
 
     @Override
-    public int add(PlanetarySystem system) {
-        addXmlRpc(system);
-        return system.getId();
-
-    }
-
-    @Override
-    public int createAccount(String username, String hashedPassword,
-                             String salt, String email, String phone) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int createAccount(User user) {
+        Object[] parameters =
+                new Object[] { user.getUsername(), user.getHashedPassword(),
+                    user.getEmail(), user.getPhone() };
+        try {
+            int newId =
+                    (Integer) mXmlRpcClient.execute(
+                        "SessionManager.createAccount", parameters);
+            user.setId(newId);
+            return newId;
+        } catch (XmlRpcException e) {
+            sLogger.log(Level.WARNING, "Unable to execute RPC logout", e);
+        }
+        return -1;
     }
 
 }
