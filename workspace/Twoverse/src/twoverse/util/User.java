@@ -1,8 +1,10 @@
 package twoverse.util;
 
+import java.io.Serializable;
+
 import jbcrypt.BCrypt;
 
-public class User {
+public class User implements Serializable {
     public class UnsetPasswordException extends Exception {
         UnsetPasswordException(String e) {
             super(e);
@@ -47,6 +49,17 @@ public class User {
         }
 
         if (BCrypt.checkpw(plaintextCandidate, getHashedPassword()))
+            return true;
+        return false;
+    }
+
+    public boolean validateHashedPassword(String hashedCandidate)
+            throws UnsetPasswordException {
+        if (getHashedPassword() == null) {
+            throw new UnsetPasswordException("Password is not set");
+        }
+
+        if (hashedCandidate.equals(getHashedPassword()))
             return true;
         return false;
     }

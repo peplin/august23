@@ -1,5 +1,6 @@
 package twoverse;
 
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,35 +12,58 @@ import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
+import twoverse.Database.InvalidUserException;
 import twoverse.ObjectManager.UnhandledCelestialBodyException;
+import twoverse.SessionManager.ExistingUserException;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
+import twoverse.util.User;
 
 @SuppressWarnings("serial")
-public class RequestHandlerServer extends XmlRpcServlet implements
-        TwoversePublicApi {
+public class RequestHandlerServer implements TwoversePublicApi {
     private ObjectManagerServer mObjectManager;
     private SessionManager mSessionManager;
     private static Logger sLogger =
             Logger.getLogger(RequestHandlerServer.class.getName());
+    private static HashMap<String, Boolean> mMethodAuthorization =
+            new HashMap<String, Boolean>();
 
-    public RequestHandlerServer(ObjectManagerServer objectManager,
+    public RequestHandlerServer() {}
+
+    private static class RequestHandlerServerHolder {
+        private final static RequestHandlerServer INSTANCE =
+                new RequestHandlerServer();
+    }
+    
+    public static RequestHandlerServer getInstance() {
+        return RequestHandlerServerHolder.INSTANCE;
+    }
+
+    public void init(ObjectManagerServer objectManager,
                                 SessionManager sessionManager) {
         mObjectManager = objectManager;
         mSessionManager = sessionManager;
+
+        mMethodAuthorization.put("RequestHandlerServer.logout", true);
+        mMethodAuthorization.put("RequestHandlerServer.createAccount", false);
+        mMethodAuthorization.put("RequestHandlerServer.changeName", true);
+        mMethodAuthorization.put("RequestHandlerServer.addGalaxy", true);
+        mMethodAuthorization.put("RequestHandlerServer.addManmadeBody", true);
+        mMethodAuthorization.put("RequestHandlerServer.addPlanetarySystem",
+            true);
+        mMethodAuthorization
+                .put("RequestHandlerServer.getHashedPassword", true);
     }
 
     @Override
-    public void logout(int session) {
-        mSessionManager.logout(session);
+    public void logout(String username, int session) {
+        mSessionManager.logout(username, session);
     }
 
     @Override
-    public int createAccount(String username, String hashedPassword,
-                             String salt, String email, String phone) {
-        return mSessionManager.createAccount(username, hashedPassword, salt,
-            email, phone, 0);
+    public int createAccount(User user) throws ExistingUserException {
+        return mSessionManager.createAccount(user);
     }
 
     @Override
@@ -52,44 +76,24 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     }
 
     @Override
-    public int add(Galaxy galaxy) {
-        return mObjectManager.add(galaxy);
+    public Galaxy addGalaxy(Galaxy galaxy) {
+        mObjectManager.add(galaxy);
+        return galaxy;
     }
 
     @Override
-    public int add(ManmadeBody body) {
-        return mObjectManager.add(body);
+    public ManmadeBody addManmadeBody(ManmadeBody body) {
+        mObjectManager.add(body);
+        return body;
     }
 
     @Override
-    public int add(PlanetarySystem system) {
-        return mObjectManager.add(system);
+    public PlanetarySystem addPlanetarySystem(PlanetarySystem system) {
+        mObjectManager.add(system);
+        return system;
     }
 
-    /**
-     * Check that a user exists, confirm the password is correct. If so, create
-     * a new session and return true to the client.
-     */
-    private boolean isAuthenticated(String username, String plaintextPassword) {
-        return mSessionManager.login(username, plaintextPassword);
+    public String getHashedPassword(String username) {
+        return mSessionManager.getUser(username).getHashedPassword();
     }
-
-    @Override
-    protected XmlRpcHandlerMapping newXmlRpcHandlerMapping()
-            throws XmlRpcException {
-        PropertyHandlerMapping mapping =
-                (PropertyHandlerMapping) super.newXmlRpcHandlerMapping();
-        AbstractReflectiveHandlerMapping.AuthenticationHandler handler =
-                new AbstractReflectiveHandlerMapping.AuthenticationHandler() {
-                    public boolean isAuthorized(XmlRpcRequest pRequest) {
-                        XmlRpcHttpRequestConfig config =
-                                (XmlRpcHttpRequestConfig) pRequest.getConfig();
-                        return isAuthenticated(config.getBasicUserName(),
-                            config.getBasicPassword());
-                    };
-                };
-        mapping.setAuthenticationHandler(handler);
-        return mapping;
-    }
-
 }

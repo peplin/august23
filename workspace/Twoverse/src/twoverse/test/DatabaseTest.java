@@ -96,14 +96,14 @@ public class DatabaseTest {
     @Test
     public void testAddManmadeBody() throws SQLException {
         ManmadeBody manmadeBody = new ManmadeBody(body);
-        database.addManmadeBody(manmadeBody);
+        database.add(manmadeBody);
     }
 
     @Test
     public void testDeleteManmadeBody() throws SQLException {
         int previousCount = database.getManmadeBodies().size();
         ManmadeBody manmadeBody = new ManmadeBody(body);
-        database.addManmadeBody(manmadeBody);
+        database.add(manmadeBody);
         database.deleteObject(manmadeBody);
         Assert.assertEquals(previousCount, database.getManmadeBodies().size());
     }
@@ -111,14 +111,14 @@ public class DatabaseTest {
     @Test
     public void testAddPlanetarySystem() {
         PlanetarySystem system = new PlanetarySystem(body, -1, 1000.1);
-        database.addPlanetarySystem(system);
+        database.add(system);
     }
 
     @Test
     public void testDeletePlanetarySystem() {
         int previousCount = database.getPlanetarySystems().size();
         PlanetarySystem system = new PlanetarySystem(body, -1, 1000.1);
-        database.addPlanetarySystem(system);
+        database.add(system);
         database.deleteObject(system);
         Assert.assertEquals(previousCount, database.getPlanetarySystems()
                 .size());
@@ -129,7 +129,7 @@ public class DatabaseTest {
         Galaxy galaxy =
                 new Galaxy(body, new GalaxyShape(1, "test", "test"), 1000.5,
                         2000.20);
-        database.addGalaxy(galaxy);
+        database.add(galaxy);
         Assert.assertNotNull(galaxy.getBirthTime());
     }
 
@@ -139,7 +139,7 @@ public class DatabaseTest {
         Galaxy galaxy =
                 new Galaxy(body, new GalaxyShape(1, "test", "test"), 1000.5,
                         2000.20);
-        database.addGalaxy(galaxy);
+        database.add(galaxy);
         database.deleteObject(galaxy);
         Assert.assertEquals(previousCount, database.getGalaxies().size());
     }

@@ -89,7 +89,6 @@ public class ObjectManagerServer extends ObjectManager {
         mGalaxies.putAll(mDatabase.getGalaxies());
         mPlanetarySystems.putAll(mDatabase.getPlanetarySystems());
         mManmadeBodies.putAll(mDatabase.getManmadeBodies());
-
     }
 
     /**
