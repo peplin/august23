@@ -146,8 +146,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
     @Override
     public int createAccount(User user) {
         Object[] parameters =
-                new Object[] { user.getUsername(), user.getHashedPassword(),
-                    user.getEmail(), user.getPhone() };
+                new Object[] { user };
         try {
             int newId =
                     (Integer) mXmlRpcClient.execute(

@@ -21,7 +21,7 @@ int SINCOS_LENGTH = int(360.0 / SINCOS_PRECISION);
 void setup()
 {
   size(640, 480, OPENGL);  
-  texmap = loadImage("/home/august/bzr/images/sun.gif");    
+  texmap = loadImage("../images/sun.gif");    
   initializeSphere(sDetail);
 }
 

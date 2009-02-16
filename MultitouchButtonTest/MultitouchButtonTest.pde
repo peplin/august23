@@ -50,11 +50,11 @@ void setup()
   color buttoncolor = color(100);
   color highlight = color(100);
   ellipseMode(CENTER);
-  PImage image0 = loadImage("/home/august/bzr/images/sputnik.jpg");
-  PImage image1 = loadImage("/home/august/bzr/images/12382-Planet_Ven.jpg");
-  PImage image2 = loadImage("/home/august/bzr/images/sun.gif");
-  PImage image3 = loadImage("/home/august/bzr/images/hst_galaxy.JPG");
-  PImage image4 = loadImage("/home/august/bzr/images/230240main_Pulsar1_sm.jpg");
+  PImage image0 = loadImage("../images/sputnik.jpg");
+  PImage image1 = loadImage("../images/12382-Planet_Ven.jpg");
+  PImage image2 = loadImage("../images/sun.gif");
+  PImage image3 = loadImage("../images/hst_galaxy.JPG");
+  PImage image4 = loadImage("../images/230240main_Pulsar1_sm.jpg");
 
   image0.resize(r0,r0);
   image1.resize(r0,r0);
