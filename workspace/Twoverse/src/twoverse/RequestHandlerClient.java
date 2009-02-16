@@ -68,7 +68,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
         try {
             String actualHash =
                     String.valueOf(mXmlRpcClient.execute(
-                        "SessionManager.getHashedPassword", parameters));
+                        "RequestHandlerServer.getHashedPassword", parameters));
             if(BCrypt.checkpw(plaintextPassword, actualHash)) {
                 setAuthentication(username, actualHash);
                 return true;
@@ -80,11 +80,11 @@ public class RequestHandlerClient implements TwoversePublicApi {
         return false;
     }
 
-    //TODO this doesn't really need the arguments, but it's in the API
+    // TODO this doesn't really need the arguments, but it's in the API
     public void logout(String username, int session) {
         Object[] parameters = new Object[] { username, mSession.getId() };
         try {
-            mXmlRpcClient.execute("SessionManager.logout", parameters);
+            mXmlRpcClient.execute("RequestHandlerServer.logout", parameters);
         } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC logout", e);
         }
@@ -103,8 +103,8 @@ public class RequestHandlerClient implements TwoversePublicApi {
         try {
             Object[] parameters = new Object[] { galaxy };
             Galaxy returnedGalaxy =
-                    (Galaxy) mXmlRpcClient.execute("RequestHandler.addGalaxy",
-                        parameters);
+                    (Galaxy) mXmlRpcClient.execute(
+                        "RequestHandlerServer.addGalaxy", parameters);
             galaxy.setId(returnedGalaxy.getId());
             galaxy.setBirthTime(returnedGalaxy.getBirthTime());
         } catch (XmlRpcException e) {
@@ -119,7 +119,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
             Object[] parameters = new Object[] { body };
             ManmadeBody returnedBody =
                     (ManmadeBody) mXmlRpcClient.execute(
-                        "RequestHandler.addManmadeBody", parameters);
+                        "RequestHandlerServer.addManmadeBody", parameters);
             body.setId(returnedBody.getId());
             body.setBirthTime(returnedBody.getBirthTime());
         } catch (XmlRpcException e) {
@@ -134,7 +134,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
             Object[] parameters = new Object[] { system };
             PlanetarySystem returnedSystem =
                     (PlanetarySystem) mXmlRpcClient.execute(
-                        "RequestHandler.addPlanetarySystem", parameters);
+                        "RequestHandlerServer.addPlanetarySystem", parameters);
             system.setId(returnedSystem.getId());
             system.setBirthTime(returnedSystem.getBirthTime());
         } catch (XmlRpcException e) {
@@ -151,7 +151,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
         try {
             int newId =
                     (Integer) mXmlRpcClient.execute(
-                        "SessionManager.createAccount", parameters);
+                        "RequestHandlerServer.createAccount", parameters);
             user.setId(newId);
             return newId;
         } catch (XmlRpcException e) {

@@ -15,10 +15,7 @@ public class TwoverseServer {
     private static Logger sLogger =
             Logger.getLogger(TwoverseServer.class.getName());
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
+    public void run() {
         try {
             // TODO make all managers thread safe
             Database database = new Database();
@@ -27,8 +24,9 @@ public class TwoverseServer {
             SessionManager sessionManager = new SessionManager(database);
             SimulationRunner simulation = new SimulationRunner(objectManager);
 
-            XmlRpcServlet servlet =
-                    new RequestHandlerServer(objectManager, sessionManager);
+            //XmlRpcServlet servlet =
+            //        new RequestHandlerServer(objectManager, sessionManager);
+            XmlRpcServlet servlet = new TwoverseServlet();
             ServletWebServer webServer;
             webServer = new ServletWebServer(servlet, 8080);
 
@@ -41,5 +39,13 @@ public class TwoverseServer {
         } catch (IOException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        TwoverseServer server = new TwoverseServer();
+        server.run();
     }
 }

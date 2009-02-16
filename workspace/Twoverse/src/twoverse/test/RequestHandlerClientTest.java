@@ -1,36 +1,30 @@
 package twoverse.test;
 
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import twoverse.Database;
-import twoverse.ObjectManager;
+import twoverse.util.User;
 import twoverse.ObjectManagerClient;
-import twoverse.ObjectManagerServer;
 import twoverse.RequestHandlerClient;
-import twoverse.RequestHandlerServer;
-import twoverse.SessionManager;
+import twoverse.TwoverseServer;
 
 public class RequestHandlerClientTest {
-    private static RequestHandlerServer server;
+    private static TwoverseServer server;
     private static RequestHandlerClient client;
-    private static ObjectManagerServer objectManager;
     private static ObjectManagerClient objectManagerClient;
-    private static SessionManager sessionManager;
-    private static Database database;
+    
+    private User[] users;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        database = new Database();
-        objectManager = new ObjectManagerServer(database);
+        server = new TwoverseServer();
+        server.run();
         objectManagerClient = new ObjectManagerClient();
-        sessionManager = new SessionManager(database);
-        server = new RequestHandlerServer(objectManager, sessionManager);
         client = new RequestHandlerClient(objectManagerClient);
+
     }
 
     @AfterClass
@@ -39,6 +33,18 @@ public class RequestHandlerClientTest {
 
     @Before
     public void setUp() throws Exception {
+        users = new User[4];
+        users[0] = new User(0, "first", "first@first.org", "1111111111", 100);
+        users[1] =
+                new User(0, "second", "second@second.org", "2222222222", 100);
+        users[2] = new User(0, "third", "third@third.org", "3333333333", 100);
+        users[3] =
+                new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
+
+        users[0].setPlaintextPassword("firstpass");
+        users[1].setPlaintextPassword("secondpass");
+        users[2].setPlaintextPassword("thirdpass");
+        users[3].setPlaintextPassword("fourthpass");
     }
 
     @After
@@ -46,8 +52,13 @@ public class RequestHandlerClientTest {
     }
     
     @Test
+    public void createAccount() {
+        client.createAccount(users[0]);
+    }
+
+    @Test
     public void testLogin() {
-        
+
     }
 
 }

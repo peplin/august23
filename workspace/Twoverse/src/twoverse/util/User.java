@@ -1,8 +1,10 @@
 package twoverse.util;
 
+import java.io.Serializable;
+
 import jbcrypt.BCrypt;
 
-public class User {
+public class User implements Serializable {
     public class UnsetPasswordException extends Exception {
         UnsetPasswordException(String e) {
             super(e);

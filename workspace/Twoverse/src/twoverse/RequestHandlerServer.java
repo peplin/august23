@@ -1,5 +1,6 @@
 package twoverse;
 
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,17 +21,39 @@ import twoverse.object.PlanetarySystem;
 import twoverse.util.User;
 
 @SuppressWarnings("serial")
-public class RequestHandlerServer extends XmlRpcServlet implements
-        TwoversePublicApi {
+public class RequestHandlerServer implements TwoversePublicApi {
     private ObjectManagerServer mObjectManager;
     private SessionManager mSessionManager;
     private static Logger sLogger =
             Logger.getLogger(RequestHandlerServer.class.getName());
+    private static HashMap<String, Boolean> mMethodAuthorization =
+            new HashMap<String, Boolean>();
 
-    public RequestHandlerServer(ObjectManagerServer objectManager,
+    public RequestHandlerServer() {}
+
+    private static class RequestHandlerServerHolder {
+        private final static RequestHandlerServer INSTANCE =
+                new RequestHandlerServer();
+    }
+    
+    public static RequestHandlerServer getInstance() {
+        return RequestHandlerServerHolder.INSTANCE;
+    }
+
+    public void init(ObjectManagerServer objectManager,
                                 SessionManager sessionManager) {
         mObjectManager = objectManager;
         mSessionManager = sessionManager;
+
+        mMethodAuthorization.put("RequestHandlerServer.logout", true);
+        mMethodAuthorization.put("RequestHandlerServer.createAccount", false);
+        mMethodAuthorization.put("RequestHandlerServer.changeName", true);
+        mMethodAuthorization.put("RequestHandlerServer.addGalaxy", true);
+        mMethodAuthorization.put("RequestHandlerServer.addManmadeBody", true);
+        mMethodAuthorization.put("RequestHandlerServer.addPlanetarySystem",
+            true);
+        mMethodAuthorization
+                .put("RequestHandlerServer.getHashedPassword", true);
     }
 
     @Override
@@ -73,35 +96,4 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     public String getHashedPassword(String username) {
         return mSessionManager.getUser(username).getHashedPassword();
     }
-
-    /**
-     * Check that a user exists, confirm the password is correct. If so, create
-     * a new session and return true to the client. TODO this will not work.
-     * Need to hash password on client, so it's not sent plaintext Need actual
-     * correct hashed password in order to hash the candidate use
-     * unauthenticated login method that returns the hashed actual, allowing
-     * correct hash to be generated. then it can be set for the config.
-     */
-    private boolean isAuthenticated(String username, String hashedPassword) {
-        return (mSessionManager.login(username, hashedPassword) != -1);
-    }
-
-    @Override
-    protected XmlRpcHandlerMapping newXmlRpcHandlerMapping()
-            throws XmlRpcException {
-        PropertyHandlerMapping mapping =
-                (PropertyHandlerMapping) super.newXmlRpcHandlerMapping();
-        AbstractReflectiveHandlerMapping.AuthenticationHandler handler =
-                new AbstractReflectiveHandlerMapping.AuthenticationHandler() {
-                    public boolean isAuthorized(XmlRpcRequest pRequest) {
-                        XmlRpcHttpRequestConfig config =
-                                (XmlRpcHttpRequestConfig) pRequest.getConfig();
-                        return isAuthenticated(config.getBasicUserName(),
-                            config.getBasicPassword());
-                    };
-                };
-        mapping.setAuthenticationHandler(handler);
-        return mapping;
-    }
-
 }
