@@ -53,7 +53,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         mXmlRpcConfig.setEnabledForExtensions(true);
         mXmlRpcConfig.setConnectionTimeout(60 * 1000);
         mXmlRpcConfig.setReplyTimeout(60 * 1000);
-        // TODO need to add user/password to all request configs
         mXmlRpcClient = new XmlRpcClient();
         mXmlRpcClient.setConfig(mXmlRpcConfig);
     }
@@ -63,26 +62,47 @@ public class RequestHandlerClient implements TwoversePublicApi {
         mXmlRpcConfig.setBasicPassword(hashedPassword);
     }
 
-    public boolean login(String username, String plaintextPassword) {
+    public Session login(User user) {
+        Object[] parameters = new Object[] { user };
+        try {
+            return (Session) (mXmlRpcClient.execute(
+                "RequestHandlerServer.login", parameters));
+        } catch (XmlRpcException e) {
+            sLogger.log(Level.INFO, "Unknown user " + user, e);
+            return null;
+        }
+    }
+
+    public Session login(String username, String plaintextPassword) {
         Object[] parameters = new Object[] { username };
         try {
             String actualHash =
                     String.valueOf(mXmlRpcClient.execute(
                         "RequestHandlerServer.getHashedPassword", parameters));
-            if(BCrypt.checkpw(plaintextPassword, actualHash)) {
+            User candidateUser = new User(0, username, "", "", 0);
+            candidateUser.setHashedPassword(BCrypt.hashpw(plaintextPassword,
+                actualHash));
+            mSession = login(candidateUser);
+            if(mSession != null) {
                 setAuthentication(username, actualHash);
-                return true;
+                return mSession;
             }
         } catch (XmlRpcException e) {
             sLogger.log(Level.INFO, "Unknown user " + username, e);
-            return false;
+            return null;
         }
-        return false;
+        return null;
     }
 
-    // TODO this doesn't really need the arguments, but it's in the API
-    public void logout(String username, int session) {
-        Object[] parameters = new Object[] { username, mSession.getId() };
+    public void logout() {
+        if(mSession != null) {
+            logout(mSession);
+        }
+    }
+
+    @Override
+    public void logout(Session session) {
+        Object[] parameters = new Object[] { session };
         try {
             mXmlRpcClient.execute("RequestHandlerServer.logout", parameters);
         } catch (XmlRpcException e) {
@@ -90,14 +110,13 @@ public class RequestHandlerClient implements TwoversePublicApi {
         }
     }
 
+    @Override
     public void changeName(int objectId, String newName) {
 
     }
 
-    // TODO do these also need to add to ObjectManager? Does OM have a ref to
-    // the request handler in the same way the ObjectManagerServer has a
-    // reference
-    // to the database? maybe not, since client can exist when not logged in
+    // TODO make sure to add to ObjectManagerClient as well as calling this
+    // func.
     @Override
     public Galaxy addGalaxy(Galaxy galaxy) {
         try {
@@ -145,8 +164,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
 
     @Override
     public int createAccount(User user) {
-        Object[] parameters =
-                new Object[] { user };
+        Object[] parameters = new Object[] { user };
         try {
             int newId =
                     (Integer) mXmlRpcClient.execute(

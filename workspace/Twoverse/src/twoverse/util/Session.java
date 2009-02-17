@@ -1,8 +1,9 @@
 package twoverse.util;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class Session {
+public class Session implements Serializable {
     public Session(User user) {
         refresh();
         setUser(user);
@@ -50,6 +51,10 @@ public class Session {
     public class BadPasswordException extends Exception {
         BadPasswordException(String message) {
         }
+    }
+
+    public boolean equals(Session other) {
+        return mId == other.mId && mUser.equals(other.mUser);
     }
 
     private User mUser;

@@ -197,8 +197,6 @@ public class CelestialBody {
         element.addAttribute(new Attribute("parentId", String
                 .valueOf(mParentId)));
 
-        // TODO is this the best way to do this? think about how parsing will
-        // work, that will point in the right direction
         Element velocityElement = mVelocity.toXmlElement();
         velocityElement.addAttribute(new Attribute("name", "velocity"));
         element.appendChild(velocityElement);

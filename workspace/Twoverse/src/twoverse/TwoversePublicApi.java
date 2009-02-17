@@ -4,7 +4,9 @@ import twoverse.SessionManager.ExistingUserException;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
+import twoverse.util.Session;
 import twoverse.util.User;
+import twoverse.util.User.UnsetPasswordException;
 
 public interface TwoversePublicApi {
 
@@ -20,6 +22,8 @@ public interface TwoversePublicApi {
      */
     public int createAccount(User user)
             throws ExistingUserException;
+    
+    public Session login(User user) throws UnsetPasswordException;
 
     /**
      * Unregisters a currently active session. Confirm that session number
@@ -31,7 +35,7 @@ public interface TwoversePublicApi {
      * @param username
      * @param session
      */
-    public void logout(String username, int session);
+    public void logout(Session session);
 
     /**
      * These functions modify galaxy, but over XML-RPC that doesn't really work.

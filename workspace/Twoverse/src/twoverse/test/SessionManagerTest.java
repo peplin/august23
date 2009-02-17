@@ -11,6 +11,7 @@ import org.junit.Test;
 import twoverse.Database;
 import twoverse.SessionManager;
 import twoverse.SessionManager.ExistingUserException;
+import twoverse.util.Session;
 import twoverse.util.User;
 import twoverse.util.User.UnsetPasswordException;
 
@@ -54,39 +55,32 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void testLogin() {
+    public void testLogin() throws UnsetPasswordException {
         User candidateUser =
                 new User(0, "first", "first@first.org", "1111111111", 100);
         candidateUser.setHashedPassword(users[0].getHashedPassword());
-        Assert.assertTrue(manager.login(candidateUser.getUsername(),
-            candidateUser.getHashedPassword()) != -1);
-        Assert.assertTrue(manager.login(users[1].getUsername(), users[1]
-                .getHashedPassword()) == -1);
+        Assert.assertTrue(manager.login(candidateUser) != null);
+        Assert.assertTrue(manager.login(users[1]) == null);
 
     }
 
     @Test
-    public void testLogout() {
+    public void testLogout() throws UnsetPasswordException {
         User candidateUser =
                 new User(0, "first", "first@first.org", "1111111111", 100);
         candidateUser.setHashedPassword(users[0].getHashedPassword());
-        int sessionId =
-                manager.login(candidateUser.getUsername(), candidateUser
-                        .getHashedPassword());
-        manager.logout(candidateUser.getUsername(), sessionId);
-        int nextSessionId =
-                manager.login(candidateUser.getUsername(), candidateUser
-                        .getHashedPassword());
-        Assert.assertFalse(sessionId == nextSessionId);
+        Session firstSession = manager.login(candidateUser);
+        manager.logout(firstSession);
+        Session secondSession = manager.login(candidateUser);
+        Assert.assertFalse(firstSession.equals(secondSession));
     }
 
     @Test
-    public void testCreateAccount() throws ExistingUserException {
+    public void testCreateAccount() throws ExistingUserException,
+            UnsetPasswordException {
         manager.createAccount(users[1]);
-        int sessionId =
-                manager.login(users[1].getUsername(), users[1]
-                        .getHashedPassword());
-        Assert.assertFalse(sessionId == -1);
+        Session session = manager.login(users[1]);
+        Assert.assertFalse(session.getId() == -1);
         database.deleteUser(users[1]);
     }
 

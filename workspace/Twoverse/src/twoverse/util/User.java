@@ -5,6 +5,13 @@ import java.io.Serializable;
 import jbcrypt.BCrypt;
 
 public class User implements Serializable {
+    private String mUsername;
+    private String mHashedPassword;
+    private int mId;
+    private String mEmail;
+    private String mPhone;
+    private int mPoints;
+    
     public class UnsetPasswordException extends Exception {
         UnsetPasswordException(String e) {
             super(e);
@@ -62,6 +69,10 @@ public class User implements Serializable {
         if (hashedCandidate.equals(getHashedPassword()))
             return true;
         return false;
+    }
+    
+    public boolean validate(User user) throws UnsetPasswordException {
+        return validateHashedPassword(user.getHashedPassword());
     }
 
     public String getHashedPassword() {
@@ -123,11 +134,4 @@ public class User implements Serializable {
                     + getPhone() + ", " + getPoints() + "]";
         return result;
     }
-
-    private String mUsername;
-    private String mHashedPassword;
-    private int mId;
-    private String mEmail;
-    private String mPhone;
-    private int mPoints;
 }

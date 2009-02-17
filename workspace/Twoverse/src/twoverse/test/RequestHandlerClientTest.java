@@ -1,5 +1,7 @@
 package twoverse.test;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -34,7 +36,7 @@ public class RequestHandlerClientTest {
     @Before
     public void setUp() throws Exception {
         users = new User[4];
-        users[0] = new User(0, "first", "first@first.org", "1111111111", 100);
+        users[0] = new User(0, "xmlrpcfirst", "first@first.org", "1111111111", 100);
         users[1] =
                 new User(0, "second", "second@second.org", "2222222222", 100);
         users[2] = new User(0, "third", "third@third.org", "3333333333", 100);
@@ -53,12 +55,14 @@ public class RequestHandlerClientTest {
     
     @Test
     public void createAccount() {
-        client.createAccount(users[0]);
+        int idBefore = users[0].getId();
+        Assert.assertTrue(0 < client.createAccount(users[0]));
+        Assert.assertFalse(idBefore == users[0].getId());
     }
 
     @Test
     public void testLogin() {
-
+        Assert.assertTrue(client.login("xmlrpcfirst", "firstpass") != null);
     }
 
 }
