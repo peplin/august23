@@ -11,5 +11,8 @@
 	<classpathentry kind="lib" path="/usr/share/java/commons-logging.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/ws-commons-util.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/mysql-connector-java.jar"/>
+	<classpathentry kind="lib" path="lib/core.jar"/>
+	<classpathentry kind="lib" path="lib/javaosc.jar"/>
+	<classpathentry kind="lib" path="lib/tuio.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
