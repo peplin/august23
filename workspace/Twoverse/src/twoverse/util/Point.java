@@ -10,7 +10,12 @@ public class Point {
         setZ(z);
     }
 
-    public void setX(double x) {
+    public Point(double x, double y) {
+    	setX(x);
+    	setY(y);
+	}
+
+	public void setX(double x) {
         mX = x;
     }
 
