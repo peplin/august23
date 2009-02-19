@@ -11,7 +11,9 @@ PGraphics imgtmp;
 
 int lensDiameter = 300;  // Lens diameter
 int magFactor = 40;  // Magnification factor
-int[] lensArray = new int[lensDiameter*lensDiameter];  // Height and width of lens
+int lensCenterX = 150;
+int lensCenterY = 150;
+int[] lensArray;  // Height and width of lens
 int[] buffer;
 
 void setup() {
@@ -29,9 +31,11 @@ void setup() {
 
   background(0);
   video = new Capture( this, 640, 480, 15 );
-  buffer = new int[640*480];
+  buffer = new int[video.width * video.height];
+  lensArray = new int[video.width * video.height];
   initializeLensMatrix();
   loadPixels();  // load pixels into memory for manip
+  video.loop();
 }
 
 void initializeLensMatrix() {
@@ -40,20 +44,22 @@ void initializeLensMatrix() {
   int r = lensDiameter / 2;
   float s = sqrt(r*r - magFactor*magFactor);
 
-  for (int y = -r; y < r; y++) {
-
-    for (int x = -r; x < r; x++) {
-      if(x*x + y*y >= s*s) {
+  for (int y = 0; y < video.width; y++) {
+    for (int x = 0; x < video.height; x++) {
+      if(dist(x, y, lensCenterX, lensCenterY) >= s*s) {
+        // point is outside the circle of the lens, so its pixel should not
+        // be modified
         a = x;
         b = y;
       }
       else {
+        // point is under the lens, so point it somewhere else
         float z = sqrt(r*r - x*x - y*y);
         a = int(x * magFactor / z + 0.5);
         b = int(y * magFactor / z + 0.5);
       }
-      lensArray[(y + r) * lensDiameter + (x + r)] 
-        = (b + r) * lensDiameter + (a + r);
+      lensArray[(x + r) + (y + r) * video.width] 
+                    = (a + r) + (b + r) * video.width;
     }
   }
 }
@@ -70,19 +76,11 @@ void draw() {
 
   int startingCornerX = 150;
   int startingCornerY = 150;
-  for(int x = 0; x < lensDiameter; x++) {
-    for(int y = 0; y < lensDiameter; y++) {
-      int lensedX = lensArray[x + (lensDiameter * y)] 
-                      % lensDiameter - startingCornerX;
-      int lensedY = lensArray[x + (lensDiameter * y)]
-                      / lensDiameter - startingCornerY;
-      buffer[(startingCornerX + x) + (video.width * (y + startingCornerY))] 
-        = buffer[startingCornerX + lensedX + video.width*(startingCornerY +lensedY)];
-    }
+  for(int i = 0; i < video.width * video.height; i++) {
+      buffer[i] = buffer[lensArray[i]];
   }
   arraycopy(buffer, g.pixels);
   updatePixels();
-
 
   /**background(255);
    * textFont(font,18*scale_factor);
