@@ -14,46 +14,33 @@ import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 
 public class TwoverseClient extends PApplet {
-	// mods:
-	// let display take variables to hide or display
-
-	TuioClient tuioClient;
-	PFont font;
-	int currentcolor;
-
-	CircleButton circle1, circle2, circle3, circle0, circle4;
-	RectButton rect0, rect1, rect2, rect3, rect4, rect5;
-	CircleButton obj0, obj1, obj2, obj3, obj4, obj5;
-	RectButton cont0, cont1, cont2, cont3, cont4, cont5, slide0, slide1;
-	RectButton inv0, inv1, inv2;
+	/** TUIO & Control Members **/
+	TuioClient mTuioClient;
 	
-	ObjectManager holla;
-	ArrayList<Galaxy> ho; 
+	/** GUI Members **/
+	PFont mButtonFont;
+	ArrayList<Button> mButtons;
 
-	int cont = 99;
-	int obj = 99;
-	int inv = 99;
-	boolean locked = false;
-	int back0 = color(0);
-	Galaxy g;
+	/** Object & Server Members **/
+	ObjectManagerClient mObjectManager;
+	RequestHandlerClient mRequestHandler;
+	
+	/** Other **/
+	int cont = 99;  // TODO consider making local
+	int obj = 99; // TODO consider making local
+	int inv = 99; // TODO consider making local
+	int backgroundColor = color(0); // TODO consider making local
 
 	public void setup() {
-		font = loadFont("twoverse/data/NimbusSanL-BoldCond-48.vlw");
+		mButtonFont
+                        = loadFont("twoverse/data/NimbusSanL-BoldCond-48.vlw");
 
-		frameRate(320);
-		size(600, 400);
-		smooth();
+		frameRate(30);
+		size(800, 600, OPENGL);
 
-		holla = new ObjectManagerClient();
+		mObjectManager = new ObjectManagerClient();
+                mRequestHandler = new RequestHandlerClient(mObjectManager);
 		
-		g = new Galaxy(1, 3, "theBody", null, null, -1, new Point(42, 43, 44),
-				new PhysicsVector3d(1, 2, 3, 4),
-				new PhysicsVector3d(5, 6, 7, 8), new GalaxyShape(1, "test",
-						"test"), 1000.5, 2000.20);
-		
-		holla.add(g);
-		
-
 		int baseColor = color(102);
 		currentcolor = baseColor;
 
@@ -72,7 +59,8 @@ public class TwoverseClient extends PApplet {
 		int slidex1 = 50, slidey1 = 350;
 
 		// Investigate button positions
-		int invxsize = 40, invysize = 25, invx0 = 120, invy0 = 350, dinvx = invxsize + 10;
+		int invxsize = 40, invysize = 25, invx0 = 120,
+                                invy0 = 350, dinvx = invxsize + 10;
 
 		// Object create Buttons
 		int buttoncolor = color(100);
@@ -89,57 +77,56 @@ public class TwoverseClient extends PApplet {
 		image2.resize(r0, r0);
 		image3.resize(r0, r0);
 		image4.resize(r0, r0);
-		obj0 = new CircleButton(x0, y0, r0, buttoncolor, highlight, image0);
-		obj1 = new CircleButton(x0 + dx, y0, r0, buttoncolor, highlight, image1);
-		obj2 = new CircleButton(x0 + 2 * dx, y0, r0, buttoncolor, highlight,
-				image2);
-		obj3 = new CircleButton(x0 + 3 * dx, y0, r0, buttoncolor, highlight,
-				image3);
-		obj4 = new CircleButton(x0 + 4 * dx, y0, r0, buttoncolor, highlight,
-				image4);
+
+                mButtons.add(new CircleButton(x0, y0, r0, buttoncolor, highlight, image0));
+		mButtons.add(new CircleButton(x0 + dx, y0, r0, buttoncolor, highlight, image1));
+		mButtons.add(new CircleButton(x0 + 2 * dx, y0, r0, buttoncolor, highlight,
+				image2));
+		mButtons.add(new CircleButton(x0 + 3 * dx, y0, r0, buttoncolor, highlight,
+				image3));
+		mButtons.add(new CircleButton(x0 + 4 * dx, y0, r0, buttoncolor, highlight,
+				image4));
 
 		// Action Buttons
 		buttoncolor = color(100);
 		highlight = color(100);
-		cont0 = new RectButton(rectx0, recty0, drect, drect, buttoncolor,
-				highlight, "create");
-		cont1 = new RectButton(rectx0, recty0 + dy, drect, drect, buttoncolor,
-				highlight, "move");
-		cont2 = new RectButton(rectx0, recty0 + 2 * dy, drect, drect,
-				buttoncolor, highlight, "zoom");
-		cont3 = new RectButton(rectx0, recty0 + 3 * dy, drect, drect,
-				buttoncolor, highlight, "evolve");
-		cont4 = new RectButton(rectx0, recty0 + 4 * dy, drect, drect,
-				buttoncolor, highlight, "rotate");
-		cont5 = new RectButton(rectx0, recty0 + 5 * dy, drect, drect,
-				buttoncolor, highlight, "learn");
+		mButtons.add(new RectButton(rectx0, recty0, drect, drect, buttoncolor,
+				highlight, "create"));
+		mButtons.add(new RectButton(rectx0, recty0 + dy, drect, drect, buttoncolor,
+				highlight, "move"));
+		mButtons.add(new RectButton(rectx0, recty0 + 2 * dy, drect, drect,
+				buttoncolor, highlight, "zoom"));
+		mButtons.add(new RectButton(rectx0, recty0 + 3 * dy, drect, drect,
+				buttoncolor, highlight, "evolve"));
+		mButtons.add(new RectButton(rectx0, recty0 + 4 * dy, drect, drect,
+				buttoncolor, highlight, "rotate"));
+		mButtons.add(new RectButton(rectx0, recty0 + 5 * dy, drect, drect,
+				buttoncolor, highlight, "learn"));
 
 		// Sliders
-		slide0 = new RectButton(slidex0, slidey0, 15, 150, buttoncolor,
-				highlight, "zoom");
-		slide1 = new RectButton(slidex1, slidey1, 150, 15, buttoncolor,
-				highlight, "evolve");
+		mButtons.add(new RectButton(slidex0, slidey0, 15, 150, buttoncolor,
+				highlight, "zoom"));
+		mButtons.add(new RectButton(slidex1, slidey1, 150, 15, buttoncolor,
+				highlight, "evolve"));
 
 		// Investigation
-		inv0 = new RectButton(invx0, invy0, invxsize, invysize, buttoncolor,
-				highlight, "read");
-		inv1 = new RectButton(invx0 + dinvx, invy0, invxsize, invysize,
-				buttoncolor, highlight, "hear");
-		inv2 = new RectButton(invx0 + 2 * dinvx, invy0, invxsize, invysize,
-				buttoncolor, highlight, "watch");
+		mButtons.add(new RectButton(invx0, invy0, invxsize, invysize, buttoncolor,
+				highlight, "read"));
+		mButtons.add(new RectButton(invx0 + dinvx, invy0, invxsize, invysize,
+				buttoncolor, highlight, "hear"));
+		mButtons.add(new RectButton(invx0 + 2 * dinvx, invy0, invxsize, invysize,
+				buttoncolor, highlight, "watch"));
 
 		// Run TUIO Client
-		tuioClient = new TuioClient(this);
+		mTuioClient = new TuioClient(this);
 	}
 
 	public void draw() {
 		background(back0);
 		updateButtons();
+		updateUniverse();
 		
-		ho = holla.getGalaxies();
-		for (int i = 0; i< ho.size(); i++ ){
-			rect((int)(ho.get(i).getPosition().getX()), (int)(ho.get(i).getPosition().getY()), 10, 10);
-		}
+		
 		
 		TuioCursor[] tuioCursorList = tuioClient.getTuioCursors();
 		for (int i = 0; i < tuioCursorList.length; i++) {
@@ -147,6 +134,13 @@ public class TwoverseClient extends PApplet {
 			// tuioCursorList[i].getScreenY(height), 10, 10);
 			rect(tuioCursorList[0].getScreenX(width), tuioCursorList[0]
 					.getScreenY(height), 10, 10);
+		}
+	}
+	
+	void updateUniverse() {
+		ArrayList<Galaxy> galaxies = objectManager.getGalaxies();
+		for (int i = 0; i< ho.size(); i++ ){
+			rect((int)(ho.get(i).getPosition().getX()), (int)(ho.get(i).getPosition().getY()), 10, 10);
 		}
 	}
 
