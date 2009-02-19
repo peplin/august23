@@ -59,7 +59,6 @@ void initializeLensMatrix() {
         float z = sqrt(r*r
               - pow(distanceToCenterX, 2) 
               - pow(distanceToCenterY, 2));
-        println(magFactor / z);
         a = int(distanceToCenterX * magFactor / z + 0.5);
         b = int(distanceToCenterY * magFactor / z + 0.5);
         a += lensCenterX;
