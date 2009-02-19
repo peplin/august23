@@ -37,19 +37,19 @@ void initializeLensMatrix() {
     int r = lensDiameter / 2;
     float s = sqrt(r*r - magFactor*magFactor);
 
-    for (int y = -r; y < r; y++) {
-      for (int x = -r ;x < r; x++) {
-        if(x*x + y*y >= s*s) {
-          a = x;
-          b = y;
-        }
-        else {
-          float z = sqrt(r*r - x*x - y*y);
-          a = int(x * magFactor / z + 0.5);
-          b = int(y * magFactor / z + 0.5);
-        }
-        lensArray[(y + r) * (lensDiameter + width) + (x + r)]
-                            = (b + r) * (lensDiameter + width) + (a + r);
+    for (int x = 0; x < lensDiameter; x++) {
+        for (int y = 0; y < lensDiameter; y++) {
+            if(x*x + y*y >= s*s) {
+                a = x;
+                b = y;
+            }
+            else {
+                float z = sqrt(r*r - x*x - y*y);
+                a = int(x * magFactor / z + 0.5);
+                b = int(y * magFactor / z + 0.5);
+            }
+            lensArray[y * lensDiameter + x]
+                                = b * lensDiameter + a;
       }
     }
 }
@@ -68,7 +68,7 @@ void draw() {
         for(int y = 0; y < lensDiameter; y++) {
             buffer[startingCornerX + x 
                     + (video.width * (y + startingCornerY))] 
-                            *= lensArray[x + (lensDiameter * y)];
+                            = buffer[lensArray[x + (lensDiameter * y)]];
         }
     }
     arraycopy(buffer, g.pixels);
