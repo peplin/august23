@@ -10,9 +10,9 @@ PImage lensImage2;
 PGraphics imgtmp;
 
 int lensDiameter = 300;  // Lens diameter
-int magFactor = 40;  // Magnification factor
-int lensCenterX = 150;
-int lensCenterY = 150;
+int magFactor = 20;  // Magnification factor
+int lensCenterX = 300;
+int lensCenterY = 300;
 int[] lensArray;  // Height and width of lens
 int[] buffer;
 
@@ -34,8 +34,8 @@ void setup() {
   buffer = new int[video.width * video.height];
   lensArray = new int[video.width * video.height];
   initializeLensMatrix();
+
   loadPixels();  // load pixels into memory for manip
-  video.loop();
 }
 
 void initializeLensMatrix() {
@@ -44,9 +44,11 @@ void initializeLensMatrix() {
   int r = lensDiameter / 2;
   float s = sqrt(r*r - magFactor*magFactor);
 
-  for (int y = 0; y < video.width; y++) {
-    for (int x = 0; x < video.height; x++) {
-      if(dist(x, y, lensCenterX, lensCenterY) >= s*s) {
+  for (int y = 0; y < video.height; y++) {
+    for (int x = 0; x < video.width; x++) {
+      int distanceToCenterX = x - lensCenterX;
+      int distanceToCenterY = y - lensCenterY;
+      if(dist(x, y, lensCenterX, lensCenterY) >= r) {
         // point is outside the circle of the lens, so its pixel should not
         // be modified
         a = x;
@@ -54,12 +56,20 @@ void initializeLensMatrix() {
       }
       else {
         // point is under the lens, so point it somewhere else
-        float z = sqrt(r*r - x*x - y*y);
-        a = int(x * magFactor / z + 0.5);
-        b = int(y * magFactor / z + 0.5);
+        float z = sqrt(r*r
+              - pow(distanceToCenterX, 2) 
+              - pow(distanceToCenterY, 2));
+        println(magFactor / z);
+        a = int(distanceToCenterX * magFactor / z + 0.5);
+        b = int(distanceToCenterY * magFactor / z + 0.5);
+        a += lensCenterX;
+        b += lensCenterY;
+        a = constrain(a, 0, video.width-1);
+        b = constrain(b, 0, video.height-1);
       }
-      lensArray[(x + r) + (y + r) * video.width] 
-                    = (a + r) + (b + r) * video.width;
+
+      lensArray[x + y * video.width] 
+                    = a + b * video.width;
     }
   }
 }
@@ -72,10 +82,6 @@ void captureEvent(Capture c) {
 
 
 void draw() {
-
-
-  int startingCornerX = 150;
-  int startingCornerY = 150;
   for(int i = 0; i < video.width * video.height; i++) {
       buffer[i] = buffer[lensArray[i]];
   }
