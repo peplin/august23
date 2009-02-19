@@ -18,6 +18,9 @@ public abstract class ObjectManager extends Thread {
             Logger.getLogger(ObjectManager.class.getName());
 
     public ObjectManager() {
+    	mGalaxies = new HashMap<Integer, Galaxy>();
+    	mPlanetarySystems = new HashMap<Integer, PlanetarySystem>();
+    	mManmadeBodies = new HashMap<Integer, ManmadeBody>();
     }
 
     public ArrayList<CelestialBody> getAllBodies() {

@@ -1,11 +1,17 @@
 package twoverse;
 
+import java.util.ArrayList;
+
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
 import tuio.TuioClient;
 import tuio.TuioCursor;
 import tuio.TuioObject;
+import twoverse.object.Galaxy;
+import twoverse.util.GalaxyShape;
+import twoverse.util.PhysicsVector3d;
+import twoverse.util.Point;
 
 public class TwoverseClient extends PApplet {
 	// mods:
@@ -20,19 +26,33 @@ public class TwoverseClient extends PApplet {
 	CircleButton obj0, obj1, obj2, obj3, obj4, obj5;
 	RectButton cont0, cont1, cont2, cont3, cont4, cont5, slide0, slide1;
 	RectButton inv0, inv1, inv2;
+	
+	ObjectManager holla;
+	ArrayList<Galaxy> ho; 
 
 	int cont = 99;
 	int obj = 99;
 	int inv = 99;
 	boolean locked = false;
 	int back0 = color(0);
+	Galaxy g;
 
 	public void setup() {
-		font = loadFont("NimbusSanL-BoldCond-48.vlw");
+		font = loadFont("twoverse/data/NimbusSanL-BoldCond-48.vlw");
 
 		frameRate(320);
 		size(600, 400);
 		smooth();
+
+		holla = new ObjectManagerClient();
+		
+		g = new Galaxy(1, 3, "theBody", null, null, -1, new Point(42, 43, 44),
+				new PhysicsVector3d(1, 2, 3, 4),
+				new PhysicsVector3d(5, 6, 7, 8), new GalaxyShape(1, "test",
+						"test"), 1000.5, 2000.20);
+		
+		holla.add(g);
+		
 
 		int baseColor = color(102);
 		currentcolor = baseColor;
@@ -58,11 +78,11 @@ public class TwoverseClient extends PApplet {
 		int buttoncolor = color(100);
 		int highlight = color(100);
 		ellipseMode(CENTER);
-		PImage image0 = loadImage("../images/sputnik.jpg");
-		PImage image1 = loadImage("../images/12382-Planet_Ven.jpg");
-		PImage image2 = loadImage("../images/sun.gif");
-		PImage image3 = loadImage("../images/hst_galaxy.JPG");
-		PImage image4 = loadImage("../images/230240main_Pulsar1_sm.jpg");
+		PImage image0 = loadImage("twoverse/images/sputnik.jpg");
+		PImage image1 = loadImage("twoverse/images/12382-Planet_Ven.jpg");
+		PImage image2 = loadImage("twoverse/images/sun.gif");
+		PImage image3 = loadImage("twoverse/images/hst_galaxy.JPG");
+		PImage image4 = loadImage("twoverse/images/230240main_Pulsar1_sm.jpg");
 
 		image0.resize(r0, r0);
 		image1.resize(r0, r0);
@@ -115,7 +135,12 @@ public class TwoverseClient extends PApplet {
 	public void draw() {
 		background(back0);
 		updateButtons();
-
+		
+		ho = holla.getGalaxies();
+		for (int i = 0; i< ho.size(); i++ ){
+			rect((int)(ho.get(i).getPosition().getX()), (int)(ho.get(i).getPosition().getY()), 10, 10);
+		}
+		
 		TuioCursor[] tuioCursorList = tuioClient.getTuioCursors();
 		for (int i = 0; i < tuioCursorList.length; i++) {
 			// rect(tuioCursorList[i].getScreenX(width),

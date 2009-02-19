@@ -216,7 +216,7 @@
             <MODE>2</MODE>
             <DISPLAY>2</DISPLAY>
             <STEPS>0</STEPS>
-            <VALUE>1</VALUE>
+            <VALUE>0</VALUE>
         </OBJECT>
         <OBJECT>
             <ID>34</ID>
@@ -229,7 +229,7 @@
             <MODE>2</MODE>
             <DISPLAY>2</DISPLAY>
             <STEPS>0</STEPS>
-            <VALUE>1</VALUE>
+            <VALUE>0</VALUE>
         </OBJECT>
         <OBJECT>
             <ID>32</ID>
@@ -244,7 +244,7 @@
             <STEPS>0</STEPS>
             <MIN>0.000000</MIN>
             <MAX>255.000000</MAX>
-            <VALUE>95.199997</VALUE>
+            <VALUE>5.100000</VALUE>
         </OBJECT>
     </OBJECT>
     <OBJECT>
@@ -392,7 +392,7 @@
             <STEPS>0</STEPS>
             <MIN>0.000000</MIN>
             <MAX>15.000000</MAX>
-            <VALUE>5.000000</VALUE>
+            <VALUE>6.000000</VALUE>
         </OBJECT>
     </OBJECT>
     <OBJECT>
@@ -449,7 +449,7 @@
             <STEPS>0</STEPS>
             <MIN>0.000000</MIN>
             <MAX>30.000000</MAX>
-            <VALUE>1.363636</VALUE>
+            <VALUE>7.909091</VALUE>
         </OBJECT>
     </OBJECT>
     <OBJECT>
@@ -491,7 +491,7 @@
             <STEPS>0</STEPS>
             <MIN>0.000000</MIN>
             <MAX>300.000000</MAX>
-            <VALUE>27.272728</VALUE>
+            <VALUE>32.727272</VALUE>
         </OBJECT>
     </OBJECT>
 </UI>

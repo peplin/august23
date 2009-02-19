@@ -1,21 +1,25 @@
 import tuio.*;
 // mods:
-// let display take variables to hide or display
 
 TuioClient tuioClient;
 PFont font;
-color currentcolor;
 
-CircleButton circle1, circle2, circle3, circle0, circle4;
-RectButton   rect0, rect1, rect2, rect3, rect4, rect5;
-CircleButton obj0, obj1, obj2, obj3, obj4, obj5;
-RectButton   cont0, cont1, cont2, cont3, cont4, cont5,slide0, slide1;
-RectButton   inv0, inv1, inv2;
-
-int cont= 99;
-int obj = 99;
-int inv = 99;
 boolean locked = false;
+int nobj = 5;
+int ncont = 6;
+int nslide = 2;
+int ninv = 3;
+
+PImage[] imgs       = new PImage[nobj];
+boolean[] lock = new boolean[ncont];
+boolean[] locka = new boolean[ncont];
+boolean[] acton = new boolean[ncont];
+CircleButton[] objs = new CircleButton[nobj];
+RectButton[] conts  = new RectButton[ncont];
+RectButton[] slides = new RectButton[nslide];
+RectButton[] invs   = new RectButton[ninv];
+
+
 color back0 = color(0);
 
 void setup()
@@ -26,20 +30,54 @@ void setup()
   size(600, 400);
   smooth();
 
-  color baseColor = color(102);
-  currentcolor = baseColor;
-
-  //Ojbect button positions
-  int dx=60;
-  int x, x0=100,y0=40, r0=30;
   
-  //Action Button positions
+
+ 
+
+ 
+
+  
+
+  // Object create Buttons
+  color buttoncolor = color(100);
+  color highlight = color(100);
+  ellipseMode(CENTER);
+  String img_dir = "/home/august/bzr/images/";
+  String[] img_name = {
+    "sputnik.jpg","12382-Planet_Ven.jpg","sun.gif","hst_galaxy.JPG","230240main_Pulsar1_sm.jpg"      };
+  for (int i=0 ; i<nobj; i++){
+    imgs[i] = loadImage(img_dir+img_name[i]);
+   int dx=60;
+  int x, x0=100,y0=40, r0=30;
+    imgs[i].resize(r0,r0);
+    objs[i] = new CircleButton(x0 + i*dx, y0, r0, buttoncolor, highlight,imgs[i]);
+  }
+
+ //Action Button positions
   int rectx0 = 540;
   int recty0 = 60;
   int drect = 30;
   int dy = drect+10;
+  String[] cont_name = {
+    "create","move","zoom","evolve","rotate","learn"      };
+  for (int i=0 ; i<ncont; i++){
+    conts[i] = new RectButton(rectx0, recty0+ i*dy, drect, drect, buttoncolor, highlight,cont_name[i]);
+  }
+  String[] slide_name ={
+    "zoom","evolve"      }; 
+  for (int i=0 ; i<nslide; i++){
+    slides[i] = new RectButton(rectx0, recty0+ i*dy, drect, drect, buttoncolor, highlight,slide_name[i]);
+  }
   
-  //Slider positions
+  // Investigate button positions
+  int invxsize = 40, invysize = 25, invx0 = 120, invy0=350, dinvx = invxsize +10;
+  String[] inv_name = {
+    "create","move","zoom"      };
+  for (int i=0 ; i<ninv; i++){
+    invs[i] = new RectButton(rectx0, recty0+ i*dy, drect, drect, buttoncolor, highlight,inv_name[i]);
+  }
+
+   //Slider positions
   int slidex0 = 30, slidey0=90;
   int slidex1 = 50, slidey1=350;
   
@@ -88,118 +126,82 @@ void setup()
 
   // Run TUIO Client
   tuioClient = new TuioClient(this);
+
+
+  for(int i = 0; i < ncont; i++) {
+    lock[i] = false;
+    locka[i] = false;
+    acton[i] = false;
+  }
 }
 
 void draw() {
   background(back0);
-  updateButtons();
+  updateTouch();
+  updateMouse();
 
-   TuioCursor[] tuioCursorList = tuioClient.getTuioCursors();
+  TuioCursor[] tuioCursorList = tuioClient.getTuioCursors();
   for(int i = 0; i < tuioCursorList.length; i++) {
-//    rect(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height), 10, 10);
-  rect(tuioCursorList[0].getScreenX(width), tuioCursorList[0].getScreenY(height), 10, 10);
+    //    rect(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height), 10, 10);
+    rect(tuioCursorList[0].getScreenX(width), tuioCursorList[0].getScreenY(height), 10, 10);
   }
 }
 
-void updateButtons()
-{
+void updateMouse() {
 
-  if(locked == false) {
-   
-    if (cont == 0) {
-      if (obj == 0) { obj0.highlight();  }else{obj0.display();}
-      if (obj == 1) { obj1.highlight();  }else{obj1.display();}
-      if (obj == 2) { obj2.highlight();  }else{obj2.display();}
-      if (obj == 3) { obj3.highlight();  }else{obj3.display();}
-      if (obj == 4) { obj4.highlight();  }else{obj4.display();}
-      
-      cont0.highlight();
-    }else{cont0.display();}
-    
-    if (cont ==1) {cont1.highlight();}else{cont1.display();}
-
-    if (cont == 2){
-      cont2.highlight(); 
-      slide0.display();
-    }else{cont2.display();}
-
-    if ( cont ==3){
-      cont3.highlight();
-      slide1.display();
-    }else{cont3.display();}
-    
-    if (cont == 4){cont4.highlight();}else{cont4.display();}
-    
-    if (cont == 5){
-      if (inv == 0) { inv0.highlight();  }else{inv0.display();}
-      if (inv == 1) { inv1.highlight();  }else{inv1.display();}
-      if (inv == 2) { inv2.highlight();  }else{inv2.display();}
-      cont5.highlight();
-      }else{cont5.display();}
-
-  } 
+    if(locked == false) {
+      } 
   else {
     locked = false;
   }
+  
+//  boolean[] objon = new boolean[nobj];
+//  for (int i = 0; i< ncont; i++){
+//    acton[i] = conts[i].display(conts[i].over(mouseX, mouseY) && mousePressed);
+//    conts[i].display(acton[i] || lock[i]);
+//    if (acton[i] && !lock[i]) { 
+//      lock[i] = true;
+//      for (int j = 0; j< ncont; j++){
+//        if (i != j) {
+//          acton[j] = false; 
+//          lock[j] = false;
+//        }
+//      }
+//    }
+//
+//    if (lock[0]) {
+//      for (int j=0 ; j < nobj ; j++ ){
+//        objon[j]= objs[j].display(objs[j].over(mouseX, mouseY) && mousePressed);
+//        objs[j].display(objon[j] || locka[j]);
+//        if (objon[j] && !locka[j]) { 
+//          locka[j] = true;
+//          for (int k = 0; k< nobj; k++){
+//            if (j != k) {
+//              objon[k] = false; 
+//              locka[k] = false;
+//            }
+//          }
+//        }
+//
+//
+//      }
+//    }
+//  }
+}
+
+
+
+
+// UPDATE WITH TUIO
+void updateTouch()
+{
+
 
   TuioCursor[] tuioCursorList = tuioClient.getTuioCursors();
   for(int i = 0; i < tuioCursorList.length; i++) {
 
-    if(cont0.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-      cont = 0;
-     } 
-    else if(cont1.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-       cont = 1;
-    }
-    else if(cont2.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-      cont = 2;
-    } 
-    else if(cont3.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-      cont = 3;
-    }
-    else if(cont4.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-      cont = 4;
-    }
-    else if(cont5.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-      cont = 5;
-    }
-    
-    if (cont ==0){
-      if(obj0.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-        obj = 0;
-     } 
-      else if(obj1.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-        obj =1;
-
-      } 
-      else if(obj2.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-        obj =2;
-      } 
-      else if(obj3.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-        obj =3;
-      } 
-      else if(obj4.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-        obj =4;
-      } 
-    }
-    
-    if (cont==5){
-      if(inv0.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-        inv = 0;
-     } 
-      else if(inv1.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-        inv =1;
-
-      } 
-      else if(inv2.over(tuioCursorList[i].getScreenX(width), tuioCursorList[i].getScreenY(height))) {
-        inv =2;
-      } 
-    }
-    
   }
 }
-
-
 
 /////////////////////////////////////////
 class Button {
@@ -281,18 +283,38 @@ class CircleButton extends Button {
     }
   }
 
-  void display() {
-    noStroke();
-    noFill();
-    tint(255,100);
-    image(myimage,x-size/2,y-size/2);
+void check(boolean disp) {  
+    if ( disp ){
+      noStroke();
+      noFill();
+      tint(255,40000);
+      image(myimage,x-size/2,y-size/2);
+    } 
+    else  {
+      noStroke();
+      noFill();
+      tint(255,10);
+      image(myimage,x-size/2,y-size/2);     
+    }
+    return disp;
   }
-  void highlight() {
-    noStroke();
-    noFill();
-    tint(255,40000);
-    image(myimage,x-size/2,y-size/2);
-    tint(255,100);
+
+
+
+  boolean display(boolean disp) {  
+    if ( disp ){
+      noStroke();
+      noFill();
+      tint(255,40000);
+      image(myimage,x-size/2,y-size/2);
+    } 
+    else  {
+      noStroke();
+      noFill();
+      tint(255,10);
+      image(myimage,x-size/2,y-size/2);     
+    }
+    return disp;
   }
 }
 
@@ -320,23 +342,25 @@ class RectButton extends Button {
     }
   }
 
-  void display() {
-    stroke(180);
-    fill(color(130));
-    rect(x, y, size, sizey);
-    textFont(font,8);
-    fill(color(255));
-    text(name,x+size/4,y+sizey/2);
+  boolean display(boolean disp) {
+    if (disp ){
+      stroke(255);
+      fill(color(230));
+      rect(x, y, size, sizey);
+      textFont(font,8);
+      fill(color(0));
+      text(name,x+size/4,y+sizey/2);
+    }
+    else {
+      stroke(180);
+      fill(color(130));
+      rect(x, y, size, sizey);
+      textFont(font,8);
+      fill(color(255));
+      text(name,x+size/4,y+sizey/2);
+    }
+    return disp;
   }
-
-  void highlight() {
-    stroke(255);
-    fill(color(230));
-    rect(x, y, size, sizey);
-    textFont(font,8);
-    fill(color(0));
-    text(name,x+size/4,y+sizey/2);
- }
 }
 
 // called when an object is added to the scene
@@ -376,6 +400,9 @@ void removeTuioCursor(TuioCursor tcur) {
 void refresh(long timestamp) { 
   //redraw();
 }
+
+
+
 
 
 
