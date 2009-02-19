@@ -9,9 +9,9 @@ PImage lensImage;
 PImage lensImage2;
 PGraphics imgtmp;
 
-int lensD = 150;  // Lens diameter
+int lensDiameter = 150;  // Lens diameter
 int magFactor = 45;  // Magnification factor
-//int[] lensArray = new int[lensD*lensD];  // Height and width of lens
+int[] lensArray = new int[lensDiameter*lensD];  // Height and width of lens
 
 void setup() {
   size( 640, 480 );
@@ -26,27 +26,15 @@ void setup() {
    * tuioClient  = new TuioClient(this);
    **/
 
-  // VIDEO setup
+  background(0);
   video = new Capture( this, width, height, 60 );
-
+    loadPixels();  // load pixels into memory for manip
 }
 
-
-void draw() {
-  if ( video.available()) {
-
-    // CAPTURE VIDEO
-    video.read(); // read video from device
-    scale(-1,1);  // manip
-    image( video, -width, 0, width, height ); // put video on screen
-    loadPixels();  // load pixels into memory for manip
-
-    // LENSING
-    int[] lensArray = new int[width*height];  // Height and width of lens
-
+void initializeLensMatrix() {
     // Lens algorithm (transformation array)
     int m, a, b;
-    int r = lensD / 2;
+    int r = lensDiameter / 2;
     float s = sqrt(r*r - magFactor*magFactor);
 
     for (int y = -r; y < r; y++) {
@@ -60,25 +48,30 @@ void draw() {
           a = int(x * magFactor / z + 0.5);
           b = int(y * magFactor / z + 0.5);
         }
-        lensArray[(y + r)*(lensD+width)+(x + r)] = (b + r) *(lensD+width) + (a + r);
+        lensArray[(y + r) * (lensDiameter + width) + (x + r)]
+                            = (b + r) * (lensDiameter + width) + (a + r);
       }
     }
-    int i,ii,dximg,dyimg;    
-    int yimg0,ximg0,ximg1,yimg1;
-    int[] lensArrayFull = new int[width*height]; 
-    dximg = dyimg = 100;
-    ximg0 = yimg0 = 140;
-    ximg1 = ximg0+dximg;
-    yimg1 = yimg0+dyimg;
+}
 
-    ii=0;
-    for ( int yimg = yimg0; yimg< yimg1; yimg++) {
-      for ( int ximg = ximg0; ximg< ximg1 ; ximg++) {
-        i = width*yimg + ximg -1 ;
-        pixels[i] = pixels[lensArray[i]]; // re-map the lensArray transformed coord. to the image coord.
-        ii++;
-      }
+void captureEvent(Capture c) {
+    c.read();
+    c.loadPixels();
+    arraycopy(c.pixels, buffer);
+}
+
+
+void draw() {
+    int startingCornerX = 50;
+    int startingCornerY = 50;
+    for(int x = 0; x < lensDiameter; x++) {
+        for(int y = 0; y < lensDiameter; y++) {
+            buffer[startingCornerX + x 
+                    + (video.width * (y + startingCornerY))] 
+                            *= lensArray[x + (lensDiameter * y)];
+        }
     }
+    arraycopy(buffer, g.pixels);
     updatePixels();
 
 
@@ -124,32 +117,6 @@ void draw() {
      * 
      * }
      **/
-
-
-
-
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
