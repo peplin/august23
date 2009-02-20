@@ -3,13 +3,13 @@ import java.util.*;
 import tuio.*;
 
 TuioClient tuioClient;
-//Capture video;
+Capture video;
 
 int[] lensArray;  // Height and width of lens
 int[] buffer;
 
 /** Configuration Parameters **/
-final int LENS_DIAMETER = 200;
+final int LENS_DIAMETER = 300;
 final int MAGNIFICATION_FACTOR = 40;
 
 HashMap lenses, lenses_in, lenses_buffer, lenses_mv;
@@ -27,8 +27,6 @@ void setup() {
   lensArray = new int[video.width * video.height];
   lenses = new HashMap();
   lenses_in = new HashMap();
-  lenses_mv = new HashMap();
-  lenses_buffer = new HashMap();
   initializeLensMatrix();
   
   loadPixels();  // load pixels into memory for manip
@@ -41,20 +39,18 @@ void initializeLensMatrix() {
 }
 
 void updateLensMatrix() {
+  lenses = new HashMap(lenses_in);
 
-  int i = 0;
-  while ( i < 2 ) {
-  if ( i == 0 ) { lenses_buffer.putAll(lenses_in); }
-  if ( i == 1 ) { lenses_buffer.putAll(lenses_mv); }
-  lenses.putAll(lenses_buffer);
-  Iterator it = lenses.entrySet().iterator();
-  while(it.hasNext()) {
+  if(!lenses.isEmpty()) {
+  //Iterator it = lenses.entrySet().iterator();
+  //while(it.hasNext()) {
+    
     int m, a, b;
     int r = LENS_DIAMETER / 2;
     float s = sqrt(r*r - pow(MAGNIFICATION_FACTOR, 2));
-    if(!it.hasNext()) 
-      break;
-    Lens lens = (Lens) (((Map.Entry)it.next()).getValue());
+    //Lens lens = (Lens) (((Map.Entry)it.next()).getValue());
+    Lens lens = (Lens) (lenses.get(0));
+    
      
     for (int y = 0; y < video.height; y++) {
       for (int x = 0; x < video.width; x++) {
@@ -82,16 +78,13 @@ void updateLensMatrix() {
       }
     }
   }
-  i++;
-  }
-
 }
 
-/*void captureEvent(Capture c) {
+void captureEvent(Capture c) {
   c.read();
   c.loadPixels();
   arraycopy(c.pixels, buffer);
-}*/
+}
 
 
 void draw() {
@@ -128,19 +121,21 @@ class Lens {
 
 // called when a cursor is added to the scene
 void addTuioCursor(TuioCursor tcur) {
-  lenses_in.put(tcur.getFingerID(), new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height)));
-
+  //System.out.println(tcur);
+  //Lens lens = new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height));
+  //System.out.println(tcur.getFingerID());
+  //lenses.put(tcur.getFingerID(), lens );
 }
 
 // called when a cursor is moved
 void updateTuioCursor (TuioCursor tcur) {
-    lenses_mv.put(tcur.getFingerID(), new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height)));
+  //System.out.println(tcur);
+  lenses_in.put(tcur.getFingerID(), new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height)));
  }
 
 // called when a cursor is removed from the scene
-/*void removeTuioCursor(TuioCursor tcur) {
-  if(!mapLock)
-  lenses.remove(tcur.getFingerID());
-}*/
+void removeTuioCursor(TuioCursor tcur) {
+  //lenses_in.remove(tcur.getFingerID());
+}
 
 
