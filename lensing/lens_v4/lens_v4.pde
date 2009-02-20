@@ -16,13 +16,13 @@ HashMap lenses, lenses_in, lenses_buffer, lenses_mv;
 boolean mapLock = false;
 
 void setup() {
-  size(640, 480);
+  size(800, 600);
 
   // TUIO setup
   tuioClient  = new TuioClient(this);
 
   background(0);
-  video = new Capture( this, 640, 480, 15 );
+  video = new Capture( this, 800, 600, 15 );
   buffer = new int[video.width * video.height];
   lensArray = new int[video.width * video.height];
   lenses = new HashMap();
@@ -32,26 +32,39 @@ void setup() {
   loadPixels();  // load pixels into memory for manip
 }
 
+class Lens {
+  private int mX;
+  private int mY;
+   public Lens(int x, int y) {
+     mX = x;
+     mY = y;
+   }
+   
+   public void setX(int x) {
+      mX = x; 
+   }
+   public void setY(int y) {
+      mY = y; 
+   }
+   public int getX() {
+      return mX; 
+   }
+   public int getY() {
+      return mY; 
+   }
+}
+
 void initializeLensMatrix() {
   for(int i = 0; i < lensArray.length; i++) {
      lensArray[i] = i;
   } 
 }
 
-void updateLensMatrix() {
-  lenses = new HashMap(lenses_in);
-
-  if(!lenses.isEmpty()) {
-  //Iterator it = lenses.entrySet().iterator();
-  //while(it.hasNext()) {
-    
+public void updateLensMatrix(Lens lens) {
     int m, a, b;
     int r = LENS_DIAMETER / 2;
     float s = sqrt(r*r - pow(MAGNIFICATION_FACTOR, 2));
-    //Lens lens = (Lens) (((Map.Entry)it.next()).getValue());
-    Lens lens = (Lens) (lenses.get(0));
     
-     
     for (int y = 0; y < video.height; y++) {
       for (int x = 0; x < video.width; x++) {
        
@@ -78,7 +91,6 @@ void updateLensMatrix() {
       }
     }
   }
-}
 
 void captureEvent(Capture c) {
   c.read();
@@ -88,7 +100,10 @@ void captureEvent(Capture c) {
 
 
 void draw() {
-  updateLensMatrix();
+  //updateLensMatrix();
+  TuioCursor[] tuioCursorList = tuioClient.getTuioCursors();
+  if(tuioCursorList.length > 0)
+    updateLensMatrix(new Lens(tuioCursorList[0].getScreenX(video.width), tuioCursorList[0].getScreenY(video.height)));
   int[] outputBuffer = new int[video.width * video.height];
   for(int i = 0; i < video.width * video.height; i++) {
     outputBuffer[i] = buffer[lensArray[i]];
@@ -97,40 +112,23 @@ void draw() {
   updatePixels();
 }
 
-class Lens {
-  private int mX;
-  private int mY;
-   public Lens(int x, int y) {
-     mX = x;
-     mY = y;
-   }
-   
-   public void setX(int x) {
-      mX = x; 
-   }
-   public void setY(int y) {
-      mY = y; 
-   }
-   public int getX() {
-      return mX; 
-   }
-   public int getY() {
-      return mY; 
-   }
-}
+
 
 // called when a cursor is added to the scene
 void addTuioCursor(TuioCursor tcur) {
   //System.out.println(tcur);
   //Lens lens = new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height));
   //System.out.println(tcur.getFingerID());
-  //lenses.put(tcur.getFingerID(), lens );
+  //lenses_in.put(tcur.getFingerID(), lens );
+  //updateLensMatrix(new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height)));
 }
 
 // called when a cursor is moved
 void updateTuioCursor (TuioCursor tcur) {
-  //System.out.println(tcur);
-  lenses_in.put(tcur.getFingerID(), new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height)));
+  System.out.println(tcur);
+  //if(!mapLock)
+  //lenses.put(tcur.getFingerID(), new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height)));
+  //updateLensMatrix(new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height)));
  }
 
 // called when a cursor is removed from the scene
