@@ -125,9 +125,9 @@ public class TwoverseClient extends PApplet {
 		button = new RectButton(this, new Point(rectx0, recty0 + dy * 5),
 				buttoncolor, highlight, "Learn", drect, drect);
 		button.addChild(new RectButton(this, new Point(invx0, invy0),
-				buttoncolor, highlight, "read", invxsize, invysize));
+				buttoncolor, highlight, "Read", invxsize, invysize));
 		button.addChild(new RectButton(this, new Point(invx0 + dinvx, invy0),
-				buttoncolor, highlight, "hear", invxsize, invysize));
+				buttoncolor, highlight, "Hear", invxsize, invysize));
 		button.addChild(new RectButton(this,
 				new Point(invx0 + 2 * dinvx, invy0), buttoncolor, highlight,
 				"watch", invxsize, invysize));
