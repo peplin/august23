@@ -14,6 +14,7 @@ final int LENS_DIAMETER = 200;
 final int MAGNIFICATION_FACTOR = 40;
 
 HashMap lenses;
+boolean mapLock = false;
 
 void setup() {
   size(640, 480);
@@ -38,11 +39,14 @@ void initializeLensMatrix() {
 }
 
 void updateLensMatrix() {
+  mapLock = true;
   Iterator it = lenses.entrySet().iterator();
   while(it.hasNext()) {
     int m, a, b;
     int r = LENS_DIAMETER / 2;
     float s = sqrt(r*r - pow(MAGNIFICATION_FACTOR, 2));
+    if(!it.hasNext()) 
+      break;
     Lens lens = (Lens) (((Map.Entry)it.next()).getValue());
      
     for (int y = 0; y < video.height; y++) {
@@ -71,6 +75,7 @@ void updateLensMatrix() {
       }
     }
   }
+  mapLock = false;
 }
 
 void captureEvent(Capture c) {
@@ -115,19 +120,20 @@ class Lens {
 // called when a cursor is added to the scene
 void addTuioCursor(TuioCursor tcur) {
   //println("add cursor "+tcur.getFingerID()+" ("+tcur.getSessionID()+ ") " +tcur.getX()+" "+tcur.getY());
-  
 }
 
 // called when a cursor is moved
 void updateTuioCursor (TuioCursor tcur) {
   // println("update cursor "+tcur.getFingerID()+" ("+tcur.getSessionID()+ ") " +tcur.getX()+" "+tcur.getY()
   //         +" "+tcur.getMotionSpeed()+" "+tcur.getMotionAccel());
-  lenses.put(tcur.getFingerID(), new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height)));
-}
+  if(!mapLock)
+    lenses.put(tcur.getFingerID(), new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height)));
+ }
 
 // called when a cursor is removed from the scene
 void removeTuioCursor(TuioCursor tcur) {
-  //println("remove cursor "+tcur.getFingerID()+" ("+tcur.getSessionID()+")");
+  if(!mapLock)
+  lenses.remove(tcur.getFingerID());
 }
 
 
