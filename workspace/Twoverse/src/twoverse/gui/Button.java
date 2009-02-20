@@ -22,7 +22,7 @@ public abstract class Button {
 	}
 
 	public void update(Point cursor) {
-
+		
 	}
 
 	boolean pressed() {

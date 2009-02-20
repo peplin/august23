@@ -137,7 +137,7 @@ public class TwoverseClient extends PApplet {
 
 	public void draw() {
 		background(mBackgroundColor);
-		updateButtons();
+	updateButtons();
 		updateUniverse();
 
 		if (DEBUG) {
@@ -167,25 +167,13 @@ public class TwoverseClient extends PApplet {
 				mCurrentMode = mMainMenu.get(j).update(tuioCursorList[i].getScreenX(width),
 						tuioCursorList[i].getScreenY(height));
 			}
-			
-			switch (mCurrentMode) {
-			
-			case 0 : 
-				for (int k = 0; k < mMainMenu.size(); k++) {
-					// TODO how does button set mode?
-					mCurrentMode = mMainMenu.get(j).update(tuioCursorList[i].getScreenX(width),
-							tuioCursorList[i].getScreenY(height));
-				}
-				
-			}
-			
 		}
 
 		//TODO if the user isn't pressing a button, they are manipulating in
 		// the sandbox - we need to know what mode we're in so we can 
 		// perform the correct behavior
 		
-			
+	switch (mCurrentMode) {	
 		case CREATE:
 				
 		case ROTATE:
