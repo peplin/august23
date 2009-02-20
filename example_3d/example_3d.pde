@@ -3,12 +3,12 @@ import processing.opengl.*;
 PImage bg;
 PImage texmap;
 
-int sDetail = 35;  //Sphere detail setting
+int sDetail = 50;  //Sphere detail setting
 float rotationX = 0;
 float rotationY = 0;
 float velocityX = 0;
 float velocityY = 0;
-float globeRadius = 300;
+float globeRadius;
 float pushBack = 0;
 
 float[] cx,cz,sphereX,sphereY,sphereZ;
@@ -27,15 +27,16 @@ void setup()
 
 void draw()
 {    
+  int xx = 40, yy = 50, rr = 20;
   background(0);            
-  renderGlobe(); 
+  renderGlobe(xx, yy, rr); 
 }
 
 
-void renderGlobe() 
+void renderGlobe(int xx, int yy, int rr) 
 {
   pushMatrix();
-  translate(width/2.0, height/2.0, pushBack);
+  translate(width/2.0+xx, height/2.0-yy, pushBack);
   pushMatrix();
   noFill();
   stroke(255,200);
@@ -52,10 +53,10 @@ void renderGlobe()
   texturedSphere(globeRadius, texmap);
   popMatrix();  
   popMatrix();
-  rotationX += velocityX;
-  rotationY += velocityY;
-  velocityX *= 0.95;
-  velocityY *= 0.95;
+  //rotationX += velocityX;
+  //rotationY += velocityY;
+  //velocityX *= 0.95;
+  //velocityY *= 0.95;
   
   // Implements mouse control (interaction will be inverse when sphere is  upside down)
   if(mousePressed){
