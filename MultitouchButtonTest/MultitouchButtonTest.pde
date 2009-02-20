@@ -11,13 +11,15 @@ int nslide = 2;
 int ninv = 3;
 
 PImage[] imgs       = new PImage[nobj];
-boolean[] lock = new boolean[ncont];
-boolean[] locka = new boolean[ncont];
-boolean[] acton = new boolean[ncont];
 CircleButton[] objs = new CircleButton[nobj];
 RectButton[] conts  = new RectButton[ncont];
 RectButton[] slides = new RectButton[nslide];
 RectButton[] invs   = new RectButton[ninv];
+
+boolean[] objon = new boolean[nobj];
+boolean[] objlock  = new boolean[nobj];
+boolean[] conton = new boolean[ncont];
+boolean[] contlock = new boolean[ncont];
 
 
 color back0 = color(0);
@@ -30,109 +32,46 @@ void setup()
   size(600, 400);
   smooth();
 
-  
-
- 
-
- 
-
-  
-
-  // Object create Buttons
+   // Object create Buttons
   color buttoncolor = color(100);
   color highlight = color(100);
   ellipseMode(CENTER);
   String img_dir = "/home/august/bzr/images/";
-  String[] img_name = {
-    "sputnik.jpg","12382-Planet_Ven.jpg","sun.gif","hst_galaxy.JPG","230240main_Pulsar1_sm.jpg"      };
+  String[] img_name = { "sputnik.jpg","12382-Planet_Ven.jpg","sun.gif","hst_galaxy.JPG","230240main_Pulsar1_sm.jpg"      };
+  int[] pobj={100, 40, 30, 60};
   for (int i=0 ; i<nobj; i++){
     imgs[i] = loadImage(img_dir+img_name[i]);
-   int dx=60;
-  int x, x0=100,y0=40, r0=30;
-    imgs[i].resize(r0,r0);
-    objs[i] = new CircleButton(x0 + i*dx, y0, r0, buttoncolor, highlight,imgs[i]);
+    imgs[i].resize(pobj[3],pobj[3]);
+    objs[i] = new CircleButton(pobj[0] + i*pobj[3], pobj[1], pobj[2], buttoncolor, highlight,imgs[i]);
   }
 
  //Action Button positions
-  int rectx0 = 540;
-  int recty0 = 60;
-  int drect = 30;
-  int dy = drect+10;
-  String[] cont_name = {
-    "create","move","zoom","evolve","rotate","learn"      };
+  int[] pcont = {540, 60, 30, 10};
+  String[] cont_name = { "create","move","zoom","evolve","rotate","learn" };
   for (int i=0 ; i<ncont; i++){
-    conts[i] = new RectButton(rectx0, recty0+ i*dy, drect, drect, buttoncolor, highlight,cont_name[i]);
-  }
-  String[] slide_name ={
-    "zoom","evolve"      }; 
-  for (int i=0 ; i<nslide; i++){
-    slides[i] = new RectButton(rectx0, recty0+ i*dy, drect, drect, buttoncolor, highlight,slide_name[i]);
+    conts[i] = new RectButton(pcont[0], pcont[1]+ i*(pcont[2] + pcont[3]) , pcont[2], pcont[2], buttoncolor, highlight,cont_name[i]);
   }
   
-  // Investigate button positions
-  int invxsize = 40, invysize = 25, invx0 = 120, invy0=350, dinvx = invxsize +10;
-  String[] inv_name = {
-    "create","move","zoom"      };
-  for (int i=0 ; i<ninv; i++){
-    invs[i] = new RectButton(rectx0, recty0+ i*dy, drect, drect, buttoncolor, highlight,inv_name[i]);
-  }
-
    //Slider positions
-  int slidex0 = 30, slidey0=90;
-  int slidex1 = 50, slidey1=350;
+  int[] pslide = {30, 90, 50, 350, 15, 150};
+  String[] slide_name ={ "zoom" , "evolve" }; 
+  slides[0] = new RectButton(pslide[0], pslide[1], pslide[4], pslide[5], buttoncolor, highlight,slide_name[0]);
+  slides[1] = new RectButton(pslide[2], pslide[3], pslide[5], pslide[4], buttoncolor, highlight,slide_name[1]);
+  
   
   // Investigate button positions
-  int invxsize = 40, invysize = 25, invx0 = 120, invy0=350, dinvx = invxsize +10;
+  int[] pinv = {120, 350, 40, 25, 10};
+  String[] inv_name = { "create","move","zoom"  };
+  for (int i=0 ; i<ninv; i++){
+    invs[i] = new RectButton(pinv[0] + i*(pinv[3]+pinv[4]), pinv[1], pinv[2], pinv[2], buttoncolor, highlight,inv_name[i]);
+  }
 
-  // Object create Buttons
-  color buttoncolor = color(100);
-  color highlight = color(100);
+   // Object create Buttons
   ellipseMode(CENTER);
-  PImage image0 = loadImage("../images/sputnik.jpg");
-  PImage image1 = loadImage("../images/12382-Planet_Ven.jpg");
-  PImage image2 = loadImage("../images/sun.gif");
-  PImage image3 = loadImage("../images/hst_galaxy.JPG");
-  PImage image4 = loadImage("../images/230240main_Pulsar1_sm.jpg");
 
-  image0.resize(r0,r0);
-  image1.resize(r0,r0);
-  image2.resize(r0,r0);
-  image3.resize(r0,r0);
-  image4.resize(r0,r0);
-  obj0 = new CircleButton(x0,  y0, r0,     buttoncolor, highlight,image0);
-  obj1 = new CircleButton(x0+  dx, y0, r0, buttoncolor, highlight,image1);
-  obj2 = new CircleButton(x0+2*dx, y0, r0, buttoncolor, highlight,image2);
-  obj3 = new CircleButton(x0+3*dx, y0, r0, buttoncolor, highlight,image3);
-  obj4 = new CircleButton(x0+4*dx, y0, r0, buttoncolor, highlight,image4);
-
-  // Action Buttons
-  buttoncolor = color(100);
-  highlight = color(100); 
-  cont0 = new RectButton(rectx0, recty0,      drect, drect, buttoncolor, highlight,"create");
-  cont1 = new RectButton(rectx0, recty0+  dy, drect, drect, buttoncolor, highlight,"move");
-  cont2 = new RectButton(rectx0, recty0+2*dy, drect, drect, buttoncolor, highlight,"zoom");
-  cont3 = new RectButton(rectx0, recty0+3*dy, drect, drect, buttoncolor, highlight,"evolve");
-  cont4 = new RectButton(rectx0, recty0+4*dy, drect, drect, buttoncolor, highlight,"rotate");
-  cont5 = new RectButton(rectx0, recty0+5*dy, drect, drect, buttoncolor, highlight,"learn");
-
-  // Sliders
-  slide0 = new RectButton(slidex0, slidey0, 15, 150, buttoncolor,highlight,"zoom");
-  slide1 = new RectButton(slidex1, slidey1, 150, 15, buttoncolor,highlight,"evolve");
-  
-  // Investigation
-  inv0 = new RectButton(invx0, invy0,         invxsize, invysize, buttoncolor, highlight,"read");
-  inv1 = new RectButton(invx0+  dinvx, invy0, invxsize, invysize, buttoncolor, highlight,"hear");
-  inv2 = new RectButton(invx0+2*dinvx, invy0, invxsize, invysize, buttoncolor, highlight,"watch");
-
-  // Run TUIO Client
+   // Run TUIO Client
   tuioClient = new TuioClient(this);
 
-
-  for(int i = 0; i < ncont; i++) {
-    lock[i] = false;
-    locka[i] = false;
-    acton[i] = false;
-  }
 }
 
 void draw() {
@@ -147,6 +86,9 @@ void draw() {
   }
 }
 
+
+
+
 void updateMouse() {
 
     if(locked == false) {
@@ -155,38 +97,56 @@ void updateMouse() {
     locked = false;
   }
   
-//  boolean[] objon = new boolean[nobj];
-//  for (int i = 0; i< ncont; i++){
-//    acton[i] = conts[i].display(conts[i].over(mouseX, mouseY) && mousePressed);
-//    conts[i].display(acton[i] || lock[i]);
-//    if (acton[i] && !lock[i]) { 
-//      lock[i] = true;
-//      for (int j = 0; j< ncont; j++){
-//        if (i != j) {
-//          acton[j] = false; 
-//          lock[j] = false;
-//        }
-//      }
-//    }
-//
-//    if (lock[0]) {
-//      for (int j=0 ; j < nobj ; j++ ){
-//        objon[j]= objs[j].display(objs[j].over(mouseX, mouseY) && mousePressed);
-//        objs[j].display(objon[j] || locka[j]);
-//        if (objon[j] && !locka[j]) { 
-//          locka[j] = true;
-//          for (int k = 0; k< nobj; k++){
-//            if (j != k) {
-//              objon[k] = false; 
-//              locka[k] = false;
-//            }
-//          }
-//        }
-//
-//
-//      }
-//    }
-//  }
+  
+  for (int i = 0; i< ncont; i++){
+    conton[i] = conts[i].display(conts[i].over(mouseX, mouseY) && mousePressed);
+    conts[i].display(conton[i] || contlock[i]);
+    if (conton[i] && !contlock[i]) { // if lock not true, but press is true, change lock to true
+      contlock[i] = true;
+      for (int j = 0; j< ncont; j++){ // set all other contlocks to off
+        if (i != j) {
+          conton[j] = false; 
+          contlock[j] = false;
+        }
+      }
+    }
+
+    
+ }
+ 
+ for (int i = 0; i< nobj; i++){
+   objon[i]= objs[i]display(objs[i].over(mouseX, mouseY) && mousePressed);
+   objlock[i] = objon[i] + contlock[0];
+   for (int j = 0; j< nobj; j++){
+            if (i != j) {
+              objon[j] = false; 
+              objlock[j] = false;
+            }
+          }
+ }
+   
+ 
+ 
+ if (contlock[0]) {
+      for (int j=0 ; j < nobj ; j++ ){
+        objon[j]= objs[j].display(objs[j].over(mouseX, mouseY) && mousePressed);
+        objs[j].display(objon[j] || objlock[j]);
+        if (objon[j] && !objlock[j]) { 
+
+          objlock[j] = true;
+          for (int k = 0; k< nobj; k++){
+            if (j != k) {
+              objon[k] = false; 
+              objlock[k] = false;
+            }
+          }
+        }
+
+
+      }
+    }
+ 
+ 
 }
 
 
@@ -199,8 +159,9 @@ void updateTouch()
 
   TuioCursor[] tuioCursorList = tuioClient.getTuioCursors();
   for(int i = 0; i < tuioCursorList.length; i++) {
-
   }
+  
+  
 }
 
 /////////////////////////////////////////
@@ -296,7 +257,7 @@ void check(boolean disp) {
       tint(255,10);
       image(myimage,x-size/2,y-size/2);     
     }
-    return disp;
+  //  return disp;
   }
 
 

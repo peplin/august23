@@ -35,6 +35,21 @@ public class TwoverseClient extends PApplet {
     int obj = 99; // TODO consider making local
     int inv = 99; // TODO consider making local
     int mBackgroundColor = color(0); // TODO consider making local
+    
+    
+    int nobj = 5;
+    int ncont = 6;
+    int nslide = 2;
+    int ninv = 3;
+
+    PImage[] imgs       = new PImage[nobj];
+    CircleButton[] objs = new CircleButton[nobj];
+    RectButton[] conts  = new RectButton[ncont];
+    RectButton[] slides = new RectButton[nslide];
+    RectButton[] invs   = new RectButton[ninv];
+    boolean[] objon = new boolean[nobj];
+    boolean[] conton = new boolean[ncont];
+
 
     public void setup() {
         mButtonFont
@@ -50,68 +65,38 @@ public class TwoverseClient extends PApplet {
         
         int baseColor = color(102);
         currentcolor = baseColor;
+         
+        
+        //Obj
+        String img_dir = "/home/august/bzr/images/";
+        String[] img_name = { "sputnik.jpg","12382-Planet_Ven.jpg","sun.gif","hst_galaxy.JPG","230240main_Pulsar1_sm.jpg"      };
+        int[] pobj={100, 40, 30, 60};
+        for (int i=0 ; i<nobj; i++){
+          imgs[i] = loadImage(img_dir+img_name[i]);
+          imgs[i].resize(pobj[3],pobj[3]);
+          mButtons.add(new CircleButton(pobj[0] + i*pobj[3], pobj[1], pobj[2], buttoncolor, highlight,imgs[i]));
+        }
 
-        // Ojbect button positions
-        int dx = 60;
-        int x, x0 = 100, y0 = 40, r0 = 30;
-
-        // Action Button positions
-        int rectx0 = 540;
-        int recty0 = 60;
-        int drect = 30;
-        int dy = drect + 10;
-
-        // Slider positions
-        int slidex0 = 30, slidey0 = 90;
-        int slidex1 = 50, slidey1 = 350;
-
-        // Investigate button positions
-        int invxsize = 40, invysize = 25, invx0 = 120,
-                        invy0 = 350, dinvx = invxsize + 10;
-
-        // Object create Buttons
-        int buttoncolor = color(100);
-        int highlight = color(100);
-
-        mButtons.add(new CircleButton(x0, y0, r0, buttoncolor, highlight, loadImage("twoverse/images/sputnik.jpg"));
-        mButtons.add(new CircleButton(x0 + dx, y0, r0, buttoncolor, highlight, loadImage("twoverse/images/12382-Planet_Ven.jpg")));
-        mButtons.add(new CircleButton(x0 + 2 * dx, y0, r0, buttoncolor, highlight,
-                        loadImage("twoverse/images/sun.gif")));
-        mButtons.add(new CircleButton(x0 + 3 * dx, y0, r0, buttoncolor, highlight,
-                        loadImage("twoverse/images/hst_galaxy.JPG")));
-        mButtons.add(new CircleButton(x0 + 4 * dx, y0, r0, buttoncolor, highlight,
-                        loadImage("twoverse/images/230240main_Pulsar1_sm.jpg")));
-
-        // Action Buttons
-        buttoncolor = color(100);
-        highlight = color(100);
-        mButtons.add(new RectButton(rectx0, recty0, drect, drect, buttoncolor,
-                        highlight, "create"));
-        mButtons.add(new RectButton(rectx0, recty0 + dy, drect, drect, buttoncolor,
-                        highlight, "move"));
-        mButtons.add(new RectButton(rectx0, recty0 + 2 * dy, drect, drect,
-                        buttoncolor, highlight, "zoom"));
-        mButtons.add(new RectButton(rectx0, recty0 + 3 * dy, drect, drect,
-                        buttoncolor, highlight, "evolve"));
-        mButtons.add(new RectButton(rectx0, recty0 + 4 * dy, drect, drect,
-                        buttoncolor, highlight, "rotate"));
-        mButtons.add(new RectButton(rectx0, recty0 + 5 * dy, drect, drect,
-                        buttoncolor, highlight, "learn"));
-
-        // Sliders
-        mButtons.add(new RectButton(slidex0, slidey0, 15, 150, buttoncolor,
-                        highlight, "zoom"));
-        mButtons.add(new RectButton(slidex1, slidey1, 150, 15, buttoncolor,
-                        highlight, "evolve"));
-
-        // Investigation
-        mButtons.add(new RectButton(invx0, invy0, invxsize, invysize, buttoncolor,
-                        highlight, "read"));
-        mButtons.add(new RectButton(invx0 + dinvx, invy0, invxsize, invysize,
-                        buttoncolor, highlight, "hear"));
-        mButtons.add(new RectButton(invx0 + 2 * dinvx, invy0, invxsize, invysize,
-                        buttoncolor, highlight, "watch"));
-
+       //Action 
+        int[] pcont = {540, 60, 30, 10};
+        String[] cont_name = { "create","move","zoom","evolve","rotate","learn" };
+        for (int i=0 ; i<ncont; i++){
+          mButtons.add(new RectButton(pcont[0], pcont[1]+ i*(pcont[2] + pcont[3]) , pcont[2], pcont[2], buttoncolor, highlight,cont_name[i]));
+        }
+        
+         //Slider 
+        int[] pslide = {30, 90, 50, 350, 15, 150};
+        String[] slide_name ={ "zoom" , "evolve" }; 
+        mButtons.add(new RectButton(pslide[0], pslide[1], pslide[4], pslide[5], buttoncolor, highlight,slide_name[0]));
+        mButtons.add(new RectButton(pslide[2], pslide[3], pslide[5], pslide[4], buttoncolor, highlight,slide_name[1]));
+        
+        // Investigate 
+        int[] pinv = {120, 350, 40, 25, 10};
+        String[] inv_name = { "create","move","zoom"  };
+        for (int i=0 ; i<ninv; i++){
+          mButtons.add(new RectButton(pinv[0] + i*(pinv[3]+pinv[4]), pinv[1], pinv[2], pinv[2], buttoncolor, highlight,inv_name[i]));
+        }
+        
         // Run TUIO Client
         mTuioClient = new TuioClient(this);
     }
@@ -119,8 +104,11 @@ public class TwoverseClient extends PApplet {
     public void draw() {
         background(mBackgroundColor);
         updateButtons();
+        updateMouse();
         updateUniverse();
 
+         
+        
         if(DEBUG) {
             // Draw each cursor to teh screen for debugging
             TuioCursor[] tuioCursorList = tuioClient.getTuioCursors();
@@ -129,6 +117,8 @@ public class TwoverseClient extends PApplet {
                         tuioCursorList[i].getScreenY(height), 10, 10);
             }
         }
+        
+        
     }
 
     void updateUniverse() {
@@ -137,6 +127,14 @@ public class TwoverseClient extends PApplet {
             rect((int) (galaxies.get(i).getPosition().getX()),
                     (int) (galaxies.get(i).getPosition().getY()), 10, 10);
         }
+    }
+    
+    void updateMouse() {
+    	for (i =0; i< nobj ; i++){
+    		objon[i] = (objs[i].over(mouseX,mouseY) && objs[i].pressed());    		
+    		
+    	}
+    	
     }
 
     void updateButtons() {
@@ -323,14 +321,15 @@ public class TwoverseClient extends PApplet {
                     }
             }
 
-            void display() {
+            void display(int disp) {
+            	if (disp == 0){
+            }
+            	else if (disp == 1){
                     noStroke();
                     noFill();
                     tint(255, 100);
                     image(myimage, x - size / 2, y - size / 2);
-            }
-
-            void highlight() {
+            }else if(disp == 2){
                     noStroke();
                     noFill();
                     tint(255, 40000);
@@ -363,16 +362,16 @@ public class TwoverseClient extends PApplet {
                 }
             }
 
-            void display() {
+            void display(int disp) {
+            	if (disp ==0){
+            	}else if (disp ==1){
                     stroke(180);
                     fill(color(130));
                     rect(x, y, size, sizey);
                     textFont(font, 8);
                     fill(color(255));
                     text(name, x + size / 4, y + sizey / 2);
-            }
-
-            void highlight() {
+            }else if (disp == 2){
                     stroke(255);
                     fill(color(230));
                     rect(x, y, size, sizey);
