@@ -64,13 +64,13 @@ public class TwoverseClient extends PApplet {
 	float sinLUT[];
 	float cosLUT[];
 	float SINCOS_PRECISION = 0.5f;
-	int SINCOS_LENGTH = int(360.0 / SINCOS_PRECISION);
+	int SINCOS_LENGTH = (int)(360.0 / SINCOS_PRECISION);
 	
 
 	public void setup() {
 
 		frameRate(30);
-		size(800, 600);
+		size(1024, 768);
 		mCurrentMode = Mode.NONE;
 
 		mObjectManager = new ObjectManagerClient();
@@ -181,7 +181,7 @@ public class TwoverseClient extends PApplet {
 		ArrayList<Galaxy> galaxies = mObjectManager.getGalaxies();
 		for (int i = 0; i < galaxies.size(); i++) {
                     renderGlobe((int) (galaxies.get(i).getPosition().getX()), (int) (galaxies
-                        .get(i).getPosition().getY()), texmap[randomNumber.next() % 39]);
+                        .get(i).getPosition().getY()), randomNumber.nextInt() % 10, texmap[randomNumber.nextInt() % 39]);
 		}
 	}
 
@@ -210,7 +210,7 @@ public class TwoverseClient extends PApplet {
 
 void renderGlobe(int x, int y, float rr, PImage mytexmap ) {
   pushMatrix();
-  translate(width/2.0+x, height/2.0-y, pushBack);
+  translate((float)(width/2.0+x), (float)(height/2.0-y), pushBack);
   pushMatrix();
   noFill();
   stroke(255,200);
@@ -287,7 +287,7 @@ void initializeSphere(int res) {
 void texturedSphere(float r, PImage t) {
   int v1,v11,v2;
 //  r = (r + 240 ) * 0.33;
-  r = (r + 40 ) * 0.33;
+  r = (float)((r + 40 ) * 0.33);
   beginShape(TRIANGLE_STRIP);
   texture(t);
   float iu=(float)(t.width-1)/(sDetail);
