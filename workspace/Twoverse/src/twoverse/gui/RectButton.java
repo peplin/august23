@@ -15,13 +15,18 @@ public class RectButton extends Button {
 		setHeight(height);
 	}
 
-	boolean over(int cursorX, int cursorY) {
-		if (overRect(cursorX, cursorY, getCenter(), mWidth, mHeight)) {
-			setPressed(true);
-			return true;
-		} else {
-			setPressed(false);
-			return false;
+	public boolean isPressed(Point cursor) {
+		return overRect(cursor, getCenter(), mWidth, mHeight); 
+	}
+	
+	public void update(Point cursor) {
+		super.update(cursor);
+		if(isVisible()) {
+			if(isLocked()) {
+				highlight();
+			} else {
+				display();
+			}
 		}
 	}
 
@@ -30,23 +35,23 @@ public class RectButton extends Button {
 		mParentApplet.fill(130);
 		mParentApplet.rect((float) getCenter().getX(), (float) getCenter()
 				.getY(), (float) getWidth(), (float) getHeight());
-		// mParentApplet.textFont(font, 8);
+		//mParentApplet.textFont(font, 8);
 		mParentApplet.fill(255);
-		mParentApplet.text(getName(),
-				(float) (getCenter().getX() + getWidth() / 4),
-				(float) (getCenter().getY() + getHeight() / 2));
+		//mParentApplet.text(getName(),
+		//		(float) (getCenter().getX() + getWidth() / 4),
+		//		(float) (getCenter().getY() + getHeight() / 2));
 	}
 
 	void highlight() {
 		mParentApplet.stroke(180);
-		mParentApplet.fill(130);
+		mParentApplet.fill(250);
 		mParentApplet.rect((float) getCenter().getX(), (float) getCenter()
 				.getY(), (float) getWidth(), (float) getHeight());
 		// mParentApplet.textFont(font, 8);
 		mParentApplet.fill(255);
-		mParentApplet.text(getName(),
-				(float) (getCenter().getX() + getWidth() / 4),
-				(float) (getCenter().getY() + getHeight() / 2));
+		//mParentApplet.text(getName(),
+		//		(float) (getCenter().getX() + getWidth() / 4),
+		//		(float) (getCenter().getY() + getHeight() / 2));
 	}
 
 	public void setWidth(int width) {

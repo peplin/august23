@@ -4,73 +4,78 @@ import tuio.*;
 
 TuioClient tuioClient;
 Capture video;
-PGraphics lensEffect;
-PImage lensImage;
-PImage lensImage2;
-PGraphics imgtmp;
 
-int lensDiameter = 300;  // Lens diameter
-int magFactor = 20;  // Magnification factor
-int lensCenterX = 300;
-int lensCenterY = 300;
+
 int[] lensArray;  // Height and width of lens
 int[] buffer;
 
+/** Configuration Parameters **/
+final int LENS_DIAMETER = 200;
+final int MAGNIFICATION_FACTOR = 40;
+
+HashMap lenses;
+boolean mapLock = false;
+
 void setup() {
-  size( 640, 480 );
+  size(640, 480);
 
   // TUIO setup
-  /**noStroke();
-   * fill(0);
-   * loop();
-   * hint(ENABLE_NATIVE_FONTS);
-   * font = createFont("Arial", 18);
-   * scale_factor = height/table_size;
-   * tuioClient  = new TuioClient(this);
-   **/
+  tuioClient  = new TuioClient(this);
 
   background(0);
   video = new Capture( this, 640, 480, 15 );
   buffer = new int[video.width * video.height];
   lensArray = new int[video.width * video.height];
+  lenses = new HashMap();
   initializeLensMatrix();
-
+  
   loadPixels();  // load pixels into memory for manip
 }
 
 void initializeLensMatrix() {
-  // Lens algorithm (transformation array)
-  int m, a, b;
-  int r = lensDiameter / 2;
-  float s = sqrt(r*r - magFactor*magFactor);
+  for(int i = 0; i < lensArray.length; i++) {
+     lensArray[i] = i;
+  } 
+}
 
-  for (int y = 0; y < video.height; y++) {
-    for (int x = 0; x < video.width; x++) {
-      int distanceToCenterX = x - lensCenterX;
-      int distanceToCenterY = y - lensCenterY;
-      if(dist(x, y, lensCenterX, lensCenterY) >= r) {
-        // point is outside the circle of the lens, so its pixel should not
-        // be modified
-        a = x;
-        b = y;
-      }
-      else {
-        // point is under the lens, so point it somewhere else
-        float z = sqrt(r*r
-              - pow(distanceToCenterX, 2) 
-              - pow(distanceToCenterY, 2));
-        a = int(distanceToCenterX * magFactor / z + 0.5);
-        b = int(distanceToCenterY * magFactor / z + 0.5);
-        a += lensCenterX;
-        b += lensCenterY;
-        a = constrain(a, 0, video.width-1);
-        b = constrain(b, 0, video.height-1);
-      }
+void updateLensMatrix() {
+  mapLock = true;
+  Iterator it = lenses.entrySet().iterator();
+  while(it.hasNext()) {
+    int m, a, b;
+    int r = LENS_DIAMETER / 2;
+    float s = sqrt(r*r - pow(MAGNIFICATION_FACTOR, 2));
+    if(!it.hasNext()) 
+      break;
+    Lens lens = (Lens) (((Map.Entry)it.next()).getValue());
+     
+    for (int y = 0; y < video.height; y++) {
+      for (int x = 0; x < video.width; x++) {
+       
+        int distanceToCenterX = x - lens.getX();
+        int distanceToCenterY = y - lens.getY();
+        if(pow(distanceToCenterX, 2) + pow(distanceToCenterY, 2) >= s*s) {
+          // point is outside the circle of the lens, so its pixel should not
+          // be modified
+          a = x;
+          b = y;
+        }
+        else {
+          // point is under the lens, so point it somewhere else
+          float z = sqrt(r*r
+            - pow(distanceToCenterX, 2) 
+            - pow(distanceToCenterY, 2));
+          a = int(distanceToCenterX * MAGNIFICATION_FACTOR / z + 0.5);
+          b = int(distanceToCenterY * MAGNIFICATION_FACTOR / z + 0.5);
+          a += lens.getX();
+          b += lens.getY();
+        }
 
-      lensArray[x + y * video.width] 
-                    = a + b * video.width;
+        lensArray[x + y * video.width] = a + b * video.width;
+      }
     }
   }
+  mapLock = false;
 }
 
 void captureEvent(Capture c) {
@@ -81,54 +86,54 @@ void captureEvent(Capture c) {
 
 
 void draw() {
+  updateLensMatrix();
+  int[] outputBuffer = new int[video.width * video.height];
   for(int i = 0; i < video.width * video.height; i++) {
-      buffer[i] = buffer[lensArray[i]];
+    outputBuffer[i] = buffer[lensArray[i]];
   }
-  arraycopy(buffer, g.pixels);
+  arraycopy(outputBuffer, g.pixels);
   updatePixels();
+}
 
-  /**background(255);
-   * textFont(font,18*scale_factor);
-   * float obj_size = object_size*scale_factor; 
-   * float cur_size = cursor_size*scale_factor; 
-   * 
-   * TuioObject[] tuioObjectList = tuioClient.getTuioObjects();
-   * for (int i=0;i<tuioObjectList.length;i++) {
-   * TuioObject tobj = tuioObjectList[i];
-   * stroke(0);
-   * fill(0);
-   * pushMatrix();
-   * translate(tobj.getScreenX(width),tobj.getScreenY(height));
-   * rotate(tobj.getAngle());
-   * rect(-obj_size/2,-obj_size/2,obj_size,obj_size);
-   * popMatrix();
-   * fill(255);
-   * text(""+tobj.getFiducialID(), tobj.getScreenX(width), tobj.getScreenY(height));
-   * }
-   * 
-   * TuioCursor[] tuioCursorList = tuioClient.getTuioCursors();
-   * for (int i=0;i<tuioCursorList.length;i++) {
-   * TuioCursor tcur = tuioCursorList[i];
-   * TuioPoint[] pointList = tcur.getPath();
-   * 
-   * if (pointList.length>0) {
-   * stroke(0,0,255);
-   * TuioPoint start_point = pointList[0];
-   * for (int j=0;j<pointList.length;j++) {
-   * TuioPoint end_point = pointList[j];
-   * line(start_point.getScreenX(width),start_point.getScreenY(height),end_point.getScreenX(width),end_point.getScreenY(height));
-   * start_point = end_point;
-   * }
-   * 
-   * stroke(192,192,192);
-   * fill(192,192,192);
-   * ellipse( tcur.getScreenX(width), tcur.getScreenY(height),cur_size,cur_size);
-   * fill(0);
-   * text(""+ tcur.getFingerID(),  tcur.getScreenX(width)-5,  tcur.getScreenY(height)+5);
-   * }
-   * 
-   * }
-   **/
+class Lens {
+  private int mX;
+  private int mY;
+   public Lens(int x, int y) {
+     mX = x;
+     mY = y;
+   }
+   
+   public void setX(int x) {
+      mX = x; 
+   }
+   public void setY(int y) {
+      mY = y; 
+   }
+   public int getX() {
+      return mX; 
+   }
+   public int getY() {
+      return mY; 
+   }
+}
+
+// called when a cursor is added to the scene
+void addTuioCursor(TuioCursor tcur) {
+  //println("add cursor "+tcur.getFingerID()+" ("+tcur.getSessionID()+ ") " +tcur.getX()+" "+tcur.getY());
+}
+
+// called when a cursor is moved
+void updateTuioCursor (TuioCursor tcur) {
+  // println("update cursor "+tcur.getFingerID()+" ("+tcur.getSessionID()+ ") " +tcur.getX()+" "+tcur.getY()
+  //         +" "+tcur.getMotionSpeed()+" "+tcur.getMotionAccel());
+  if(!mapLock)
+    lenses.put(tcur.getFingerID(), new Lens(tcur.getScreenX(video.width), tcur.getScreenY(video.height)));
+ }
+
+// called when a cursor is removed from the scene
+void removeTuioCursor(TuioCursor tcur) {
+  if(!mapLock)
+  lenses.remove(tcur.getFingerID());
 }
 
 

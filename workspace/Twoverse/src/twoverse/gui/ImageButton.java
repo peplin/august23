@@ -16,32 +16,22 @@ public class ImageButton extends Button {
 		setRadius(radius);
 	}
 
-	boolean over(int cursorX, int cursorY) {
-		if (overCircle(cursorX, cursorY, getCenter(), mRadius)) {
-			setPressed(true);
-			return true;
-		} else {
-			setPressed(false);
-			return false;
+	@Override
+	public boolean isPressed(Point cursor) {
+		return overCircle(cursor, getCenter(), mRadius);
+	}
+	
+	public void update(Point cursor) {
+		super.update(cursor);
+		if(isVisible()) {
+			if(isLocked()) {
+				highlight();
+			} else {
+				display();
+			}
 		}
 	}
-
-	public void setImage(PImage image) {
-		mImage = image;
-	}
-
-	public PImage getImage() {
-		return mImage;
-	}
-
-	public void setRadius(int radius) {
-		mRadius = radius;
-	}
-
-	public int getRadius() {
-		return mRadius;
-	}
-
+	
 	void display() {
 		mParentApplet.noStroke();
 		mParentApplet.noFill();
@@ -60,4 +50,22 @@ public class ImageButton extends Button {
 				(float) (getCenter().getY() - getRadius() / 2));
 		mParentApplet.tint(255, 100);
 	}
+
+	public void setImage(PImage image) {
+		mImage = image;
+	}
+
+	public PImage getImage() {
+		return mImage;
+	}
+
+	public void setRadius(int radius) {
+		mRadius = radius;
+	}
+
+	public int getRadius() {
+		return mRadius;
+	}
+
+
 }
