@@ -21,20 +21,22 @@ int SINCOS_LENGTH = int(360.0 / SINCOS_PRECISION);
 void setup()
 {
   size(640, 480, OPENGL);  
-  texmap = loadImage("../images/sun.gif");    
+   
   initializeSphere(sDetail);
 }
 
 void draw()
 {    
   int xx = 40, yy = 50, rr = 20;
-  background(0);            
-  renderGlobe(xx, yy, rr); 
+  background(0);           
+  texmap = loadImage("../images/sun.gif");  
+  renderGlobe(xx, yy, rr, texmap); 
 }
 
 
-void renderGlobe(int xx, int yy, int rr) 
+void renderGlobe(int xx, int yy, int rr, PImage texmap) 
 {
+   
   pushMatrix();
   translate(width/2.0+xx, height/2.0-yy, pushBack);
   pushMatrix();
