@@ -1,6 +1,7 @@
 package twoverse;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -17,7 +18,7 @@ import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 
 public class TwoverseClient extends PApplet {
-	private final static boolean DEBUG = true;
+	private final static boolean DEBUG = false;
 	private final static boolean USE_TUIO = true;
 	private final int GUI_SIDE_MIN_X = screen.width - 100;
 	private final int GUI_TOP_MIN_Y = screen.height - 100;
@@ -37,6 +38,8 @@ public class TwoverseClient extends PApplet {
 	/** Object & Server Members **/
 	private ObjectManagerClient mObjectManager;
 	private RequestHandlerClient mRequestHandler;
+
+        public Random randomNumber = new Random(1);
 
 	/** Other **/
 	int cont = 99; // TODO consider making local
@@ -76,9 +79,9 @@ public class TwoverseClient extends PApplet {
 		initializeButtons();
 
 		/** load image textures **/
-		String imgs_dir = "./images/";
+		String imgs_dir = "twoverse/images/";
 		String[] imgs_map ={"sun.gif","earthmap1k.jpg","mercurymap.jpg","saturnmap.jpg","moonbump1k.jpg","sputnik.jpg","deimosbump.jpg","jupiter2_1k.jpg","moonmap1k.jpg","sun.gif","earthbump1k.jpg","jupitermap.jpg","neptunemap.jpg","sunmap.jpg","earthcloudmap.jpg","mars_1k_color.jpg","phobosbump.jpg","uranusmap.jpg","earthlights1k.jpg","marsmap1k.jpg","plutomap1k.jpg","venusmap.jpg"  };
-		  for ( int i = 0; i< 2; i++) {
+		  for ( int i = 0; i < 40; i++) {
 		    texmap[i] = loadImage(imgs_dir+imgs_map[i]);
 		  }
 
@@ -161,7 +164,7 @@ public class TwoverseClient extends PApplet {
 
 	public void draw() {
 		background(mBackgroundColor);
-	updateButtons();
+                updateButtons();
 		updateUniverse();
 
 		if (DEBUG && USE_TUIO) {
@@ -177,8 +180,8 @@ public class TwoverseClient extends PApplet {
 	void updateUniverse() {
 		ArrayList<Galaxy> galaxies = mObjectManager.getGalaxies();
 		for (int i = 0; i < galaxies.size(); i++) {
-			rect((int) (galaxies.get(i).getPosition().getX()), (int) (galaxies
-					.get(i).getPosition().getY()), 10, 10);
+                    renderGlobe((int) (galaxies.get(i).getPosition().getX()), (int) (galaxies
+                        .get(i).getPosition().getY()), texmap[randomNumber.next() % 39]);
 		}
 	}
 
@@ -205,10 +208,9 @@ public class TwoverseClient extends PApplet {
 		}
 	}
 
-	void renderGlobe(int xx, int yy, float rr, PImage mytexmap ) 
-{
+void renderGlobe(int x, int y, float rr, PImage mytexmap ) {
   pushMatrix();
-  translate(width/2.0+xx, height/2.0-yy, pushBack);
+  translate(width/2.0+x, height/2.0-y, pushBack);
   pushMatrix();
   noFill();
   stroke(255,200);
@@ -237,8 +239,7 @@ public class TwoverseClient extends PApplet {
   }
 }
 
-void initializeSphere(int res)
-{
+void initializeSphere(int res) {
   sinLUT = new float[SINCOS_LENGTH];
   cosLUT = new float[SINCOS_LENGTH];
 
@@ -283,8 +284,7 @@ void initializeSphere(int res)
 }
 
 // Generic routine to draw textured sphere
-void texturedSphere(float r, PImage t) 
-{
+void texturedSphere(float r, PImage t) {
   int v1,v11,v2;
 //  r = (r + 240 ) * 0.33;
   r = (r + 40 ) * 0.33;
