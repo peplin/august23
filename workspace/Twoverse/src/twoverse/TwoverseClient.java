@@ -18,7 +18,7 @@ import twoverse.util.Point;
 
 public class TwoverseClient extends PApplet {
 	private final static boolean DEBUG = true;
-	private final static boolean USE_TUIO = false;
+	private final static boolean USE_TUIO = true;
 	private final int GUI_SIDE_MIN_X = screen.width - 100;
 	private final int GUI_TOP_MIN_Y = screen.height - 100;
 	/** TUIO & Control Members **/
@@ -154,6 +154,12 @@ public class TwoverseClient extends PApplet {
 	}
 
 	void updateButtons() {
+		//TODO must display at least once, so we don't have to hold down
+		// two parts - update() and display() based on wht you learned from
+		// update()
+		for (int i = 0; i < mMainMenu.size(); i++) {
+			mMainMenu.get(i).update(new Point(-1, -1));
+		}
 		if (USE_TUIO) {
 			TuioCursor[] tuioCursorList = mTuioClient.getTuioCursors();
 			for (int i = 0; i < tuioCursorList.length; i++) {
@@ -177,12 +183,13 @@ public class TwoverseClient extends PApplet {
 
 	//TODO remove this...
 	private static int galaxy_counter = 0;
-	void addTuioObject(TuioObject tobj) {
-		// println("add object "+tobj.getFiducialID()+" ("+tobj.getSessionID()+") "+tobj.getX()+" "+tobj.getY()+" "+tobj.getAngle());
-		if (tobj.getScreenX(screen.width) < GUI_SIDE_MIN_X
-				&& tobj.getScreenY(screen.height) < GUI_TOP_MIN_Y) {
+	public void addTuioCursor(TuioCursor tcur) {
+		System.out.println("foo");
+		if (tcur.getScreenX(800) < GUI_SIDE_MIN_X
+				&& tcur.getScreenY(600) < GUI_TOP_MIN_Y) {
+			System.out.println("foo1");
 			mObjectManager.add(new Galaxy(galaxy_counter++, -1, "theBody", null, null, -1,
-					new Point(tobj.getScreenX(screen.width), tobj.getScreenY(screen.width), 0), new PhysicsVector3d(1, 2, 3, 4),
+					new Point(tcur.getScreenX(800), tcur.getScreenY(600), 0), new PhysicsVector3d(1, 2, 3, 4),
 					new PhysicsVector3d(5, 6, 7, 8), new GalaxyShape(1, "test",
 							"test"), 1000.5, 2000.20));
 		}
@@ -196,15 +203,6 @@ public class TwoverseClient extends PApplet {
 					new PhysicsVector3d(5, 6, 7, 8), new GalaxyShape(1, "test",
 							"test"), 1000.5, 2000.20));
 		}
-	}
-
-	void removeTuioObject(TuioObject tobj) {
-		// println("remove object "+tobj.getFiducialID()+" ("+tobj.getSessionID()+")");
-	}
-
-	void updateTuioObject(TuioObject tobj) {
-		// println("update object "+tobj.getFiducialID()+" ("+tobj.getSessionID()+") "+tobj.getX()+" "+tobj.getY()+" "+tobj.getAngle()
-		// +" "+tobj.getMotionSpeed()+" "+tobj.getRotationSpeed()+" "+tobj.getMotionAccel()+" "+tobj.getRotationAccel());
 	}
 
 	public static void main(String args[]) {
