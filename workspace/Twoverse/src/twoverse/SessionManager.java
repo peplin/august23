@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,8 +15,8 @@ public class SessionManager extends Thread {
     private HashMap<String, Session> mSessions; // username to session obj
     private HashMap<String, User> mUsers; // username to user obj
     private Database mDatabase;
-    private static Logger sLogger =
-            Logger.getLogger(SessionManager.class.getName());
+    private static Logger sLogger = Logger.getLogger(SessionManager.class
+            .getName());
 
     public SessionManager(Database database) {
         mDatabase = database;
@@ -31,13 +30,13 @@ public class SessionManager extends Thread {
     }
 
     public int createAccount(User user) throws ExistingUserException {
-        if(!mUsers.containsKey(user.getUsername())) {
+        if (!mUsers.containsKey(user.getUsername())) {
             mDatabase.addUser(user);
             mUsers.put(user.getUsername(), user);
             return user.getId();
         } else {
             throw new ExistingUserException("Username " + user.getUsername()
-                + " is already in use");
+                    + " is already in use");
         }
     }
 
@@ -47,15 +46,15 @@ public class SessionManager extends Thread {
      * @param username
      * @param password
      * @return successful login or existing session
-     * @throws UnsetPasswordException 
+     * @throws UnsetPasswordException
      * @throws Exception
      */
     public Session login(User user) throws UnsetPasswordException {
         User actualUser = mUsers.get(user.getUsername());
         try {
-            if(actualUser != null && actualUser.validate(user)) {
+            if (actualUser != null && actualUser.validate(user)) {
                 Session userSession = mSessions.get(actualUser.getUsername());
-                if(userSession == null) {
+                if (userSession == null) {
                     mSessions.put(actualUser.getUsername(), new Session(
                             actualUser));
                     mDatabase.updateLoginTime(actualUser);
@@ -64,14 +63,14 @@ public class SessionManager extends Thread {
             }
         } catch (UnsetPasswordException e) {
             sLogger.log(Level.INFO,
-                "Tried to login with user with uninitialized password", e);
+                    "Tried to login with user with uninitialized password", e);
             throw e;
         }
         return null;
     }
 
     public void logout(Session session) {
-        if(mSessions.get(session.getUser().getUsername()).equals(session)) {
+        if (mSessions.get(session.getUser().getUsername()).equals(session)) {
             mSessions.remove(session.getUser().getUsername());
         }
     }
@@ -81,11 +80,12 @@ public class SessionManager extends Thread {
      */
     private void cleanup() {
         Timestamp timeNow = new Timestamp((new java.util.Date()).getTime());
-        Iterator it = mSessions.entrySet().iterator();
-        while(it.hasNext()) {
+        Iterator<Map.Entry<String, Session>> it = mSessions.entrySet()
+                .iterator();
+        while (it.hasNext()) {
             Session session = (Session) it.next();
-            //TODO pull out this constant
-            if(timeNow.getTime() - session.getLastRefresh().getTime() > 1000) {
+            // TODO pull out this constant
+            if (timeNow.getTime() - session.getLastRefresh().getTime() > 1000) {
                 it.remove();
             }
         }
@@ -96,6 +96,11 @@ public class SessionManager extends Thread {
     }
 
     public class ExistingUserException extends Exception {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 5064882885554598200L;
+
         public ExistingUserException(String e) {
             super(e);
         }
@@ -104,17 +109,18 @@ public class SessionManager extends Thread {
     public boolean isLoggedIn(String username, String hashedPassword) {
         User user = mUsers.get(username);
         try {
-            if(user != null && user.validateHashedPassword(hashedPassword)) {
+            if (user != null && user.validateHashedPassword(hashedPassword)) {
                 Session userSession = mSessions.get(username);
-                if(userSession != null) {
+                if (userSession != null) {
                     mSessions.get(username).refresh();
+                    return true;
                 } else {
                     return false;
                 }
             }
         } catch (UnsetPasswordException e) {
             sLogger.log(Level.INFO,
-                "Tried to login with user with uninitialized password", e);
+                    "Tried to login with user with uninitialized password", e);
             return false;
         }
         return false;

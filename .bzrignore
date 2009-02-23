@@ -1,9 +1,5 @@
 bin
-bin
-workspace/Twoverse/.metadata
-tbeta-1.1-lin-bin/tbeta/data/.svn
-tbeta-1.1-lin-bin/tbeta/shaders/.svn
+.svn/
 __MACOSX
 MultitouchFreespin/data
-workspace/Twoverse/.classpath
 .metadata

@@ -1,7 +1,9 @@
 package twoverse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
@@ -11,16 +13,26 @@ import twoverse.object.PlanetarySystem;
 import twoverse.util.User;
 
 public abstract class ObjectManager extends Thread {
-    HashMap<Integer, Galaxy> mGalaxies;
-    HashMap<Integer, PlanetarySystem> mPlanetarySystems;
-    HashMap<Integer, ManmadeBody> mManmadeBodies;
-    protected static Logger sLogger =
-            Logger.getLogger(ObjectManager.class.getName());
+    protected HashMap<Integer, Galaxy> mGalaxies;
+    protected HashMap<Integer, PlanetarySystem> mPlanetarySystems;
+    protected HashMap<Integer, ManmadeBody> mManmadeBodies;
+    protected Properties mConfigFile;
+    protected static Logger sLogger = Logger.getLogger(ObjectManager.class
+            .getName());
 
     public ObjectManager() {
-    	mGalaxies = new HashMap<Integer, Galaxy>();
-    	mPlanetarySystems = new HashMap<Integer, PlanetarySystem>();
-    	mManmadeBodies = new HashMap<Integer, ManmadeBody>();
+        try {
+            mConfigFile = new Properties();
+            mConfigFile.load(this.getClass().getClassLoader()
+                    .getResourceAsStream(
+                            "twoverse/conf/ObjectManager.properties"));
+        } catch (IOException e) {
+
+        }
+
+        mGalaxies = new HashMap<Integer, Galaxy>();
+        mPlanetarySystems = new HashMap<Integer, PlanetarySystem>();
+        mManmadeBodies = new HashMap<Integer, ManmadeBody>();
     }
 
     public ArrayList<CelestialBody> getAllBodies() {

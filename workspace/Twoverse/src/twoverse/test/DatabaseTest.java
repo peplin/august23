@@ -1,7 +1,6 @@
 package twoverse.test;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.HashMap;
 
 import org.junit.AfterClass;
@@ -32,11 +31,9 @@ public class DatabaseTest {
         database = new Database();
         users = new User[4];
         users[0] = new User(0, "first", "first@first.org", "1111111111", 100);
-        users[1] =
-                new User(0, "second", "second@second.org", "2222222222", 100);
+        users[1] = new User(0, "second", "second@second.org", "2222222222", 100);
         users[2] = new User(0, "third", "third@third.org", "3333333333", 100);
-        users[3] =
-                new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
+        users[3] = new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
 
         users[0].setPlaintextPassword("firstpass");
         users[1].setPlaintextPassword("secondpass");
@@ -48,10 +45,9 @@ public class DatabaseTest {
         database.addUser(users[2]);
         database.addUser(users[3]);
 
-        body =
-                new CelestialBody(0, -1, "theBody", null, null, -1, new Point(
-                        42, 43, 44), new PhysicsVector3d(1, 2, 3, 4),
-                        new PhysicsVector3d(5, 6, 7, 8));
+        body = new CelestialBody(0, -1, "theBody", null, null, -1, new Point(
+                42, 43, 44), new PhysicsVector3d(1, 2, 3, 4),
+                new PhysicsVector3d(5, 6, 7, 8));
     }
 
     @AfterClass
@@ -126,9 +122,8 @@ public class DatabaseTest {
 
     @Test
     public void testAddGalaxy() {
-        Galaxy galaxy =
-                new Galaxy(body, new GalaxyShape(1, "test", "test"), 1000.5,
-                        2000.20);
+        Galaxy galaxy = new Galaxy(body, new GalaxyShape(1, "test", "test"),
+                1000.5, 2000.20);
         database.add(galaxy);
         Assert.assertNotNull(galaxy.getBirthTime());
     }
@@ -136,9 +131,8 @@ public class DatabaseTest {
     @Test
     public void testDeleteGalaxy() {
         int previousCount = database.getGalaxies().size();
-        Galaxy galaxy =
-                new Galaxy(body, new GalaxyShape(1, "test", "test"), 1000.5,
-                        2000.20);
+        Galaxy galaxy = new Galaxy(body, new GalaxyShape(1, "test", "test"),
+                1000.5, 2000.20);
         database.add(galaxy);
         database.deleteObject(galaxy);
         Assert.assertEquals(previousCount, database.getGalaxies().size());
@@ -187,9 +181,8 @@ public class DatabaseTest {
     public void testAddGalaxies() {
         Galaxy[] galaxies = new Galaxy[10];
         for (int i = 0; i < 10; i++) {
-            galaxies[i] =
-                    new Galaxy(body, new GalaxyShape(1, "test", "test"),
-                            1000.5 + i, 2000.20 - i);
+            galaxies[i] = new Galaxy(body, new GalaxyShape(1, "test", "test"),
+                    1000.5 + i, 2000.20 - i);
         }
         int previousCount = database.getGalaxies().size();
         database.addGalaxies(galaxies);

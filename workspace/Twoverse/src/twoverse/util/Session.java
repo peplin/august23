@@ -4,6 +4,11 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 public class Session implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3290251644990110932L;
+
     public Session(User user) {
         refresh();
         setUser(user);

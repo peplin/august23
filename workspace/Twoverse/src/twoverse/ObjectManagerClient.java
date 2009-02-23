@@ -1,49 +1,64 @@
 package twoverse;
 
 import java.io.IOException;
-import java.util.Properties;
 import java.util.logging.Level;
 
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
-
-import org.apache.xmlrpc.client.XmlRpcClient;
+import twoverse.object.Galaxy;
+import twoverse.object.ManmadeBody;
+import twoverse.object.PlanetarySystem;
 
 public class ObjectManagerClient extends ObjectManager {
     private Builder mParser;
-    private Properties mConfigFile;
-    private XmlRpcClient mXmlRpcClient;
 
     public ObjectManagerClient() {
         super();
         mParser = new Builder();
+    }
 
-        try {
-            mConfigFile = new Properties();
-            mConfigFile.load(this.getClass().getClassLoader()
-                    .getResourceAsStream(
-                        "twoverse/conf/ObjectManagerClient.properties"));
-        } catch (IOException e) {
-
+    @Override
+    public void run() {
+        while (true) {
+            pullFeed();
+            try {
+                // TODO any way to check if it's actually updated before
+                // polling?
+                // plus, this isn't really CPU efficient
+                sleep(5000);
+            } catch (InterruptedException e) {
+            }
         }
     }
 
     public void pullFeed() {
-    	/** TODO
-    	 * pull feed
-    	 * parse objects into a hash map
-    	 * match our current map to this new one
-    	 * 		update as we go, remove from the xml feed map after
-    	 * 		remove as we go if not in xml feed map
-    	 * now reverse, all remaining in xml feed map are new objs
-    	 * 	add to our map
-    	 */
         try {
-            Document doc = mParser.build(mConfigFile.getProperty("FEED"));
-            Elements children = doc.getRootElement().getChildElements();
+            Document doc = mParser.build(mConfigFile.getProperty("FEED_URL"));
             // TODO figure out how to parse feed
+            Elements galaxies = doc.getRootElement().getChildElements(
+                    mConfigFile.getProperty("GALAXY_TAG"));
+            for (int i = 0; i < galaxies.size(); i++) {
+                Galaxy g = new Galaxy(galaxies.get(i));
+                update(g);
+            }
+
+            Elements planetarySystems = doc.getRootElement().getChildElements(
+                    mConfigFile.getProperty("PLANETARY_SYSTEM_TAG"));
+            for (int i = 0; i < planetarySystems.size(); i++) {
+                PlanetarySystem system = new PlanetarySystem(planetarySystems
+                        .get(i));
+                update(system);
+            }
+
+            Elements manmadeBodies = doc.getRootElement().getChildElements(
+                    mConfigFile.getProperty("CELESTIAL_BODY_TAG"));
+            for (int i = 0; i < manmadeBodies.size(); i++) {
+                ManmadeBody manmadeBody = new ManmadeBody(manmadeBodies.get(i));
+                update(manmadeBody);
+            }
+
         } catch (ParsingException e) {
             sLogger.log(Level.WARNING, "Feed may be malformed", e);
         } catch (IOException e) {

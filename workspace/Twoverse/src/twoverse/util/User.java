@@ -5,14 +5,23 @@ import java.io.Serializable;
 import jbcrypt.BCrypt;
 
 public class User implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1849465514178345554L;
     private String mUsername;
     private String mHashedPassword;
     private int mId;
     private String mEmail;
     private String mPhone;
     private int mPoints;
-    
+
     public class UnsetPasswordException extends Exception {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6748088724958043808L;
+
         UnsetPasswordException(String e) {
             super(e);
         }
@@ -55,8 +64,9 @@ public class User implements Serializable {
             throw new UnsetPasswordException("Password is not set");
         }
 
-        if (BCrypt.checkpw(plaintextCandidate, getHashedPassword()))
+        if (BCrypt.checkpw(plaintextCandidate, getHashedPassword())) {
             return true;
+        }
         return false;
     }
 
@@ -66,11 +76,12 @@ public class User implements Serializable {
             throw new UnsetPasswordException("Password is not set");
         }
 
-        if (hashedCandidate.equals(getHashedPassword()))
+        if (hashedCandidate.equals(getHashedPassword())) {
             return true;
+        }
         return false;
     }
-    
+
     public boolean validate(User user) throws UnsetPasswordException {
         return validateHashedPassword(user.getHashedPassword());
     }
@@ -121,17 +132,16 @@ public class User implements Serializable {
 
     public boolean equals(User other) {
         return mUsername.equals(other.mUsername)
-            && mHashedPassword.equals(other.mHashedPassword)
-            && mId == other.mId && mEmail.equals(other.mEmail)
-            && mPhone.equals(other.mPhone) && mPoints == other.mPoints;
+                && mHashedPassword.equals(other.mHashedPassword)
+                && mId == other.mId && mEmail.equals(other.mEmail)
+                && mPhone.equals(other.mPhone) && mPoints == other.mPoints;
     }
 
     @Override
     public String toString() {
-        String result =
-                "[" + getId() + ", " + getUsername() + ", "
-                    + getHashedPassword() + ", " + getEmail() + ", "
-                    + getPhone() + ", " + getPoints() + "]";
+        String result = "[" + getId() + ", " + getUsername() + ", "
+                + getHashedPassword() + ", " + getEmail() + ", " + getPhone()
+                + ", " + getPoints() + "]";
         return result;
     }
 }

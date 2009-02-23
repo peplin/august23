@@ -25,11 +25,9 @@ public class SessionManagerTest {
         database = new Database();
         users = new User[4];
         users[0] = new User(0, "first", "first@first.org", "1111111111", 100);
-        users[1] =
-                new User(0, "second", "second@second.org", "2222222222", 100);
+        users[1] = new User(0, "second", "second@second.org", "2222222222", 100);
         users[2] = new User(0, "third", "third@third.org", "3333333333", 100);
-        users[3] =
-                new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
+        users[3] = new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
 
         users[0].setPlaintextPassword("firstpass");
         users[1].setPlaintextPassword("secondpass");
@@ -56,8 +54,8 @@ public class SessionManagerTest {
 
     @Test
     public void testLogin() throws UnsetPasswordException {
-        User candidateUser =
-                new User(0, "first", "first@first.org", "1111111111", 100);
+        User candidateUser = new User(0, "first", "first@first.org",
+                "1111111111", 100);
         candidateUser.setHashedPassword(users[0].getHashedPassword());
         Assert.assertTrue(manager.login(candidateUser) != null);
         Assert.assertTrue(manager.login(users[1]) == null);
@@ -66,8 +64,8 @@ public class SessionManagerTest {
 
     @Test
     public void testLogout() throws UnsetPasswordException {
-        User candidateUser =
-                new User(0, "first", "first@first.org", "1111111111", 100);
+        User candidateUser = new User(0, "first", "first@first.org",
+                "1111111111", 100);
         candidateUser.setHashedPassword(users[0].getHashedPassword());
         Session firstSession = manager.login(candidateUser);
         manager.logout(firstSession);

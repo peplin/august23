@@ -1,18 +1,11 @@
 package twoverse;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
-import org.apache.xmlrpc.XmlRpcConfig;
-import org.apache.xmlrpc.XmlRpcConfigImpl;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
-import org.apache.xmlrpc.common.XmlRpcHttpRequestConfigImpl;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.ServletWebServer;
@@ -21,10 +14,9 @@ import org.apache.xmlrpc.webserver.XmlRpcServlet;
 import twoverse.Database.DatabaseException;
 
 public class TwoverseServer {
-    private static Logger sLogger =
-            Logger.getLogger(TwoverseServer.class.getName());
+    private static Logger sLogger = Logger.getLogger(TwoverseServer.class
+            .getName());
     private ServletWebServer mWebServer;
-    private XmlRpcServlet mServlet;
     private Database mDatabase;
     private ObjectManagerServer mObjectManager;
     private SessionManager mSessionManager;
@@ -43,10 +35,11 @@ public class TwoverseServer {
             XmlRpcServlet servlet = new RequestHandlerServer();
             mWebServer = new ServletWebServer(servlet, 8080);
             XmlRpcServer server = servlet.getXmlRpcServletServer();
-            XmlRpcServerConfigImpl config =
-                    (XmlRpcServerConfigImpl) server.getConfig();
+            XmlRpcServerConfigImpl config = (XmlRpcServerConfigImpl) server
+                    .getConfig();
             config.setEnabledForExtensions(true);
 
+            mObjectManager.start(); // begin publishing XML feed
             mSimulation.start(); // run simulation
             mWebServer.start(); // accept requests
         } catch (DatabaseException e) {

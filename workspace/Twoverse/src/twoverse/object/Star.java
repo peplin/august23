@@ -7,9 +7,14 @@ import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 
 public class Star extends CelestialBody implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1616604995850235969L;
+
     public Star(int id, int ownerId, String name, Timestamp birthTime,
-                Timestamp deathTime, int parentId, Point position,
-                PhysicsVector3d velocity, PhysicsVector3d acceleration) {
+            Timestamp deathTime, int parentId, Point position,
+            PhysicsVector3d velocity, PhysicsVector3d acceleration) {
         super(id, ownerId, name, birthTime, deathTime, parentId, position,
                 velocity, acceleration);
     }

@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -14,7 +13,6 @@ import nu.xom.Serializer;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
-import twoverse.util.User;
 
 public class ObjectManagerServer extends ObjectManager {
     Database mDatabase;
@@ -22,6 +20,7 @@ public class ObjectManagerServer extends ObjectManager {
     public ObjectManagerServer(Database database) {
         super();
         mDatabase = database;
+        initialize();
     }
 
     @Override
@@ -30,62 +29,50 @@ public class ObjectManagerServer extends ObjectManager {
             publishFeed();
             try {
                 sleep(5000);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         }
     }
 
     public void publishFeed() {
-        Element root = new Element("August");
-        Element galaxies = new Element("Galaxies");
-        Element planetarySystems = new Element("PlanetarySystems");
-        Element manmadeBodies = new Element("ManmadeBodies");
-
-        root.appendChild(galaxies);
-        root.appendChild(planetarySystems);
-        root.appendChild(manmadeBodies);
+        Element root = new Element(mConfigFile.getProperty("ROOT_TAG"));
 
         {
             Iterator<Galaxy> it = mGalaxies.values().iterator();
             while (it.hasNext()) {
-                galaxies.appendChild(it.next().toXmlElement());
+                root.appendChild(it.next().toXmlElement());
             }
         }
         {
-            Iterator<PlanetarySystem> it =
-                    mPlanetarySystems.values().iterator();
+            Iterator<PlanetarySystem> it = mPlanetarySystems.values()
+                    .iterator();
             while (it.hasNext()) {
-                planetarySystems.appendChild(it.next().toXmlElement());
+                root.appendChild(it.next().toXmlElement());
             }
         }
         {
             Iterator<ManmadeBody> it = mManmadeBodies.values().iterator();
             while (it.hasNext()) {
-                manmadeBodies.appendChild(it.next().toXmlElement());
+                root.appendChild(it.next().toXmlElement());
             }
         }
         Document doc = new Document(root);
         try {
-            FileOutputStream xmlFeedFile = new FileOutputStream("feed.xml");
-            OutputStream bufferedXmlFeedFile =
-                    new BufferedOutputStream(xmlFeedFile);
-            Serializer serializer =
-                    new Serializer(bufferedXmlFeedFile, "ISO-8859-1");
+            FileOutputStream xmlFeedFile = new FileOutputStream(mConfigFile
+                    .getProperty("FEED_FILE_LOCATION"));
+            OutputStream bufferedXmlFeedFile = new BufferedOutputStream(
+                    xmlFeedFile);
+            Serializer serializer = new Serializer(bufferedXmlFeedFile,
+                    "ISO-8859-1");
             serializer.setIndent(4);
             serializer.setMaxLength(64);
             serializer.write(doc);
-
-            // TODO confirm the serializer works, and doesn't waste space
-            /*
-             * OutputStreamWriter outStream = new OutputStreamWriter(
-             * bufferedXmlFeedFile, "8859_1"); outStream.write(doc.toXML());
-             * outStream.flush(); outStream.close();
-             */
         } catch (IOException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
     }
 
-    public void initialize(HashMap<Integer, User> users) {
+    public void initialize() {
         mGalaxies.putAll(mDatabase.getGalaxies());
         mPlanetarySystems.putAll(mDatabase.getPlanetarySystems());
         mManmadeBodies.putAll(mDatabase.getManmadeBodies());
@@ -94,14 +81,16 @@ public class ObjectManagerServer extends ObjectManager {
     /**
      * Modifies galaxy, sets ID and birth time
      */
+    @Override
     public synchronized void add(Galaxy galaxy) {
         super.add(galaxy);
         mDatabase.add(galaxy);
     }
-    
+
     /**
      * Modifies system, sets ID and birth time
      */
+    @Override
     public synchronized void add(PlanetarySystem system) {
         super.add(system);
         mDatabase.add(system);
@@ -110,9 +99,10 @@ public class ObjectManagerServer extends ObjectManager {
     /**
      * Modifies manmadeBody, sets ID and birth time
      */
+    @Override
     public synchronized void add(ManmadeBody manmadeBody) {
         mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
         mDatabase.add(manmadeBody);
     }
-    
+
 }

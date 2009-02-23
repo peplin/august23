@@ -18,11 +18,10 @@ public interface TwoversePublicApi {
      * @param email
      * @param phone
      * @return ID for new user account
-     * @throws  
+     * @throws
      */
-    public int createAccount(User user)
-            throws ExistingUserException;
-    
+    public int createAccount(User user) throws ExistingUserException;
+
     public Session login(User user) throws UnsetPasswordException;
 
     /**
@@ -78,8 +77,9 @@ public interface TwoversePublicApi {
      */
 
     /**
-     * Change the name of an existing object.
-     *TODO this needs specific names, three functions
+     * Change the name of an existing object. TODO this needs specific names,
+     * three functions
+     * 
      * @param objectId
      * @param newName
      */

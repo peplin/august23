@@ -12,7 +12,6 @@ import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
-import twoverse.Database.InvalidUserException;
 import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.SessionManager.ExistingUserException;
 import twoverse.object.Galaxy;
@@ -27,16 +26,15 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         TwoversePublicApi {
     private static ObjectManagerServer sObjectManager;
     private static SessionManager sSessionManager;
-    private static Logger sLogger =
-            Logger.getLogger(RequestHandlerServer.class.getName());
-    private static HashMap<String, Boolean> sMethodAuthorization =
-            new HashMap<String, Boolean>();
+    private static Logger sLogger = Logger.getLogger(RequestHandlerServer.class
+            .getName());
+    private static HashMap<String, Boolean> sMethodAuthorization = new HashMap<String, Boolean>();
 
     public RequestHandlerServer() {
     }
 
     public static void init(ObjectManagerServer objectManager,
-                            SessionManager sessionManager) {
+            SessionManager sessionManager) {
         sObjectManager = objectManager;
         sSessionManager = sessionManager;
 
@@ -47,16 +45,16 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         sMethodAuthorization.put("RequestHandlerServer.addGalaxy", true);
         sMethodAuthorization.put("RequestHandlerServer.addManmadeBody", true);
         sMethodAuthorization.put("RequestHandlerServer.addPlanetarySystem",
-            true);
-        sMethodAuthorization
-                .put("RequestHandlerServer.getHashedPassword", false);
+                true);
+        sMethodAuthorization.put("RequestHandlerServer.getHashedPassword",
+                false);
     }
 
     @Override
     public Session login(User user) throws UnsetPasswordException {
         return sSessionManager.login(user);
     }
-    
+
     @Override
     public void logout(Session session) {
         sSessionManager.logout(session);
@@ -109,22 +107,20 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     @Override
     protected XmlRpcHandlerMapping newXmlRpcHandlerMapping()
             throws XmlRpcException {
-        PropertyHandlerMapping mapping =
-                (PropertyHandlerMapping) super.newXmlRpcHandlerMapping();
-        AbstractReflectiveHandlerMapping.AuthenticationHandler handler =
-                new AbstractReflectiveHandlerMapping.AuthenticationHandler() {
-                    public boolean isAuthorized(XmlRpcRequest pRequest) {
-                        if(sMethodAuthorization.get(pRequest.getMethodName())) {
-                            XmlRpcHttpRequestConfig config =
-                                    (XmlRpcHttpRequestConfig) pRequest
-                                            .getConfig();
-                            return isAuthenticated(config.getBasicUserName(),
-                                config.getBasicPassword());
-                        } else {
-                            return true;
-                        }
-                    };
-                };
+        PropertyHandlerMapping mapping = (PropertyHandlerMapping) super
+                .newXmlRpcHandlerMapping();
+        AbstractReflectiveHandlerMapping.AuthenticationHandler handler = new AbstractReflectiveHandlerMapping.AuthenticationHandler() {
+            public boolean isAuthorized(XmlRpcRequest pRequest) {
+                if (sMethodAuthorization.get(pRequest.getMethodName())) {
+                    XmlRpcHttpRequestConfig config = (XmlRpcHttpRequestConfig) pRequest
+                            .getConfig();
+                    return isAuthenticated(config.getBasicUserName(), config
+                            .getBasicPassword());
+                } else {
+                    return true;
+                }
+            };
+        };
         mapping.setAuthenticationHandler(handler);
         return mapping;
     }
