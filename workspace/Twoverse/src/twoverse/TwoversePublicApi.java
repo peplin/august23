@@ -77,11 +77,11 @@ public interface TwoversePublicApi {
      */
 
     /**
-     * Change the name of an existing object. TODO this needs specific names,
-     * three functions
+     * Change the name of an existing object.
+     * User must own the object.
      * 
      * @param objectId
      * @param newName
      */
-    public void changeName(int objectId, String newName);
+    public void changeName(Session session, int objectId, String newName);
 }

@@ -57,8 +57,6 @@ public class TwoverseClient extends PApplet {
     }
 
     private void initializeButtons() {
-        // TODO pull all of these settings out to conf file
-        // make the names meaningful
         mMainMenu = new ArrayList<Button>();
         mButtonFont = loadFont("twoverse/data/NimbusSanL-BoldCond-48.vlw");
 
@@ -148,9 +146,6 @@ public class TwoverseClient extends PApplet {
     }
 
     void updateButtons() {
-        // TODO must display at least once, so we don't have to hold down
-        // two parts - update() and display() based on wht you learned from
-        // update()
         for (int i = 0; i < mMainMenu.size(); i++) {
             mMainMenu.get(i).update(new Point(-1, -1));
         }
@@ -174,28 +169,16 @@ public class TwoverseClient extends PApplet {
      * TUIO Callbacks: Unfortunately, these must be implemented in the PApplet
      * class itself, so we can't pull it out to a MultitouchHandler class
      */
-    // TODO remove this...
-    private static int galaxy_counter = 0;
 
     public void addTuioCursor(TuioCursor tcur) {
         if (tcur.getScreenX(800) < GUI_SIDE_MIN_X
                 && tcur.getScreenY(600) < GUI_TOP_MIN_Y) {
-            mObjectManager.add(new Galaxy(galaxy_counter++, -1, "theBody",
-                    null, null, -1, new Point(tcur.getScreenX(800), tcur
-                            .getScreenY(600), 0), new PhysicsVector3d(1, 2, 3,
-                            4), new PhysicsVector3d(5, 6, 7, 8),
-                    new GalaxyShape(1, "test", "test"), 1000.5, 2000.20));
         }
     }
 
     @Override
     public void mousePressed() {
         if (mouseX < GUI_SIDE_MIN_X && mouseY < GUI_TOP_MIN_Y) {
-            mObjectManager.add(new Galaxy(galaxy_counter++, -1, "theBody",
-                    null, null, -1, new Point(mouseX, mouseY, 0),
-                    new PhysicsVector3d(1, 2, 3, 4), new PhysicsVector3d(5, 6,
-                            7, 8), new GalaxyShape(1, "test", "test"), 1000.5,
-                    2000.20));
         }
     }
 

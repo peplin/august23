@@ -22,11 +22,31 @@ public class Galaxy extends CelestialBody implements Serializable {
     private static final long serialVersionUID = 4163663398347532933L;
     private Properties mConfigFile;
 
+    /**
+     * A new client side galaxy, ID and birth are set and returned by the server
+     * 
+     * @param ownerId
+     * @param name
+     * @param parentId
+     * @param position
+     * @param velocity
+     * @param acceleration
+     * @param shape
+     * @param mass
+     * @param density
+     */
+    public Galaxy(int ownerId, String name, int parentId, Point position,
+                  PhysicsVector3d velocity, PhysicsVector3d acceleration,
+                  GalaxyShape shape, double mass, double density) {
+        super(ownerId, name, parentId, position, velocity, acceleration);
+        loadConfig();
+        initialize(shape, mass, density);
+    }
 
     public Galaxy(int id, int ownerId, String name, Timestamp birthTime,
-            Timestamp deathTime, int parentId, Point position,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            GalaxyShape shape, double mass, double density) {
+                  Timestamp deathTime, int parentId, Point position,
+                  PhysicsVector3d velocity, PhysicsVector3d acceleration,
+                  GalaxyShape shape, double mass, double density) {
         super(id, ownerId, name, birthTime, deathTime, parentId, position,
                 velocity, acceleration);
         loadConfig();
@@ -34,7 +54,7 @@ public class Galaxy extends CelestialBody implements Serializable {
     }
 
     public Galaxy(CelestialBody body, GalaxyShape shape, double mass,
-            double density) {
+                  double density) {
         super(body);
         loadConfig();
         initialize(shape, mass, density);
@@ -44,20 +64,24 @@ public class Galaxy extends CelestialBody implements Serializable {
         super(element);
         loadConfig();
 
-        if (!element.getLocalName().equals(
-                mConfigFile.getProperty("GALAXY_TAG"))) {
+        if(!element.getLocalName()
+                .equals(mConfigFile.getProperty("GALAXY_TAG"))) {
             throw new UnexpectedXmlElementException("Element is not a galaxy");
         }
 
-        Element shapeElement = element.getFirstChildElement(mConfigFile
-                .getProperty("GALAXY_SHAPE_TAG"));
+        Element shapeElement =
+                element.getFirstChildElement(mConfigFile
+                        .getProperty("GALAXY_SHAPE_TAG"));
         GalaxyShape shape = new GalaxyShape(shapeElement);
 
-        double mass = Double.valueOf(element.getAttribute(
-                mConfigFile.getProperty("MASS_ATTRIBUTE_TAG")).getValue());
+        double mass =
+                Double.valueOf(element.getAttribute(
+                    mConfigFile.getProperty("MASS_ATTRIBUTE_TAG")).getValue());
 
-        double density = Double.valueOf(element.getAttribute(
-                mConfigFile.getProperty("DENSITY_ATTRIBUTE_TAG")).getValue());
+        double density =
+                Double.valueOf(element.getAttribute(
+                    mConfigFile.getProperty("DENSITY_ATTRIBUTE_TAG"))
+                        .getValue());
 
         initialize(shape, mass, density);
     }
@@ -74,7 +98,8 @@ public class Galaxy extends CelestialBody implements Serializable {
             mConfigFile.load(this.getClass().getClassLoader()
                     .getResourceAsStream("twoverse/conf/Galaxy.properties"));
         } catch (IOException e) {
-            sLogger.log(Level.SEVERE, "Unable to laod config: " + e.getMessage(), e);
+            sLogger.log(Level.SEVERE, "Unable to laod config: "
+                + e.getMessage(), e);
         }
     }
 

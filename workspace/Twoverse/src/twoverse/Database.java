@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +44,7 @@ public class Database {
     private PreparedStatement mGetManmadeBodiesStatement;
     // private PreparedStatement mGetPhenomenonStatement;
     private PreparedStatement mUpdateSimDataStatement;
+    private PreparedStatement mUpdateCelestialBodyStatement;
     private PreparedStatement mUpdateGalaxyStatement;
     private PreparedStatement mUpdatePlanetarySystemStatement;
     private PreparedStatement mUpdatePhenomenonStatement;
@@ -58,32 +60,205 @@ public class Database {
             while (resultSet.next()) {
                 CelestialBody body;
 
-                body = new CelestialBody(resultSet.getInt("object.id"),
-                        resultSet.getInt("object.owner"), resultSet
-                                .getString("object.name"), resultSet
-                                .getTimestamp("birth"), resultSet
-                                .getTimestamp("death"), resultSet
-                                .getInt("parent"), new Point(resultSet
-                                .getInt("x"), resultSet.getInt("y"), resultSet
-                                .getInt("z")), new PhysicsVector3d(resultSet
-                                .getDouble("velocity_vector_x"), resultSet
-                                .getDouble("velocity_vector_y"), resultSet
-                                .getDouble("velocity_vector_z"), resultSet
-                                .getDouble("velocity_magnitude")),
-                        new PhysicsVector3d(resultSet
-                                .getDouble("accel_vector_x"), resultSet
-                                .getDouble("accel_vector_y"), resultSet
-                                .getDouble("accel_vector_z"), resultSet
-                                .getDouble("accel_magnitude")));
+                body =
+                        new CelestialBody(
+                                resultSet.getInt("object.id"),
+                                resultSet.getInt("object.owner"),
+                                resultSet.getString("object.name"),
+                                resultSet.getTimestamp("birth"),
+                                resultSet.getTimestamp("death"),
+                                resultSet.getInt("parent"),
+                                new Point(resultSet.getInt("x"), resultSet
+                                        .getInt("y"), resultSet.getInt("z")),
+                                new PhysicsVector3d(
+                                        resultSet
+                                                .getDouble("velocity_vector_x"),
+                                        resultSet
+                                                .getDouble("velocity_vector_y"),
+                                        resultSet
+                                                .getDouble("velocity_vector_z"),
+                                        resultSet
+                                                .getDouble("velocity_magnitude")),
+                                new PhysicsVector3d(resultSet
+                                        .getDouble("accel_vector_x"), resultSet
+                                        .getDouble("accel_vector_y"), resultSet
+                                        .getDouble("accel_vector_z"), resultSet
+                                        .getDouble("accel_magnitude")));
                 bodies.add(body);
             }
         } catch (SQLException e) {
             sLogger.log(Level.WARNING,
-                    "Unable to parse celestial bodies from set: " + resultSet,
-                    e);
+                "Unable to parse celestial bodies from set: " + resultSet, e);
         }
 
         return bodies;
+    }
+
+    private synchronized void updateSimulationBody(CelestialBody body)
+            throws SQLException {
+        try {
+            mUpdateSimDataStatement.setDouble(1, body.getPosition().getX());
+            mUpdateSimDataStatement.setDouble(2, body.getPosition().getY());
+            mUpdateSimDataStatement.setDouble(3, body.getPosition().getZ());
+            mUpdateSimDataStatement.setDouble(4, body.getVelocity()
+                    .getMagnitude());
+            mUpdateSimDataStatement.setDouble(5, body.getVelocity()
+                    .getUnitDirection().getX());
+            mUpdateSimDataStatement.setDouble(6, body.getVelocity()
+                    .getUnitDirection().getY());
+            mUpdateSimDataStatement.setDouble(7, body.getVelocity()
+                    .getUnitDirection().getZ());
+            mUpdateSimDataStatement.setDouble(8, body.getAcceleration()
+                    .getMagnitude());
+            mUpdateSimDataStatement.setDouble(9, body.getAcceleration()
+                    .getUnitDirection().getX());
+            mUpdateSimDataStatement.setDouble(10, body.getAcceleration()
+                    .getUnitDirection().getY());
+            mUpdateSimDataStatement.setDouble(11, body.getAcceleration()
+                    .getUnitDirection().getZ());
+            mUpdateSimDataStatement.setInt(12, body.getId());
+            mUpdateSimDataStatement.executeUpdate();
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING,
+                "Update celestial body query failed for body: " + body, e);
+        }
+    }
+
+    private synchronized void updateCelestialBody(CelestialBody body)
+            throws SQLException {
+        try {
+            mUpdateCelestialBodyStatement.setString(1, body.getName());
+
+            if(body.getOwnerId() != -1) {
+                mUpdateCelestialBodyStatement.setInt(2, body.getOwnerId());
+            } else {
+                mUpdateCelestialBodyStatement.setNull(2, Types.INTEGER);
+            }
+
+            if(body.getParentId() != -1) {
+                mUpdateCelestialBodyStatement.setInt(3, body.getParentId());
+            } else {
+                mUpdateCelestialBodyStatement.setNull(3, Types.INTEGER);
+            }
+
+            mUpdateCelestialBodyStatement.setDouble(4, body.getPosition()
+                    .getX());
+            mUpdateCelestialBodyStatement.setDouble(5, body.getPosition()
+                    .getY());
+            mUpdateCelestialBodyStatement.setDouble(6, body.getPosition()
+                    .getZ());
+            mUpdateCelestialBodyStatement.setDouble(7, body.getVelocity()
+                    .getMagnitude());
+            mUpdateCelestialBodyStatement.setDouble(8, body.getVelocity()
+                    .getUnitDirection().getX());
+            mUpdateCelestialBodyStatement.setDouble(9, body.getVelocity()
+                    .getUnitDirection().getY());
+            mUpdateCelestialBodyStatement.setDouble(10, body.getVelocity()
+                    .getUnitDirection().getZ());
+            mUpdateCelestialBodyStatement.setDouble(11, body.getAcceleration()
+                    .getMagnitude());
+            mUpdateCelestialBodyStatement.setDouble(12, body.getAcceleration()
+                    .getUnitDirection().getX());
+            mUpdateCelestialBodyStatement.setDouble(13, body.getAcceleration()
+                    .getUnitDirection().getY());
+            mUpdateCelestialBodyStatement.setDouble(14, body.getAcceleration()
+                    .getUnitDirection().getZ());
+            mUpdateCelestialBodyStatement.setInt(15, body.getId());
+            mUpdateCelestialBodyStatement.executeUpdate();
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING,
+                "Update celestial body query failed for body: " + body, e);
+        }
+    }
+
+    private void prepareStatements() throws DatabaseException {
+        try {
+            mSelectUserStatement =
+                    mConnection.prepareStatement("SELECT * FROM user "
+                        + "WHERE id = ?");
+            mAddUserStatement =
+                    mConnection
+                            .prepareStatement("INSERT INTO user (username, password, email, sms) "
+                                + "VALUES (?, ?, ?, ?)");
+            mUpdateUserLastLoginStatement =
+                    mConnection.prepareStatement("UPDATE user "
+                        + "SET last_login = NOW() " + "WHERE id = ?");
+            mDeleteUserStatement =
+                    mConnection.prepareStatement("DELETE FROM user "
+                        + "WHERE id = ?");
+            mSelectAllUsersStatement =
+                    mConnection.prepareStatement("SELECT * FROM user");
+            mAddCelestialBodyStatement =
+                    mConnection
+                            .prepareStatement("INSERT INTO object (name, owner, parent, x, y, z, velocity_magnitude, "
+                                + "velocity_vector_x, velocity_vector_y, velocity_vector_z, "
+                                + "accel_magnitude, accel_vector_x, accel_vector_y, "
+                                + "accel_vector_z) "
+                                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            mAddGalaxyStatement =
+                    mConnection
+                            .prepareStatement("INSERT INTO galaxy (id, shape, mass, density) "
+                                + "VALUES (?, ?, ?, ?)");
+            mAddPlanetarySystemStatement =
+                    mConnection
+                            .prepareStatement("INSERT INTO planetary_system (id, centerid, mass) "
+                                + "VALUES (?, ?, ?)");
+            mAddManmadeBodyStatement =
+                    mConnection.prepareStatement("INSERT INTO manmade (id) "
+                        + "VALUES (?)");
+            mDeleteObjectStatement =
+                    mConnection.prepareStatement("DELETE FROM object "
+                        + "WHERE id = ?");
+            mGetCelestialBodyStatement =
+                    mConnection.prepareStatement("SELECT * FROM object "
+                        + "WHERE object.id = ?");
+            mGetGalaxiesStatement =
+                    mConnection.prepareStatement("SELECT * FROM object "
+                        + "NATURAL JOIN galaxy " + "LEFT JOIN (galaxy_shape) "
+                        + "ON (galaxy.shape = galaxy_shape.id) "
+                        + "LEFT JOIN (user) " + "ON (object.owner = user.id)");
+            mGetPlanetarySystemsStatement =
+                    mConnection.prepareStatement("SELECT * FROM object "
+                        + "NATURAL JOIN planetary_system "
+                        + "LEFT JOIN (user) " + "ON (object.owner = user.id)");
+            mGetManmadeBodiesStatement =
+                    mConnection.prepareStatement("SELECT * FROM object "
+                        + "NATURAL JOIN manmade " + "LEFT JOIN (user) "
+                        + "ON (object.owner = user.id)");
+            mUpdateSimDataStatement =
+                    mConnection.prepareStatement("UPDATE object "
+                        + "SET x = ?, y = ?, z = ?, velocity_magnitude = ?, "
+                        + "velocity_vector_x = ?, " + "velocity_vector_y = ?, "
+                        + "velocity_vector_z = ?, " + "accel_magnitude = ?, "
+                        + "accel_vector_x = ?, " + "accel_vector_y = ?, "
+                        + "accel_vector_z = ? WHERE id = ?");
+            mUpdateCelestialBodyStatement =
+                    mConnection.prepareStatement("UPDATE object "
+                        + "SET name = ?, owner = ?, parent = ?, x = ?, "
+                        + "y = ?, z = ?, velocity_magnitude = ?, "
+                        + "velocity_vector_x = ?, velocity_vector_y = ?,"
+                        + "velocity_vector_z = ?, accel_magnitude = ?,"
+                        + "accel_vector_x = ?, accel_vector_y = ?, "
+                        + "accel_vector_z = ? WHERE id = ?)");
+            mUpdateGalaxyStatement =
+                    mConnection.prepareStatement("UPDATE galaxy "
+                        + "SET shape = ?," + "mass = ?, " + "density = ? "
+                        + "WHERE id = ?");
+            mUpdatePlanetarySystemStatement =
+                    mConnection.prepareStatement("UPDATE galaxy "
+                        + "SET centerid = ?," + " mass = ? " + "WHERE id = ?");
+            mGetColorsStatement =
+                    mConnection.prepareStatement("SELECT * FROM colors");
+        } catch (SQLException e) {
+            throw new DatabaseException("Couldn't prepare statements: "
+                + e.getMessage());
+        }
+    }
+
+    private void closeConnection() throws java.sql.SQLException {
+        if(mConnection != null) {
+            mConnection.close();
+        }
     }
 
     public Database() throws DatabaseException {
@@ -97,22 +272,23 @@ public class Database {
         } catch (IOException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
             throw new DatabaseException("Unable to load config file: "
-                    + e.getMessage());
+                + e.getMessage());
         } catch (ClassNotFoundException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
             throw new DatabaseException("Unable to load JDBC class driver");
         }
 
         try {
-            mConnection = DriverManager.getConnection(mConfigFile
-                    .getProperty("CONNECTION"), mConfigFile
-                    .getProperty("DB_USER"), mConfigFile
-                    .getProperty("DB_PASSWORD"));
+            mConnection =
+                    DriverManager.getConnection(mConfigFile
+                            .getProperty("CONNECTION"), mConfigFile
+                            .getProperty("DB_USER"), mConfigFile
+                            .getProperty("DB_PASSWORD"));
             mConnection.setAutoCommit(true);
         } catch (Exception e) {
             sLogger.log(Level.SEVERE, "Connection to database failed", e);
             throw new DatabaseException("Connection to database failed: "
-                    + e.getMessage());
+                + e.getMessage());
         }
 
         prepareStatements();
@@ -123,86 +299,7 @@ public class Database {
             closeConnection();
         } catch (SQLException e) {
             sLogger.log(Level.SEVERE,
-                    "Failed while closing database connection", e);
-        }
-    }
-
-    private void prepareStatements() throws DatabaseException {
-        try {
-            mSelectUserStatement = mConnection
-                    .prepareStatement("SELECT * FROM user " + "WHERE id = ?");
-            mAddUserStatement = mConnection
-                    .prepareStatement("INSERT INTO user (username, password, email, sms) "
-                            + "VALUES (?, ?, ?, ?)");
-            mUpdateUserLastLoginStatement = mConnection
-                    .prepareStatement("UPDATE user "
-                            + "SET last_login = NOW() " + "WHERE id = ?");
-            mDeleteUserStatement = mConnection
-                    .prepareStatement("DELETE FROM user " + "WHERE id = ?");
-            mSelectAllUsersStatement = mConnection
-                    .prepareStatement("SELECT * FROM user");
-            mAddCelestialBodyStatement = mConnection
-                    .prepareStatement("INSERT INTO object (name, owner, parent, x, y, z, velocity_magnitude, "
-                            + "velocity_vector_x, velocity_vector_y, velocity_vector_z, "
-                            + "accel_magnitude, accel_vector_x, accel_vector_y, "
-                            + "accel_vector_z) "
-                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            mAddGalaxyStatement = mConnection
-                    .prepareStatement("INSERT INTO galaxy (id, shape, mass, density) "
-                            + "VALUES (?, ?, ?, ?)");
-            mAddPlanetarySystemStatement = mConnection
-                    .prepareStatement("INSERT INTO planetary_system (id, centerid, mass) "
-                            + "VALUES (?, ?, ?)");
-            mAddManmadeBodyStatement = mConnection
-                    .prepareStatement("INSERT INTO manmade (id) "
-                            + "VALUES (?)");
-            mDeleteObjectStatement = mConnection
-                    .prepareStatement("DELETE FROM object " + "WHERE id = ?");
-            mGetCelestialBodyStatement = mConnection
-                    .prepareStatement("SELECT * FROM object "
-                            + "WHERE object.id = ?");
-            mGetGalaxiesStatement = mConnection
-                    .prepareStatement("SELECT * FROM object "
-                            + "NATURAL JOIN galaxy "
-                            + "LEFT JOIN (galaxy_shape) "
-                            + "ON (galaxy.shape = galaxy_shape.id) "
-                            + "LEFT JOIN (user) "
-                            + "ON (object.owner = user.id)");
-            mGetPlanetarySystemsStatement = mConnection
-                    .prepareStatement("SELECT * FROM object "
-                            + "NATURAL JOIN planetary_system "
-                            + "LEFT JOIN (user) "
-                            + "ON (object.owner = user.id)");
-            mGetManmadeBodiesStatement = mConnection
-                    .prepareStatement("SELECT * FROM object "
-                            + "NATURAL JOIN manmade " + "LEFT JOIN (user) "
-                            + "ON (object.owner = user.id)");
-            mUpdateSimDataStatement = mConnection
-                    .prepareStatement("UPDATE object "
-                            + "SET velocity_magnitude = ?,"
-                            + "velocity_vector_x = ?, "
-                            + "velocity_vector_y = ?, "
-                            + "velocity_vector_z = ?, "
-                            + "accel_magnitude = ?, " + "accel_vector_x = ?, "
-                            + "accel_vector_y = ?, " + "accel_vector_z = ?,"
-                            + "x = ?, " + "y = ?, " + "z = ? " + "WHERE id = ?");
-            mUpdateGalaxyStatement = mConnection
-                    .prepareStatement("UPDATE galaxy " + "SET shape = ?,"
-                            + "mass = ?, " + "density = ? " + "WHERE id = ?");
-            mUpdatePlanetarySystemStatement = mConnection
-                    .prepareStatement("UPDATE galaxy " + "SET centerid = ?,"
-                            + "density = ? " + "WHERE id = ?");
-            mGetColorsStatement = mConnection
-                    .prepareStatement("SELECT * FROM colors");
-        } catch (SQLException e) {
-            throw new DatabaseException("Couldn't prepare statements: "
-                    + e.getMessage());
-        }
-    }
-
-    private void closeConnection() throws java.sql.SQLException {
-        if (mConnection != null) {
-            mConnection.close();
+                "Failed while closing database connection", e);
         }
     }
 
@@ -211,9 +308,12 @@ public class Database {
         try {
             ResultSet resultSet = mSelectAllUsersStatement.executeQuery();
             while (resultSet.next()) {
-                User user = new User(resultSet.getInt("id"), resultSet
-                        .getString("username"), resultSet.getString("email"),
-                        resultSet.getString("sms"), resultSet.getInt("points"));
+                User user =
+                        new User(resultSet.getInt("id"), resultSet
+                                .getString("username"), resultSet
+                                .getString("email"),
+                                resultSet.getString("sms"), resultSet
+                                        .getInt("points"));
                 user.setHashedPassword(resultSet.getString("password"));
 
                 users.put(user.getUsername(), user);
@@ -237,7 +337,7 @@ public class Database {
             user.setId(keySet.getInt(1));
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Add user query failed for user: "
-                    + user, e);
+                + user, e);
         }
         return user.getId();
 
@@ -258,7 +358,7 @@ public class Database {
             mDeleteUserStatement.executeUpdate();
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Delete user query failed for user: "
-                    + user, e);
+                + user, e);
         }
     }
 
@@ -269,16 +369,18 @@ public class Database {
             ArrayList<CelestialBody> bodies = parseCelestialBodies(resultSet);
             resultSet.beforeFirst();
             for (CelestialBody body : bodies) {
-                if (!resultSet.next()) {
+                if(!resultSet.next()) {
                     throw new SQLException(
                             "Mismatch between galaxies and celestial bodies");
                 }
 
-                Galaxy galaxy = new Galaxy(body, new GalaxyShape(resultSet
-                        .getInt("galaxy_shape.id"), resultSet
-                        .getString("galaxy_shape.name"), resultSet
-                        .getString("galaxy_shape.texture")), resultSet
-                        .getDouble("mass"), resultSet.getDouble("density"));
+                Galaxy galaxy =
+                        new Galaxy(body, new GalaxyShape(resultSet
+                                .getInt("galaxy_shape.id"), resultSet
+                                .getString("galaxy_shape.name"), resultSet
+                                .getString("galaxy_shape.texture")), resultSet
+                                .getDouble("mass"), resultSet
+                                .getDouble("density"));
                 galaxies.put(galaxy.getId(), galaxy);
             }
             resultSet.close();
@@ -289,18 +391,20 @@ public class Database {
     }
 
     public HashMap<Integer, PlanetarySystem> getPlanetarySystems() {
-        HashMap<Integer, PlanetarySystem> systems = new HashMap<Integer, PlanetarySystem>();
+        HashMap<Integer, PlanetarySystem> systems =
+                new HashMap<Integer, PlanetarySystem>();
         try {
             ResultSet resultSet = mGetPlanetarySystemsStatement.executeQuery();
             ArrayList<CelestialBody> bodies = parseCelestialBodies(resultSet);
             resultSet.beforeFirst();
             for (CelestialBody body : bodies) {
-                if (!resultSet.next()) {
+                if(!resultSet.next()) {
                     throw new SQLException(
                             "Mismatch between systems and celestial bodies");
                 }
-                PlanetarySystem system = new PlanetarySystem(body, resultSet
-                        .getInt("centerid"), resultSet.getDouble("mass"));
+                PlanetarySystem system =
+                        new PlanetarySystem(body, resultSet.getInt("centerid"),
+                                resultSet.getDouble("mass"));
                 systems.put(system.getId(), system);
             }
             resultSet.close();
@@ -311,13 +415,14 @@ public class Database {
     }
 
     public HashMap<Integer, ManmadeBody> getManmadeBodies() {
-        HashMap<Integer, ManmadeBody> manmadeBodies = new HashMap<Integer, ManmadeBody>();
+        HashMap<Integer, ManmadeBody> manmadeBodies =
+                new HashMap<Integer, ManmadeBody>();
         try {
             ResultSet resultSet = mGetManmadeBodiesStatement.executeQuery();
             ArrayList<CelestialBody> bodies = parseCelestialBodies(resultSet);
             resultSet.beforeFirst();
             for (CelestialBody body : bodies) {
-                if (!resultSet.next()) {
+                if(!resultSet.next()) {
                     throw new SQLException(
                             "Mismatch between manmade and celestial bodies");
                 }
@@ -337,13 +442,13 @@ public class Database {
         try {
             mAddCelestialBodyStatement.setString(1, body.getName());
 
-            if (body.getOwnerId() != -1) {
+            if(body.getOwnerId() != -1) {
                 mAddCelestialBodyStatement.setInt(2, body.getOwnerId());
             } else {
                 mAddCelestialBodyStatement.setNull(2, Types.INTEGER);
             }
 
-            if (body.getParentId() != -1) {
+            if(body.getParentId() != -1) {
                 mAddCelestialBodyStatement.setInt(3, body.getParentId());
             } else {
                 mAddCelestialBodyStatement.setNull(3, Types.INTEGER);
@@ -369,7 +474,7 @@ public class Database {
                     .getUnitDirection().getZ());
             mAddCelestialBodyStatement.executeUpdate();
             ResultSet keySet = mAddCelestialBodyStatement.getGeneratedKeys();
-            if (!keySet.next()) {
+            if(!keySet.next()) {
                 throw new SQLException(
                         "Couldn't find key of object we just added");
             }
@@ -377,16 +482,16 @@ public class Database {
             keySet.close();
             mGetCelestialBodyStatement.setInt(1, body.getId());
             ResultSet resultSet = mGetCelestialBodyStatement.executeQuery();
-            if (!resultSet.next()) {
+            if(!resultSet.next()) {
                 throw new SQLException("Couldn't find object we just added");
             }
             body.setBirthTime(resultSet.getTimestamp("birth"));
             resultSet.close();
         } catch (SQLException e) {
             sLogger.log(Level.WARNING,
-                    "Add celestial body query failed for body: " + body, e);
+                "Add celestial body query failed for body: " + body, e);
             throw new SQLException("Add celestial body query failed for body: "
-                    + body);
+                + body);
         }
     }
 
@@ -410,7 +515,7 @@ public class Database {
 
             mAddPlanetarySystemStatement.setInt(1, system.getId());
 
-            if (system.getCenterId() != -1) {
+            if(system.getCenterId() != -1) {
                 mAddPlanetarySystemStatement.setInt(2, system.getCenterId());
             } else {
                 mAddPlanetarySystemStatement.setNull(2, Types.INTEGER);
@@ -431,7 +536,7 @@ public class Database {
             mAddManmadeBodyStatement.executeUpdate();
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not add manmade body "
-                    + manmadeBody, e);
+                + manmadeBody, e);
         }
     }
 
@@ -459,7 +564,7 @@ public class Database {
             } catch (SQLException e2) {
                 sLogger
                         .log(Level.WARNING, "Could not roll back transaction",
-                                e);
+                            e);
             }
             sLogger.log(Level.WARNING, "Could not add galaxies", e);
         }
@@ -480,7 +585,7 @@ public class Database {
             } catch (SQLException e2) {
                 sLogger
                         .log(Level.WARNING, "Could not roll back transaction",
-                                e);
+                            e);
             }
             sLogger.log(Level.WARNING, "Could not add planetary systems", e);
         }
@@ -501,16 +606,18 @@ public class Database {
             } catch (SQLException e2) {
                 sLogger
                         .log(Level.WARNING, "Could not roll back transaction",
-                                e);
+                            e);
             }
             sLogger.log(Level.WARNING, "Could not add manmade bodies", e);
         }
     }
 
-    public void updateSimulationData(Object[] objects) {
-        // TODO
+    public void updateSimulation(CelestialBody[] bodies) {
         try {
             mConnection.setAutoCommit(false);
+            for (CelestialBody body : bodies) {
+                updateSimulationBody(body);
+            }
             mConnection.commit();
             mConnection.setAutoCommit(true);
         } catch (SQLException e) {
@@ -520,16 +627,18 @@ public class Database {
             } catch (SQLException e2) {
                 sLogger
                         .log(Level.WARNING, "Could not roll back transaction",
-                                e);
+                            e);
             }
             sLogger.log(Level.WARNING, "Could not update simulation data", e);
         }
     }
 
     public void updateGalaxies(Galaxy[] galaxies) {
-        // TODO
         try {
             mConnection.setAutoCommit(false);
+            for (Galaxy galaxy : galaxies) {
+                update(galaxy);
+            }
             mConnection.commit();
             mConnection.setAutoCommit(true);
         } catch (SQLException e) {
@@ -539,16 +648,18 @@ public class Database {
             } catch (SQLException e2) {
                 sLogger
                         .log(Level.WARNING, "Could not roll back transaction",
-                                e);
+                            e);
             }
             sLogger.log(Level.WARNING, "Could not update galaxies", e);
         }
     }
 
     public void updatePlanetarySystems(PlanetarySystem[] systems) {
-        // TODO
         try {
             mConnection.setAutoCommit(false);
+            for (PlanetarySystem system : systems) {
+                update(system);
+            }
             mConnection.commit();
             mConnection.setAutoCommit(true);
         } catch (SQLException e) {
@@ -558,16 +669,18 @@ public class Database {
             } catch (SQLException e2) {
                 sLogger
                         .log(Level.WARNING, "Could not roll back transaction",
-                                e);
+                            e);
             }
             sLogger.log(Level.WARNING, "Could not update planetary systems", e);
         }
     }
 
-    public void updateManmadeBodies(ManmadeBody[] bodes) {
-        // TODO
+    public synchronized void updateManmadeBodies(ManmadeBody[] bodies) {
         try {
             mConnection.setAutoCommit(false);
+            for (ManmadeBody body : bodies) {
+                update(body);
+            }
             mConnection.commit();
             mConnection.setAutoCommit(true);
         } catch (SQLException e) {
@@ -577,14 +690,49 @@ public class Database {
             } catch (SQLException e2) {
                 sLogger
                         .log(Level.WARNING, "Could not roll back transaction",
-                                e);
+                            e);
             }
             sLogger.log(Level.WARNING, "Could not update manmade bodies", e);
-            ;
         }
     }
 
-    @SuppressWarnings("serial")
+    public void update(PlanetarySystem system) {
+        try {
+            updateCelestialBody(system);
+
+            mUpdatePlanetarySystemStatement.setInt(1, system.getCenterId());
+            mUpdatePlanetarySystemStatement.setDouble(2, system.getMass());
+            mUpdatePlanetarySystemStatement.setDouble(3, system.getId());
+            mUpdateGalaxyStatement.executeUpdate();
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING, "Could not update planetary system "
+                + system, e);
+        }
+    }
+
+    public void update(Galaxy galaxy) {
+        try {
+            updateCelestialBody(galaxy);
+
+            mUpdateGalaxyStatement.setInt(1, galaxy.getShape().getId());
+            mUpdateGalaxyStatement.setDouble(2, galaxy.getMass());
+            mUpdateGalaxyStatement.setDouble(3, galaxy.getDensity());
+            mUpdateGalaxyStatement.setInt(4, galaxy.getId());
+            mUpdateGalaxyStatement.executeUpdate();
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING, "Could not update galaxy " + galaxy, e);
+        }
+    }
+
+    public void update(ManmadeBody manmadeBody) {
+        try {
+            updateCelestialBody(manmadeBody);
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING, "Could not update manmade body "
+                + manmadeBody, e);
+        }
+    }
+
     public class InvalidUserException extends Exception {
         public InvalidUserException(String e) {
             super(e);
@@ -592,7 +740,6 @@ public class Database {
         }
     }
 
-    @SuppressWarnings("serial")
     public class DatabaseException extends Exception {
         DatabaseException(String message) {
             super(message);

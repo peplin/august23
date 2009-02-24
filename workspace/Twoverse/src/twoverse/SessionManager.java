@@ -1,9 +1,11 @@
 package twoverse;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,10 +17,20 @@ public class SessionManager extends Thread {
     private HashMap<String, Session> mSessions; // username to session obj
     private HashMap<String, User> mUsers; // username to user obj
     private Database mDatabase;
-    private static Logger sLogger = Logger.getLogger(SessionManager.class
-            .getName());
+    private Properties mConfigFile;
+    private static Logger sLogger =
+            Logger.getLogger(SessionManager.class.getName());
 
     public SessionManager(Database database) {
+        try {
+            // Load properties file
+            mConfigFile = new Properties();
+            mConfigFile.load(this.getClass().getClassLoader()
+                    .getResourceAsStream(
+                        "twoverse/conf/SessionManager.properties"));
+        } catch (IOException e) {
+            sLogger.log(Level.SEVERE, e.getMessage(), e);
+        }
         mDatabase = database;
         mSessions = new HashMap<String, Session>();
         mUsers = new HashMap<String, User>();
@@ -30,13 +42,23 @@ public class SessionManager extends Thread {
     }
 
     public int createAccount(User user) throws ExistingUserException {
-        if (!mUsers.containsKey(user.getUsername())) {
+        if(!mUsers.containsKey(user.getUsername())) {
             mDatabase.addUser(user);
             mUsers.put(user.getUsername(), user);
             return user.getId();
         } else {
             throw new ExistingUserException("Username " + user.getUsername()
-                    + " is already in use");
+                + " is already in use");
+        }
+    }
+
+    public void run() {
+        while (true) {
+            cleanup();
+            try {
+                sleep(50000);
+            } catch (InterruptedException e) {
+            }
         }
     }
 
@@ -52,9 +74,9 @@ public class SessionManager extends Thread {
     public Session login(User user) throws UnsetPasswordException {
         User actualUser = mUsers.get(user.getUsername());
         try {
-            if (actualUser != null && actualUser.validate(user)) {
+            if(actualUser != null && actualUser.validate(user)) {
                 Session userSession = mSessions.get(actualUser.getUsername());
-                if (userSession == null) {
+                if(userSession == null) {
                     mSessions.put(actualUser.getUsername(), new Session(
                             actualUser));
                     mDatabase.updateLoginTime(actualUser);
@@ -63,14 +85,14 @@ public class SessionManager extends Thread {
             }
         } catch (UnsetPasswordException e) {
             sLogger.log(Level.INFO,
-                    "Tried to login with user with uninitialized password", e);
+                "Tried to login with user with uninitialized password", e);
             throw e;
         }
         return null;
     }
 
     public void logout(Session session) {
-        if (mSessions.get(session.getUser().getUsername()).equals(session)) {
+        if(mSessions.get(session.getUser().getUsername()).equals(session)) {
             mSessions.remove(session.getUser().getUsername());
         }
     }
@@ -80,12 +102,12 @@ public class SessionManager extends Thread {
      */
     private void cleanup() {
         Timestamp timeNow = new Timestamp((new java.util.Date()).getTime());
-        Iterator<Map.Entry<String, Session>> it = mSessions.entrySet()
-                .iterator();
+        Iterator<Map.Entry<String, Session>> it =
+                mSessions.entrySet().iterator();
         while (it.hasNext()) {
             Session session = (Session) it.next();
-            // TODO pull out this constant
-            if (timeNow.getTime() - session.getLastRefresh().getTime() > 1000) {
+            if(timeNow.getTime() - session.getLastRefresh().getTime() > Long
+                    .valueOf(mConfigFile.getProperty("SESSION_TIMEOUT"))) {
                 it.remove();
             }
         }
@@ -109,9 +131,9 @@ public class SessionManager extends Thread {
     public boolean isLoggedIn(String username, String hashedPassword) {
         User user = mUsers.get(username);
         try {
-            if (user != null && user.validateHashedPassword(hashedPassword)) {
+            if(user != null && user.validateHashedPassword(hashedPassword)) {
                 Session userSession = mSessions.get(username);
-                if (userSession != null) {
+                if(userSession != null) {
                     mSessions.get(username).refresh();
                     return true;
                 } else {
@@ -120,7 +142,7 @@ public class SessionManager extends Thread {
             }
         } catch (UnsetPasswordException e) {
             sLogger.log(Level.INFO,
-                    "Tried to login with user with uninitialized password", e);
+                "Tried to login with user with uninitialized password", e);
             return false;
         }
         return false;

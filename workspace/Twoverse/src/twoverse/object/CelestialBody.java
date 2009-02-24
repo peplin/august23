@@ -18,9 +18,9 @@ import twoverse.util.XmlExceptions.UnexpectedXmlAttributeException;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
 public class CelestialBody implements Serializable {
-    private Properties mConfigFile; // TODO make this static?
-    protected static Logger sLogger = Logger
-            .getLogger(RequestHandlerClient.class.getName());
+    private static Properties sConfigFile = null;
+    protected static Logger sLogger =
+            Logger.getLogger(RequestHandlerClient.class.getName());
     private int mId;
     private int mOwnerId;
     private Timestamp mBirthTime;
@@ -32,17 +32,27 @@ public class CelestialBody implements Serializable {
     private String mName;
     private static final long serialVersionUID = -6341175711814973441L;
 
-    // TODO need this for serializing?
+    /**
+     * Don't call this - needs to be here so its children are serializable.
+     */
     public CelestialBody() {
     }
 
-    // TODO need simpler constructors for most cases
+    public CelestialBody(int ownerId, String name, int parentId,
+                         Point position, PhysicsVector3d velocity,
+                         PhysicsVector3d acceleration) {
+        loadConfig();
+        initialize(-1, ownerId, name, null, null, parentId, position, velocity,
+            acceleration);
+
+    }
+
     public CelestialBody(int id, int ownerId, String name, Timestamp birthTime,
-            Timestamp deathTime, int parentId, Point position,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration) {
+                         Timestamp deathTime, int parentId, Point position,
+                         PhysicsVector3d velocity, PhysicsVector3d acceleration) {
         loadConfig();
         initialize(id, ownerId, name, birthTime, deathTime, parentId, position,
-                velocity, acceleration);
+            velocity, acceleration);
     }
 
     public CelestialBody(CelestialBody body) {
@@ -61,85 +71,84 @@ public class CelestialBody implements Serializable {
          * UnexpectedXmlElementException( "Element is not a celestial body"); }
          */
 
-        Elements positionElements = root.getChildElements(mConfigFile
-                .getProperty("POINT_TAG"));
+        Elements positionElements =
+                root.getChildElements(sConfigFile.getProperty("POINT_TAG"));
         Point position = null;
         for (int i = 0; i < positionElements.size() && position == null; i++) {
             Element element = positionElements.get(i);
             ;
-            if (element
-                    .getAttribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+            if(element
+                    .getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                     .getValue()
-                    .equals(mConfigFile.getProperty("POSITION_ATTRIBUTE_VALUE"))) {
+                    .equals(sConfigFile.getProperty("POSITION_ATTRIBUTE_VALUE"))) {
                 position = new Point(element);
             } else {
                 throw new UnexpectedXmlElementException(
                         "Unknown point element with name: "
-                                + element.getAttribute(mConfigFile
-                                        .getProperty("NAME_ATTRIBUTE_TAG")));
+                            + element.getAttribute(sConfigFile
+                                    .getProperty("NAME_ATTRIBUTE_TAG")));
             }
         }
 
-        if (position == null) {
+        if(position == null) {
             throw new MissingXmlElementException(
                     "Expected point object for position");
         }
 
-        Elements vectorElements = root.getChildElements(mConfigFile
-                .getProperty("VECTOR_TAG"));
+        Elements vectorElements =
+                root.getChildElements(sConfigFile.getProperty("VECTOR_TAG"));
         PhysicsVector3d velocityVector = null;
         PhysicsVector3d accelerationVector = null;
         for (int i = 0; i < vectorElements.size()
-                && (velocityVector == null || accelerationVector == null); i++) {
+            && (velocityVector == null || accelerationVector == null); i++) {
             Element element = vectorElements.get(i);
-            if (element
-                    .getAttribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+            if(element
+                    .getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                     .getValue()
-                    .equals(mConfigFile.getProperty("VELOCITY_ATTRIBUTE_VALUE"))) {
+                    .equals(sConfigFile.getProperty("VELOCITY_ATTRIBUTE_VALUE"))) {
                 velocityVector = new PhysicsVector3d(element);
-            } else if (element
-                    .getAttribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+            } else if(element
+                    .getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                     .getValue()
                     .equals(
-                            mConfigFile
-                                    .getProperty("ACCELERATION_ATTRIBUTE_VALUE"))) {
+                        sConfigFile.getProperty("ACCELERATION_ATTRIBUTE_VALUE"))) {
                 accelerationVector = new PhysicsVector3d(element);
             } else {
                 throw new UnexpectedXmlAttributeException(
                         "Unexpected attribute: "
-                                + element
-                                        .getAttribute(
-                                                mConfigFile
-                                                        .getProperty("NAME_ATTRIBUTE_TAG"))
-                                        .getValue());
+                            + element.getAttribute(
+                                sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+                                    .getValue());
             }
         }
 
         Timestamp deathTime = null;
-        if (root.getAttribute(mConfigFile.getProperty("DEATH_ATTRIBUTE_TAG")) != null) {
-            deathTime = new Timestamp(Long.valueOf(root.getAttribute(
-                    mConfigFile.getProperty("DEATH_ATTRIBUTE_TAG")).getValue()));
+        if(root.getAttribute(sConfigFile.getProperty("DEATH_ATTRIBUTE_TAG")) != null) {
+            deathTime =
+                    new Timestamp(Long.valueOf(root.getAttribute(
+                        sConfigFile.getProperty("DEATH_ATTRIBUTE_TAG"))
+                            .getValue()));
         }
-        initialize(Integer.valueOf(root.getAttribute(
-                mConfigFile.getProperty("ID_ATTRIBUTE_TAG")).getValue()),
-                Integer.valueOf(root.getAttribute(
-                        mConfigFile.getProperty("OWNER_ATTRIBUTE_TAG"))
-                        .getValue()), root.getAttribute(
-                        mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
-                        .getValue(), new Timestamp(Long.valueOf(root
-                        .getAttribute(
-                                mConfigFile.getProperty("BIRTH_ATTRIBUTE_TAG"))
-                        .getValue())), deathTime,
-                Integer.valueOf(root.getAttribute(
-                        mConfigFile.getProperty("PARENT_ID_ATTRIBUTE_TAG"))
-                        .getValue()), position, velocityVector,
-                accelerationVector);
+        initialize(
+            Integer.valueOf(root.getAttribute(
+                sConfigFile.getProperty("ID_ATTRIBUTE_TAG")).getValue()),
+            Integer.valueOf(root.getAttribute(
+                sConfigFile.getProperty("OWNER_ATTRIBUTE_TAG")).getValue()),
+            root.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+                    .getValue(),
+            new Timestamp(Long.valueOf(root.getAttribute(
+                sConfigFile.getProperty("BIRTH_ATTRIBUTE_TAG")).getValue())),
+            deathTime,
+            Integer.valueOf(root.getAttribute(
+                sConfigFile.getProperty("PARENT_ID_ATTRIBUTE_TAG")).getValue()),
+            position, velocityVector, accelerationVector);
     }
 
     private void initialize(int id, int ownerId, String name,
-            Timestamp birthTime, Timestamp deathTime, int parentId,
-            Point position, PhysicsVector3d velocity,
-            PhysicsVector3d acceleration) {
+                            Timestamp birthTime, Timestamp deathTime,
+                            int parentId, Point position,
+                            PhysicsVector3d velocity,
+                            PhysicsVector3d acceleration) {
         setId(id);
         setOwnerId(ownerId);
         setName(name);
@@ -151,15 +160,17 @@ public class CelestialBody implements Serializable {
         setAcceleration(acceleration);
     }
 
-    private void loadConfig() {
-        try {
-            mConfigFile = new Properties();
-            mConfigFile.load(this.getClass().getClassLoader()
-                    .getResourceAsStream(
+    private synchronized void loadConfig() {
+        if(sConfigFile == null) {
+            try {
+                sConfigFile = new Properties();
+                sConfigFile.load(this.getClass().getClassLoader()
+                        .getResourceAsStream(
                             "twoverse/conf/CelestialBody.properties"));
-        } catch (IOException e) {
-            sLogger.log(Level.SEVERE, "Unable to laod config: "
+            } catch (IOException e) {
+                sLogger.log(Level.SEVERE, "Unable to laod config: "
                     + e.getMessage(), e);
+            }
         }
     }
 
@@ -236,46 +247,46 @@ public class CelestialBody implements Serializable {
     }
 
     public void appendXmlAttributes(Element element) {
-        element.addAttribute(new Attribute(mConfigFile
+        element.addAttribute(new Attribute(sConfigFile
                 .getProperty("ID_ATTRIBUTE_TAG"), String.valueOf(mId)));
-        element.addAttribute(new Attribute(mConfigFile
+        element.addAttribute(new Attribute(sConfigFile
                 .getProperty("NAME_ATTRIBUTE_TAG"), mName));
-        element.addAttribute(new Attribute(mConfigFile
+        element.addAttribute(new Attribute(sConfigFile
                 .getProperty("OWNER_ATTRIBUTE_TAG"), String.valueOf(mOwnerId)));
-        element.addAttribute(new Attribute(mConfigFile
+        element.addAttribute(new Attribute(sConfigFile
                 .getProperty("BIRTH_ATTRIBUTE_TAG"), String.valueOf(mBirthTime
                 .getTime())));
-        if (mDeathTime != null) {
-            element.addAttribute(new Attribute(mConfigFile
+        if(mDeathTime != null) {
+            element.addAttribute(new Attribute(sConfigFile
                     .getProperty("DEATH_ATTRIBUTE_TAG"), String
                     .valueOf(mBirthTime.getTime())));
         }
-        element.addAttribute(new Attribute(mConfigFile
+        element.addAttribute(new Attribute(sConfigFile
                 .getProperty("PARENT_ID_ATTRIBUTE_TAG"), String
                 .valueOf(mParentId)));
 
         Element velocityElement = mVelocity.toXmlElement();
-        velocityElement.addAttribute(new Attribute(mConfigFile
-                .getProperty("NAME_ATTRIBUTE_TAG"), mConfigFile
+        velocityElement.addAttribute(new Attribute(sConfigFile
+                .getProperty("NAME_ATTRIBUTE_TAG"), sConfigFile
                 .getProperty("VELOCITY_ATTRIBUTE_VALUE")));
         element.appendChild(velocityElement);
 
         Element accelerationElement = mAcceleration.toXmlElement();
-        accelerationElement.addAttribute(new Attribute(mConfigFile
-                .getProperty("NAME_ATTRIBUTE_TAG"), mConfigFile
+        accelerationElement.addAttribute(new Attribute(sConfigFile
+                .getProperty("NAME_ATTRIBUTE_TAG"), sConfigFile
                 .getProperty("ACCELERATION_ATTRIBUTE_VALUE")));
         element.appendChild(accelerationElement);
 
         Element positionElement = mPosition.toXmlElement();
-        positionElement.addAttribute(new Attribute(mConfigFile
-                .getProperty("NAME_ATTRIBUTE_TAG"), mConfigFile
+        positionElement.addAttribute(new Attribute(sConfigFile
+                .getProperty("NAME_ATTRIBUTE_TAG"), sConfigFile
                 .getProperty("POSITION_ATTRIBUTE_VALUE")));
         element.appendChild(positionElement);
     }
 
     public Element toXmlElement() {
-        Element root = new Element(mConfigFile
-                .getProperty("CELESTIAL_BODY_TAG"));
+        Element root =
+                new Element(sConfigFile.getProperty("CELESTIAL_BODY_TAG"));
         appendXmlAttributes(root);
         return root;
     }

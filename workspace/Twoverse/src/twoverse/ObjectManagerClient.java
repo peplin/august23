@@ -36,7 +36,8 @@ public class ObjectManagerClient extends ObjectManager {
     public void pullFeed() {
         try {
             Document doc = mParser.build(mConfigFile.getProperty("FEED_URL"));
-            // TODO figure out how to parse feed
+            // TODO test this works
+            // TODO how do we pick up deleted objects?
             Elements galaxies = doc.getRootElement().getChildElements(
                     mConfigFile.getProperty("GALAXY_TAG"));
             for (int i = 0; i < galaxies.size(); i++) {

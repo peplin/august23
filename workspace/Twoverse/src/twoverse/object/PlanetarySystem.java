@@ -21,10 +21,21 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
     private int mCenterId;
     private double mMass;
 
+    public PlanetarySystem(int ownerId, String name, int parentId,
+                           Point position, PhysicsVector3d velocity,
+                           PhysicsVector3d acceleration, int centerStarId,
+                           double mass) {
+        super(ownerId, name, parentId, position, velocity, acceleration);
+        loadConfig();
+        initialize(centerStarId, mass);
+    }
+
     public PlanetarySystem(int id, int ownerId, String name,
-            Timestamp birthTime, Timestamp deathTime, int parentId,
-            Point position, PhysicsVector3d velocity,
-            PhysicsVector3d acceleration, int centerStarId, double mass) {
+                           Timestamp birthTime, Timestamp deathTime,
+                           int parentId, Point position,
+                           PhysicsVector3d velocity,
+                           PhysicsVector3d acceleration, int centerStarId,
+                           double mass) {
         super(id, ownerId, name, birthTime, deathTime, parentId, position,
                 velocity, acceleration);
         loadConfig();
@@ -40,17 +51,20 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
     public PlanetarySystem(Element element) {
         loadConfig();
 
-        if (!element.getLocalName().equals(
-                mConfigFile.getProperty("PLANETARY_SYSTEM_TAG"))) {
+        if(!element.getLocalName().equals(
+            mConfigFile.getProperty("PLANETARY_SYSTEM_TAG"))) {
             throw new UnexpectedXmlElementException(
                     "Element is not a planetary system");
         }
 
-        int centerStarId = Integer.valueOf(element.getAttribute(
-                mConfigFile.getProperty("CENTER_ID_ATTRIBUTE_TAG")).getValue());
+        int centerStarId =
+                Integer.valueOf(element.getAttribute(
+                    mConfigFile.getProperty("CENTER_ID_ATTRIBUTE_TAG"))
+                        .getValue());
 
-        double mass = Double.valueOf(element.getAttribute(
-                mConfigFile.getProperty("MASS_ATTRIBUTE_TAG")).getValue());
+        double mass =
+                Double.valueOf(element.getAttribute(
+                    mConfigFile.getProperty("MASS_ATTRIBUTE_TAG")).getValue());
 
         initialize(centerStarId, mass);
     }
@@ -60,9 +74,10 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
             mConfigFile = new Properties();
             mConfigFile.load(this.getClass().getClassLoader()
                     .getResourceAsStream(
-                            "twoverse/conf/PlanetarySystem.properties"));
+                        "twoverse/conf/PlanetarySystem.properties"));
         } catch (IOException e) {
-            sLogger.log(Level.SEVERE, "Unable to laod config: " + e.getMessage(), e);
+            sLogger.log(Level.SEVERE, "Unable to laod config: "
+                + e.getMessage(), e);
         }
     }
 
@@ -89,8 +104,8 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
 
     @Override
     public Element toXmlElement() {
-        Element root = new Element(mConfigFile
-                .getProperty("PLANETARY_SYSTEM_TAG"));
+        Element root =
+                new Element(mConfigFile.getProperty("PLANETARY_SYSTEM_TAG"));
         super.appendXmlAttributes(root);
         root.addAttribute(new Attribute(mConfigFile
                 .getProperty("CENTER_ID_ATTRIBUTE_TAG"), String
