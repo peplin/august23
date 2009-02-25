@@ -87,8 +87,10 @@ public class SessionManagerTest {
             manager.createAccount(users[1]);
             manager.createAccount(users[1]);
             Assert.fail();
-        } catch(ExistingUserException e) {
+        } catch (ExistingUserException e) {
             database.deleteUser(users[1]);
+        } catch (UnsetPasswordException e) {
+            Assert.fail();
         }
     }
 }

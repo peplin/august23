@@ -51,8 +51,11 @@ public class SessionManager extends TimerTask {
         cleanup();
     }
 
-    public int createAccount(User user)
-            throws ExistingUserException {
+    public int createAccount(User user) throws ExistingUserException, UnsetPasswordException {
+        if (user.getHashedPassword() == null) {
+            throw new User.UnsetPasswordException(
+                    "User doesn't have password set");
+        }
         mUsersLock.writeLock().lock();
         if (!mUsers.containsKey(user.getUsername())) {
             mDatabase.addUser(user);
@@ -159,7 +162,7 @@ public class SessionManager extends TimerTask {
     public long getCleanupDelay() {
         return Long.valueOf(mConfigFile.getProperty("CLEANUP_DELAY"));
     }
-    
+
     public class ExistingUserException extends Exception {
         private static final long serialVersionUID = 5064882885554598200L;
 

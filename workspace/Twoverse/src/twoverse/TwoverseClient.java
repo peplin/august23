@@ -11,7 +11,10 @@ import twoverse.gui.Button;
 import twoverse.gui.ImageButton;
 import twoverse.gui.RectButton;
 import twoverse.object.Galaxy;
+import twoverse.util.GalaxyShape;
+import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
+import twoverse.util.User;
 
 public class TwoverseClient extends PApplet {
     /**
@@ -54,8 +57,19 @@ public class TwoverseClient extends PApplet {
         Timer feedPushTimer = new Timer();
         feedPushTimer.scheduleAtFixedRate(mObjectManager, 0, mObjectManager
                 .getFeedDelay());
-        
+
         mTuioClient = new TuioClient(this);
+
+        User user = new User(0, "xmlrpcfirst", "first@first.org", "1111111111",
+                100);
+        user.setPlaintextPassword("foobar");
+        mRequestHandler.createAccount(user);
+        mRequestHandler.login(user.getUsername(), "foobar");
+
+        mObjectManager.add(new Galaxy(-1, "theBody", -1, new Point(42, 43, 44),
+                new PhysicsVector3d(1, 2, 3, 4),
+                new PhysicsVector3d(5, 6, 7, 8), new GalaxyShape(1, "test",
+                        "test"), 1000.5, 2000.20));
     }
 
     private void initializeButtons() {

@@ -25,7 +25,6 @@ public class TwoverseServer {
 
     public void run() {
         try {
-            // TODO make all managers thread safe
             mDatabase = new Database();
             mObjectManager = new ObjectManagerServer(mDatabase);
             mSessionManager = new SessionManager(mDatabase);

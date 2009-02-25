@@ -1,2 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<August/>
+<August>
+    <Galaxy mass="1000.5" density="2000.2">
+        <CelestialBody id="1" name="theBody" owner="-1"
+        birth="1235535874000" parentId="-1">
+            <Vector magnitude="4.0" name="velocity">
+                <Point x="1.0" y="2.0" z="3.0" name="direction"/>
+            </Vector>
+            <Vector magnitude="8.0" name="acceleration">
+                <Point x="5.0" y="6.0" z="7.0" name="direction"/>
+            </Vector>
+            <Point x="42.0" y="43.0" z="44.0" name="position"/>
+        </CelestialBody>
+        <GalaxyShape id="1" name="test" textureFile="test"/>
+    </Galaxy>
+</August>

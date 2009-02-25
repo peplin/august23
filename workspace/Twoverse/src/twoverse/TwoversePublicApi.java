@@ -11,6 +11,7 @@ import twoverse.util.User.UnsetPasswordException;
 public interface TwoversePublicApi {
 
     /**
+     * @throws UnsetPasswordException 
      * Create a new account in the system
      * 
      * @param username
@@ -20,7 +21,7 @@ public interface TwoversePublicApi {
      * @return ID for new user account
      * @throws
      */
-    public int createAccount(User user) throws ExistingUserException;
+    public int createAccount(User user) throws ExistingUserException, UnsetPasswordException;
 
     public Session login(User user) throws UnsetPasswordException;
 

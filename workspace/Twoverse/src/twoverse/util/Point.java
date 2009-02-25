@@ -50,6 +50,7 @@ public class Point implements Serializable {
     private void loadConfig() {
         try {
             mConfigFile = new Properties();
+            //TODO error in opening zip after a while?
             mConfigFile.load(this.getClass().getClassLoader()
                     .getResourceAsStream("twoverse/conf/Point.properties"));
         } catch (IOException e) {

@@ -16,13 +16,13 @@ public class User implements Serializable {
     private String mPhone;
     private int mPoints;
 
-    public class UnsetPasswordException extends Exception {
+    public static class UnsetPasswordException extends Exception {
         /**
          * 
          */
         private static final long serialVersionUID = -6748088724958043808L;
 
-        UnsetPasswordException(String e) {
+        public UnsetPasswordException(String e) {
             super(e);
         }
     }

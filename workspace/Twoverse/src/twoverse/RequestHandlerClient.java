@@ -61,6 +61,9 @@ public class RequestHandlerClient implements TwoversePublicApi {
 
     @Override
     /*
+     * Normal client will not call this function!!
+     * TODO this should be private, but API has it being public...client and
+     * server differ in this regard
      * @param user must already have correctly hashed password candidate
      */
     public Session login(User user) {
