@@ -25,18 +25,13 @@ public class ObjectManagerServer extends ObjectManager {
 
     @Override
     public void run() {
-        while (true) {
-            publishFeed();
-            try {
-                sleep(5000);
-            } catch (InterruptedException e) {
-            }
-        }
+        mLock.readLock().lock();
+        publishFeed();
+        mLock.readLock().unlock();
     }
 
     public void publishFeed() {
         Element root = new Element(mConfigFile.getProperty("ROOT_TAG"));
-
         {
             Iterator<Galaxy> it = mGalaxies.values().iterator();
             while (it.hasNext()) {
@@ -72,7 +67,7 @@ public class ObjectManagerServer extends ObjectManager {
         }
     }
 
-    public void initialize() {
+    private void initialize() {
         mGalaxies.putAll(mDatabase.getGalaxies());
         mPlanetarySystems.putAll(mDatabase.getPlanetarySystems());
         mManmadeBodies.putAll(mDatabase.getManmadeBodies());
@@ -82,27 +77,56 @@ public class ObjectManagerServer extends ObjectManager {
      * Modifies galaxy, sets ID and birth time
      */
     @Override
-    public synchronized void add(Galaxy galaxy) {
+    public void add(Galaxy galaxy) {
+        mLock.writeLock().lock();
         super.add(galaxy);
-        mDatabase.add(galaxy);
+        mDatabase.add(galaxy); //TODO should this be queued? will block now.
+        mLock.writeLock().unlock();
     }
 
     /**
      * Modifies system, sets ID and birth time
      */
     @Override
-    public synchronized void add(PlanetarySystem system) {
+    public void add(PlanetarySystem system) {
+        mLock.writeLock().lock();
         super.add(system);
         mDatabase.add(system);
+        mLock.writeLock().unlock();
     }
 
     /**
      * Modifies manmadeBody, sets ID and birth time
      */
     @Override
-    public synchronized void add(ManmadeBody manmadeBody) {
-        mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
+    public void add(ManmadeBody manmadeBody) {
+        mLock.writeLock().lock();
+        super.add(manmadeBody);
         mDatabase.add(manmadeBody);
+        mLock.writeLock().unlock();
+    }
+    
+    @Override
+    public void update(Galaxy galaxy) {
+        mLock.writeLock().lock();
+        super.update(galaxy);
+        //mDatabase.update(galaxy); TODO when does this update? queued?
+        mLock.writeLock().unlock();
     }
 
+    @Override
+    public void update(PlanetarySystem system) {
+        mLock.writeLock().lock();
+        super.update(system);
+      //mDatabase.update(system);
+        mLock.writeLock().unlock();
+    }
+
+    @Override
+    public void update(ManmadeBody manmadeBody) {
+        mLock.writeLock().lock();
+        super.update(manmadeBody);
+      //mDatabase.update(manmadeBody);
+        mLock.writeLock().unlock();
+    }
 }

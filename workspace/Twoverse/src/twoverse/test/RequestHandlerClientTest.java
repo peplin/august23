@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import twoverse.Database;
 import twoverse.ObjectManagerClient;
 import twoverse.RequestHandlerClient;
 import twoverse.TwoverseServer;
@@ -21,24 +22,17 @@ public class RequestHandlerClientTest {
     private static TwoverseServer server;
     private static RequestHandlerClient client;
     private static ObjectManagerClient objectManagerClient;
-
-    private User[] users;
+    private static Database database;
+    private static User[] users;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+        database = new Database();
         server = new TwoverseServer();
         server.run();
-        objectManagerClient = new ObjectManagerClient();
-        client = new RequestHandlerClient(objectManagerClient);
-
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() throws Exception {
+        client = new RequestHandlerClient();
+        objectManagerClient = new ObjectManagerClient(client);
+        
         users = new User[4];
         users[0] = new User(0, "xmlrpcfirst", "first@first.org", "1111111111",
                 100);
@@ -52,6 +46,15 @@ public class RequestHandlerClientTest {
         users[3].setPlaintextPassword("fourthpass");
     }
 
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+    }
+
+    @Before
+    public void setUp() throws Exception {
+
+    }
+
     @After
     public void tearDown() throws Exception {
     }
@@ -61,6 +64,7 @@ public class RequestHandlerClientTest {
         int idBefore = users[0].getId();
         Assert.assertTrue(0 < client.createAccount(users[0]));
         Assert.assertFalse(idBefore == users[0].getId());
+        database.deleteUser(users[0]);
     }
 
     @Test
@@ -74,7 +78,8 @@ public class RequestHandlerClientTest {
                 42, 43, 44), new PhysicsVector3d(1, 2, 3, 4),
                 new PhysicsVector3d(5, 6, 7, 8), new GalaxyShape(1, "test",
                         "test"), 1000.5, 2000.20);
-        client.addGalaxy(galaxy);
+        objectManagerClient.add(galaxy);
         Assert.assertTrue(galaxy.getId() != 0);
+        database.delete(galaxy);
     }
 }

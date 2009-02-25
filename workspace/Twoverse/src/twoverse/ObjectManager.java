@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
@@ -12,10 +14,11 @@ import twoverse.object.ManmadeBody;
 import twoverse.object.PlanetarySystem;
 import twoverse.util.User;
 
-public abstract class ObjectManager extends Thread {
+public abstract class ObjectManager extends TimerTask {
     protected HashMap<Integer, Galaxy> mGalaxies;
     protected HashMap<Integer, PlanetarySystem> mPlanetarySystems;
     protected HashMap<Integer, ManmadeBody> mManmadeBodies;
+    protected ReentrantReadWriteLock mLock;
     protected Properties mConfigFile;
     protected static Logger sLogger = Logger.getLogger(ObjectManager.class
             .getName());
@@ -30,69 +33,107 @@ public abstract class ObjectManager extends Thread {
 
         }
 
+        mLock = new ReentrantReadWriteLock();
+
         mGalaxies = new HashMap<Integer, Galaxy>();
         mPlanetarySystems = new HashMap<Integer, PlanetarySystem>();
         mManmadeBodies = new HashMap<Integer, ManmadeBody>();
     }
 
+    public long getFeedDelay() {
+        return Long.valueOf(mConfigFile.getProperty("FEED_DELAY"));
+    }
+
     public ArrayList<CelestialBody> getAllBodies() {
+        mLock.readLock().lock();
         ArrayList<CelestialBody> allBodies = new ArrayList<CelestialBody>();
         allBodies.addAll(mGalaxies.values());
         allBodies.addAll(mPlanetarySystems.values());
         allBodies.addAll(mManmadeBodies.values());
+        mLock.readLock().unlock();
         return allBodies;
     }
 
     public ArrayList<Galaxy> getGalaxies() {
-        return new ArrayList<Galaxy>(mGalaxies.values());
+        mLock.readLock().lock();
+        ArrayList<Galaxy> result = new ArrayList<Galaxy>(mGalaxies.values());
+        mLock.readLock().unlock();
+        return result;
     }
 
     public ArrayList<PlanetarySystem> getPlanetarySystems() {
-        return new ArrayList<PlanetarySystem>(mPlanetarySystems.values());
+        mLock.readLock().lock();
+        ArrayList<PlanetarySystem> result = new ArrayList<PlanetarySystem>(
+                mPlanetarySystems.values());
+        mLock.readLock().unlock();
+        return result;
     }
 
     public ArrayList<ManmadeBody> getManmadeBodies() {
-        return new ArrayList<ManmadeBody>(mManmadeBodies.values());
+        mLock.readLock().lock();
+        ArrayList<ManmadeBody> result = new ArrayList<ManmadeBody>(
+                mManmadeBodies.values());
+        mLock.readLock().unlock();
+        return result;
     }
 
     public CelestialBody getCelestialBody(int objectId)
             throws UnhandledCelestialBodyException {
+        CelestialBody result = null;
+        mLock.readLock().lock();
         if (mGalaxies.containsKey(objectId)) {
-            return mGalaxies.get(objectId);
+            result = mGalaxies.get(objectId);
         } else if (mPlanetarySystems.containsKey(objectId)) {
-            return mPlanetarySystems.get(objectId);
+            result = mPlanetarySystems.get(objectId);
         } else if (mManmadeBodies.containsKey(objectId)) {
-            return mManmadeBodies.get(objectId);
+            result = mManmadeBodies.get(objectId);
         } else {
+            mLock.readLock().unlock();
             throw new UnhandledCelestialBodyException("No such object ID");
         }
+        mLock.readLock().unlock();
+        return result;
     }
 
-    public void getOwnedBodies(User user) {
+    public ArrayList<CelestialBody> getOwnedBodies(User user) {
+        mLock.readLock().lock();
+        //TODO write getOwned bodies if we need it
+        ArrayList<CelestialBody> result = new ArrayList<CelestialBody>();
+        mLock.readLock().unlock();
+        return result;
 
     }
 
     public Galaxy getGalaxy(int id) {
-        return mGalaxies.get(id);
+        mLock.readLock().lock();
+        Galaxy result = mGalaxies.get(id);
+        mLock.readLock().unlock();
+        return result;
     }
 
     public PlanetarySystem getPlanetarySystem(int id) {
-        return mPlanetarySystems.get(id);
+        mLock.readLock().lock();
+        PlanetarySystem result = mPlanetarySystems.get(id);
+        mLock.readLock().unlock();
+        return result;
     }
 
     public ManmadeBody getManmadeBody(int id) {
-        return mManmadeBodies.get(id);
+        mLock.readLock().lock();
+        ManmadeBody result = mManmadeBodies.get(id);
+        mLock.readLock().unlock();
+        return result;
     }
 
-    public synchronized void add(Galaxy galaxy) {
+    public void add(Galaxy galaxy) {
         mGalaxies.put(galaxy.getId(), galaxy);
     }
 
-    public synchronized void add(PlanetarySystem system) {
+    public void add(PlanetarySystem system) {
         mPlanetarySystems.put(system.getId(), system);
     }
 
-    public synchronized void add(ManmadeBody manmadeBody) {
+    public void add(ManmadeBody manmadeBody) {
         mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
     }
 
@@ -103,20 +144,21 @@ public abstract class ObjectManager extends Thread {
      * 
      * TODO This overwrites - is that okay? No...need ID for objects sent from
      * client, so need to insert into database first.
+     * 
+     * TODO do we need upate for arrays of objects to match the DB?
      */
-    public synchronized void update(Galaxy galaxy) {
+    public void update(Galaxy galaxy) {
         mGalaxies.put(galaxy.getId(), galaxy);
     }
 
-    public synchronized void update(PlanetarySystem system) {
+    public void update(PlanetarySystem system) {
         mPlanetarySystems.put(system.getId(), system);
     }
 
-    public synchronized void update(ManmadeBody manmadeBody) {
+    public void update(ManmadeBody manmadeBody) {
         mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
     }
 
-    @SuppressWarnings("serial")
     public class UnhandledCelestialBodyException extends Exception {
         public UnhandledCelestialBodyException(String msg) {
             super(msg);

@@ -1,6 +1,7 @@
 package twoverse;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -10,8 +11,6 @@ import twoverse.gui.Button;
 import twoverse.gui.ImageButton;
 import twoverse.gui.RectButton;
 import twoverse.object.Galaxy;
-import twoverse.util.GalaxyShape;
-import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 
 public class TwoverseClient extends PApplet {
@@ -47,19 +46,21 @@ public class TwoverseClient extends PApplet {
         size(800, 600);
         mCurrentMode = Mode.NONE;
 
-        mObjectManager = new ObjectManagerClient();
-        mRequestHandler = new RequestHandlerClient(mObjectManager);
+        mRequestHandler = new RequestHandlerClient();
+        mObjectManager = new ObjectManagerClient(mRequestHandler);
 
         initializeButtons();
 
-        mObjectManager.start();
+        Timer feedPushTimer = new Timer();
+        feedPushTimer.scheduleAtFixedRate(mObjectManager, 0, mObjectManager
+                .getFeedDelay());
+        
         mTuioClient = new TuioClient(this);
     }
 
     private void initializeButtons() {
         mMainMenu = new ArrayList<Button>();
         mButtonFont = loadFont("twoverse/data/NimbusSanL-BoldCond-48.vlw");
-
 
         // Ojbect button positions
         int dx = 60;

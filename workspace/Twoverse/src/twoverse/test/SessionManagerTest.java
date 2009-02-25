@@ -39,7 +39,6 @@ public class SessionManagerTest {
     @AfterClass
     public static void tearDownOnce() throws Exception {
         database.deleteUser(users[0]);
-        database.deleteUser(users[1]);
     }
 
     @Before
@@ -82,9 +81,14 @@ public class SessionManagerTest {
         database.deleteUser(users[1]);
     }
 
-    @Test(expected = ExistingUserException.class)
-    public void testCreatAccountTwice() throws ExistingUserException {
-        manager.createAccount(users[1]);
-        manager.createAccount(users[1]);
+    @Test
+    public void testCreatAccountTwice() {
+        try {
+            manager.createAccount(users[1]);
+            manager.createAccount(users[1]);
+            Assert.fail();
+        } catch(ExistingUserException e) {
+            database.deleteUser(users[1]);
+        }
     }
 }

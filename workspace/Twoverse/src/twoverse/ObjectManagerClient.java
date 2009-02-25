@@ -13,27 +13,20 @@ import twoverse.object.PlanetarySystem;
 
 public class ObjectManagerClient extends ObjectManager {
     private Builder mParser;
+    private RequestHandlerClient mRequestHandler;
 
-    public ObjectManagerClient() {
+    public ObjectManagerClient(RequestHandlerClient requestHandler) {
         super();
         mParser = new Builder();
+        mRequestHandler = requestHandler;
     }
 
     @Override
     public void run() {
-        while (true) {
-            pullFeed();
-            try {
-                // TODO any way to check if it's actually updated before
-                // polling?
-                // plus, this isn't really CPU efficient
-                sleep(5000);
-            } catch (InterruptedException e) {
-            }
-        }
+        pullFeed();
     }
 
-    public void pullFeed() {
+    private void pullFeed() {
         try {
             Document doc = mParser.build(mConfigFile.getProperty("FEED_URL"));
             // TODO test this works
@@ -65,6 +58,63 @@ public class ObjectManagerClient extends ObjectManager {
         } catch (IOException e) {
             sLogger.log(Level.WARNING, "Unable to connect to feed", e);
         }
+    }
+    
+    /**
+     * Modifies galaxy, sets ID and birth time
+     */
+    @Override
+    public void add(Galaxy galaxy) {
+        mLock.writeLock().lock();
+        super.add(galaxy);
+        mRequestHandler.addGalaxy(galaxy);
+        mLock.writeLock().unlock();
+    }
+    
+    /**
+     * Modifies system, sets ID and birth time
+     */
+    @Override
+    public void add(PlanetarySystem system) {
+        mLock.writeLock().lock();
+        super.add(system);
+        mRequestHandler.addPlanetarySystem(system);
+        mLock.writeLock().unlock();
+    }
+
+    /**
+     * Modifies manmadeBody, sets ID and birth time
+     */
+    @Override
+    public void add(ManmadeBody manmadeBody) {
+        mLock.writeLock().lock();
+        super.add(manmadeBody);
+        mRequestHandler.addManmadeBody(manmadeBody);
+        mLock.writeLock().unlock();
+    }
+    
+    @Override
+    public void update(Galaxy galaxy) {
+        mLock.writeLock().lock();
+        super.update(galaxy);
+        //mRequestHandler.updateGalaxy(galaxy); TODO
+        mLock.writeLock().unlock();
+    }
+
+    @Override
+    public void update(PlanetarySystem system) {
+        mLock.writeLock().lock();
+        super.update(system);
+        //mRequestHandler.updatePlanetarySystem(system);
+        mLock.writeLock().unlock();
+    }
+
+    @Override
+    public void update(ManmadeBody manmadeBody) {
+        mLock.writeLock().lock();
+        super.update(manmadeBody);
+        //mRequestHandler.updateManmadeBody(manmadeBody);
+        mLock.writeLock().unlock();
     }
 
 }

@@ -1,6 +1,7 @@
 package twoverse;
 
 import java.io.IOException;
+import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +40,14 @@ public class TwoverseServer {
                     .getConfig();
             config.setEnabledForExtensions(true);
 
-            mObjectManager.start(); // begin publishing XML feed
+            Timer feedPushTimer = new Timer();
+            feedPushTimer.scheduleAtFixedRate(mObjectManager, 0, mObjectManager
+                    .getFeedDelay());
+
+            Timer sessionCleanupTimer = new Timer();
+            sessionCleanupTimer.scheduleAtFixedRate(mSessionManager, 0,
+                    mSessionManager.getCleanupDelay());
+
             mSimulation.start(); // run simulation
             mWebServer.start(); // accept requests
         } catch (DatabaseException e) {

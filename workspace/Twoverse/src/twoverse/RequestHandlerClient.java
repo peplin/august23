@@ -20,7 +20,6 @@ import twoverse.util.Session;
 import twoverse.util.User;
 
 public class RequestHandlerClient implements TwoversePublicApi {
-    private ObjectManagerClient mObjectManager;
     private Session mSession;
     private Properties mConfigFile;
     private XmlRpcClient mXmlRpcClient;
@@ -28,7 +27,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
     private static Logger sLogger =
             Logger.getLogger(RequestHandlerClient.class.getName());
 
-    public RequestHandlerClient(ObjectManagerClient objectManager) {
+    public RequestHandlerClient() {
         try {
             mConfigFile = new Properties();
             mConfigFile.load(this.getClass().getClassLoader()
@@ -53,8 +52,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         mXmlRpcConfig.setReplyTimeout(60 * 1000);
         mXmlRpcClient = new XmlRpcClient();
         mXmlRpcClient.setConfig(mXmlRpcConfig);
-
-        mObjectManager = objectManager;
     }
 
     private void setAuthentication(String username, String hashedPassword) {
@@ -134,7 +131,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
-        mObjectManager.add(galaxy);
         return galaxy;
     }
 
@@ -150,7 +146,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
-        mObjectManager.add(body);
         return body;
     }
 
@@ -166,7 +161,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
-        mObjectManager.add(system);
         return system;
     }
 
