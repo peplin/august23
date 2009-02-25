@@ -39,14 +39,6 @@ public class TwoverseServer {
                     .getConfig();
             config.setEnabledForExtensions(true);
 
-            Timer feedPushTimer = new Timer();
-            feedPushTimer.scheduleAtFixedRate(mObjectManager, 0, mObjectManager
-                    .getFeedDelay());
-
-            Timer sessionCleanupTimer = new Timer();
-            sessionCleanupTimer.scheduleAtFixedRate(mSessionManager, 0,
-                    mSessionManager.getCleanupDelay());
-
             mSimulation.start(); // run simulation
             mWebServer.start(); // accept requests
         } catch (DatabaseException e) {

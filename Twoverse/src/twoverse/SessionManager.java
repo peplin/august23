@@ -41,6 +41,10 @@ public class SessionManager extends TimerTask {
         mUsersLock = new ReentrantReadWriteLock();
         mSessionsLock = new ReentrantReadWriteLock();
         initializeUsers();
+
+        Timer sessionCleanupTimer = new Timer();
+        sessionCleanupTimer.scheduleAtFixedRate(this, 0, this,
+                Long.valueOf(mConfigFile.getProperty("CLEANUP_DELAY"));
     }
 
     private void initializeUsers() {
@@ -157,10 +161,6 @@ public class SessionManager extends TimerTask {
         mUsersLock.readLock().unlock();
         mSessionsLock.writeLock().unlock();
         return result;
-    }
-
-    public long getCleanupDelay() {
-        return Long.valueOf(mConfigFile.getProperty("CLEANUP_DELAY"));
     }
 
     public class ExistingUserException extends Exception {

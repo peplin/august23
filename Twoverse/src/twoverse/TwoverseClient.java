@@ -17,26 +17,12 @@ import twoverse.util.Point;
 import twoverse.util.User;
 
 public class TwoverseClient extends PApplet {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -2851294892412663551L;
     private final static boolean DEBUG = false;
     private final static boolean USE_TUIO = true;
-    private final int GUI_SIDE_MIN_X = screen.width - 100;
-    private final int GUI_TOP_MIN_Y = screen.height - 100;
+    private Properties mConfigFile;
+
     /** TUIO & Control Members **/
     private TuioClient mTuioClient;
-
-    /** GUI Members **/
-    private PFont mButtonFont;
-    private ArrayList<Button> mMainMenu;
-
-    private enum Mode {
-        NONE, CREATE, MOVE, ROTATE, ZOOM, EVOLVE, LEARN
-    }
-
-    private Mode mCurrentMode;
 
     /** Object & Server Members **/
     private ObjectManagerClient mObjectManager;
@@ -44,22 +30,28 @@ public class TwoverseClient extends PApplet {
 
     @Override
     public void setup() {
+        try {
+            mConfigFile = new Properties();
+            mConfigFile.load(this.getClass().getClassLoader()
+                    .getResourceAsStream("twoverse/conf/TwoverseClient.properties"));
+            Class.forName(DB_CLASS_NAME);
+        } catch (IOException e) {
+            sLogger.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
+        }
 
-        frameRate(30);
-        size(800, 600);
-        mCurrentMode = Mode.NONE;
+        frameRate(Integer.valueOf(mConfigFile.getProperty("FRAME_RATE")));
+        size(Integer.valueOf(mConfigFile.getProperty("WINDOW_WIDTH")),
+            Integer.valueOf(mConfigFile.getProperty("WINDOW_HEIGHT")));
 
         mRequestHandler = new RequestHandlerClient();
         mObjectManager = new ObjectManagerClient(mRequestHandler);
-
-        initializeButtons();
-
-        Timer feedPushTimer = new Timer();
-        feedPushTimer.scheduleAtFixedRate(mObjectManager, 0, mObjectManager
-                .getFeedDelay());
-
         mTuioClient = new TuioClient(this);
 
+        //initializeButtons();
+
+
+        // temporary stuff to test client/server connection
         User user = new User(0, "xmlrpcfirst", "first@first.org", "1111111111",
                 100);
         user.setPlaintextPassword("foobar");
@@ -72,7 +64,7 @@ public class TwoverseClient extends PApplet {
                         "test"), 1000.5, 2000.20));
     }
 
-    private void initializeButtons() {
+    /*private void initializeButtons() {
         mMainMenu = new ArrayList<Button>();
         mButtonFont = loadFont("twoverse/data/NimbusSanL-BoldCond-48.vlw");
 
@@ -134,15 +126,15 @@ public class TwoverseClient extends PApplet {
                 "watch", invxsize, invysize));
         mMainMenu.add(button);
 
-    }
+    }*/
 
     @Override
     public void draw() {
         background(0);
-        updateButtons();
         updateUniverse();
 
-        if (DEBUG && USE_TUIO) {
+        if (Boolean.valueOf(mConfigFile.getProperty("DEBUG")) 
+                && Boolean.valueOf(mConfigFile.getProperty("USE_TUIO"))) {
             // Draw each cursor to the screen for debugging
             TuioCursor[] tuioCursorList = mTuioClient.getTuioCursors();
             for (TuioCursor element : tuioCursorList) {
@@ -153,30 +145,10 @@ public class TwoverseClient extends PApplet {
     }
 
     void updateUniverse() {
-        ArrayList<Galaxy> galaxies = mObjectManager.getGalaxies();
-        for (int i = 0; i < galaxies.size(); i++) {
-            rect((int) (galaxies.get(i).getPosition().getX()), (int) (galaxies
-                    .get(i).getPosition().getY()), 10, 10);
-        }
-    }
-
-    void updateButtons() {
-        for (int i = 0; i < mMainMenu.size(); i++) {
-            mMainMenu.get(i).update(new Point(-1, -1));
-        }
-        if (USE_TUIO) {
-            TuioCursor[] tuioCursorList = mTuioClient.getTuioCursors();
-            for (TuioCursor element : tuioCursorList) {
-                for (int j = 0; j < mMainMenu.size(); j++) {
-                    mMainMenu.get(j).update(
-                            new Point(element.getScreenX(width), element
-                                    .getScreenY(height)));
-                }
-            }
-        } else {
-            for (int i = 0; i < mMainMenu.size(); i++) {
-                mMainMenu.get(i).update(new Point(mouseX, mouseY));
-            }
+        lights();
+        ArrayList<AppletCelestialBody> bodies = mObjectManager.getAllBodiesAsApplets(this);
+        for(AppletCelestialBody body : bodies) {
+            body.display();
         }
     }
 
@@ -184,10 +156,9 @@ public class TwoverseClient extends PApplet {
      * TUIO Callbacks: Unfortunately, these must be implemented in the PApplet
      * class itself, so we can't pull it out to a MultitouchHandler class
      */
-
     public void addTuioCursor(TuioCursor tcur) {
-        if (tcur.getScreenX(800) < GUI_SIDE_MIN_X
-                && tcur.getScreenY(600) < GUI_TOP_MIN_Y) {
+        if (tcur.getScreenX(Integer.valueOf(mConfigFile.getProperty("WINDOW_WIDTH")) < GUI_SIDE_MIN_X
+                && tcur.getScreenY(Integer.valueOf(mConfigFile.getProperty("WINDOW_HEIGHT")) < GUI_TOP_MIN_Y) {
         }
     }
 

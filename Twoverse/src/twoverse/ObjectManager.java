@@ -38,10 +38,10 @@ public abstract class ObjectManager extends TimerTask {
         mGalaxies = new HashMap<Integer, Galaxy>();
         mPlanetarySystems = new HashMap<Integer, PlanetarySystem>();
         mManmadeBodies = new HashMap<Integer, ManmadeBody>();
-    }
 
-    public long getFeedDelay() {
-        return Long.valueOf(mConfigFile.getProperty("FEED_DELAY"));
+        Timer feedPushTimer = new Timer();
+        feedPushTimer.scheduleAtFixedRate(this, 0, this,
+                Long.valueOf(mConfigFile.getProperty("FEED_DELAY")));
     }
 
     public ArrayList<CelestialBody> getAllBodies() {

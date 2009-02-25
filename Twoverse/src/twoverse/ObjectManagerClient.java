@@ -59,6 +59,26 @@ public class ObjectManagerClient extends ObjectManager {
             sLogger.log(Level.WARNING, "Unable to connect to feed", e);
         }
     }
+
+    public ArrayList<AppletCelestialBody> getAllBodiesAsApplets(PApplet parent) {
+        mLock.readLock().lock();
+        ArrayList<AppletCelestialBody> allBodies = new ArrayList<CelestialBody>();
+        ArrayList<Galaxy> galaxies = mGalaxies.values();
+        for(Galaxy galaxy : galaxies) {
+            allBodies.add(new AppletGalaxy(parent, galaxy));
+        }
+        ArrayList<PlanetarySystem> systems = mPlanetarySystems.values();
+        for(PlanetarySystem : systems) {
+            allBodies.add(new AppletPlanetarySystemGalaxy(parent, system));
+        }
+        ArrayList<ManmadeBody> manmadeBodies = mManmadeBodies.values();
+        for(ManmadeBody body : manmadeBodies) {
+            allBodies.add(new AppletGalaxy(parent, body));
+        }
+        mLock.readLock().unlock();
+        return allBodies;
+
+    }
     
     /**
      * Modifies galaxy, sets ID and birth time
