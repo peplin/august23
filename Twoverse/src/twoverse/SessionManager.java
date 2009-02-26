@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
@@ -22,16 +23,16 @@ public class SessionManager extends TimerTask {
     private ReentrantReadWriteLock mUsersLock;
     private ReentrantReadWriteLock mSessionsLock;
     private Properties mConfigFile;
-    private static Logger sLogger = Logger.getLogger(SessionManager.class
-            .getName());
+    private static Logger sLogger =
+            Logger.getLogger(SessionManager.class.getName());
 
     public SessionManager(Database database) {
         try {
             // Load properties file
             mConfigFile = new Properties();
-            mConfigFile.load(this.getClass().getClassLoader()
-                    .getResourceAsStream(
-                            "twoverse/conf/SessionManager.properties"));
+            mConfigFile.load(this.getClass()
+                    .getClassLoader()
+                    .getResourceAsStream("twoverse/conf/SessionManager.properties"));
         } catch (IOException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -43,22 +44,24 @@ public class SessionManager extends TimerTask {
         initializeUsers();
 
         Timer sessionCleanupTimer = new Timer();
-        sessionCleanupTimer.scheduleAtFixedRate(this, 0, this,
-                Long.valueOf(mConfigFile.getProperty("CLEANUP_DELAY"));
+        sessionCleanupTimer.scheduleAtFixedRate(this,
+                0,
+                Long.valueOf(mConfigFile.getProperty("CLEANUP_DELAY")));
     }
 
     private void initializeUsers() {
         mUsers = mDatabase.getUsers();
     }
 
+    @Override
     public void run() {
         cleanup();
     }
 
-    public int createAccount(User user) throws ExistingUserException, UnsetPasswordException {
+    public int createAccount(User user) throws ExistingUserException,
+            UnsetPasswordException {
         if (user.getHashedPassword() == null) {
-            throw new User.UnsetPasswordException(
-                    "User doesn't have password set");
+            throw new User.UnsetPasswordException("User doesn't have password set");
         }
         mUsersLock.writeLock().lock();
         if (!mUsers.containsKey(user.getUsername())) {
@@ -90,8 +93,8 @@ public class SessionManager extends TimerTask {
             if (actualUser != null && actualUser.validate(user)) {
                 Session userSession = mSessions.get(actualUser.getUsername());
                 if (userSession == null) {
-                    mSessions.put(actualUser.getUsername(), new Session(
-                            actualUser));
+                    mSessions.put(actualUser.getUsername(),
+                            new Session(actualUser));
                     mDatabase.updateLoginTime(actualUser);
                 }
                 mUsersLock.readLock().unlock();
@@ -100,7 +103,8 @@ public class SessionManager extends TimerTask {
             }
         } catch (UnsetPasswordException e) {
             sLogger.log(Level.INFO,
-                    "Tried to login with user with uninitialized password", e);
+                    "Tried to login with user with uninitialized password",
+                    e);
         }
         mUsersLock.readLock().unlock();
         mSessionsLock.writeLock().unlock();
@@ -121,12 +125,11 @@ public class SessionManager extends TimerTask {
     private void cleanup() {
         mSessionsLock.writeLock().lock();
         Timestamp timeNow = new Timestamp((new java.util.Date()).getTime());
-        Iterator<Map.Entry<String, Session>> it = mSessions.entrySet()
-                .iterator();
+        Iterator<Map.Entry<String, Session>> it =
+                mSessions.entrySet().iterator();
         while (it.hasNext()) {
             Session session = (Session) it.next();
-            if (timeNow.getTime() - session.getLastRefresh().getTime() > Long
-                    .valueOf(mConfigFile.getProperty("SESSION_TIMEOUT"))) {
+            if (timeNow.getTime() - session.getLastRefresh().getTime() > Long.valueOf(mConfigFile.getProperty("SESSION_TIMEOUT"))) {
                 it.remove();
             }
         }
@@ -155,7 +158,8 @@ public class SessionManager extends TimerTask {
             }
         } catch (UnsetPasswordException e) {
             sLogger.log(Level.INFO,
-                    "Tried to login with user with uninitialized password", e);
+                    "Tried to login with user with uninitialized password",
+                    e);
             result = false;
         }
         mUsersLock.readLock().unlock();

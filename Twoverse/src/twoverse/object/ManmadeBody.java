@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Properties;
 
-import nu.xom.Attribute;
 import nu.xom.Element;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;

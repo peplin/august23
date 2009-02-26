@@ -1,5 +1,9 @@
+package twoverse.object.applet;
 
-class AppletGalaxy implements AppletCelestialBodyInterface {
+import processing.core.PApplet;
+import twoverse.object.Galaxy;
+
+public class AppletGalaxy extends AbstractAppletCelestialBody {
     private Galaxy mGalaxy;
 
     public AppletGalaxy(PApplet parent, Galaxy galaxy) {
@@ -7,9 +11,12 @@ class AppletGalaxy implements AppletCelestialBodyInterface {
         mGalaxy = galaxy;
     }
 
+    @Override
     public void display() {
         mParent.noStroke();
-        mParent.translate(galaxy.getX(), galaxy.getY(), galaxy.getZ());
-        mParent.sphere(galaxy.getMass());
+        mParent.translate((float) mGalaxy.getPosition().getX(),
+                          (float) mGalaxy.getPosition().getY(),
+                          (float) mGalaxy.getPosition().getZ());
+        mParent.sphere((float) mGalaxy.getMass());
     }
 }

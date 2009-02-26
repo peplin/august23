@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
@@ -20,15 +21,14 @@ public abstract class ObjectManager extends TimerTask {
     protected HashMap<Integer, ManmadeBody> mManmadeBodies;
     protected ReentrantReadWriteLock mLock;
     protected Properties mConfigFile;
-    protected static Logger sLogger = Logger.getLogger(ObjectManager.class
-            .getName());
+    protected static Logger sLogger = Logger.getLogger(ObjectManager.class.getName());
 
     public ObjectManager() {
         try {
             mConfigFile = new Properties();
-            mConfigFile.load(this.getClass().getClassLoader()
-                    .getResourceAsStream(
-                            "twoverse/conf/ObjectManager.properties"));
+            mConfigFile.load(this.getClass()
+                    .getClassLoader()
+                    .getResourceAsStream("twoverse/conf/ObjectManager.properties"));
         } catch (IOException e) {
 
         }
@@ -40,8 +40,9 @@ public abstract class ObjectManager extends TimerTask {
         mManmadeBodies = new HashMap<Integer, ManmadeBody>();
 
         Timer feedPushTimer = new Timer();
-        feedPushTimer.scheduleAtFixedRate(this, 0, this,
-                Long.valueOf(mConfigFile.getProperty("FEED_DELAY")));
+        feedPushTimer.scheduleAtFixedRate(this,
+                                          1000,
+                                          Long.valueOf(mConfigFile.getProperty("FEED_DELAY")));
     }
 
     public ArrayList<CelestialBody> getAllBodies() {
@@ -63,16 +64,14 @@ public abstract class ObjectManager extends TimerTask {
 
     public ArrayList<PlanetarySystem> getPlanetarySystems() {
         mLock.readLock().lock();
-        ArrayList<PlanetarySystem> result = new ArrayList<PlanetarySystem>(
-                mPlanetarySystems.values());
+        ArrayList<PlanetarySystem> result = new ArrayList<PlanetarySystem>(mPlanetarySystems.values());
         mLock.readLock().unlock();
         return result;
     }
 
     public ArrayList<ManmadeBody> getManmadeBodies() {
         mLock.readLock().lock();
-        ArrayList<ManmadeBody> result = new ArrayList<ManmadeBody>(
-                mManmadeBodies.values());
+        ArrayList<ManmadeBody> result = new ArrayList<ManmadeBody>(mManmadeBodies.values());
         mLock.readLock().unlock();
         return result;
     }
@@ -97,7 +96,7 @@ public abstract class ObjectManager extends TimerTask {
 
     public ArrayList<CelestialBody> getOwnedBodies(User user) {
         mLock.readLock().lock();
-        //TODO write getOwned bodies if we need it
+        // TODO write getOwned bodies if we need it
         ArrayList<CelestialBody> result = new ArrayList<CelestialBody>();
         mLock.readLock().unlock();
         return result;
@@ -160,6 +159,8 @@ public abstract class ObjectManager extends TimerTask {
     }
 
     public class UnhandledCelestialBodyException extends Exception {
+        private static final long serialVersionUID = -341317408431555160L;
+
         public UnhandledCelestialBodyException(String msg) {
             super(msg);
         }

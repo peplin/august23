@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,8 +46,6 @@ public class Database {
     private PreparedStatement mUpdateCelestialBodyStatement;
     private PreparedStatement mUpdateGalaxyStatement;
     private PreparedStatement mUpdatePlanetarySystemStatement;
-    private PreparedStatement mUpdatePhenomenonStatement;
-    private PreparedStatement mGetColorsStatement;
     private static Logger sLogger = Logger.getLogger(Database.class.getName());
 
     // private PreparedStatement mGetObjectParentStatement;
@@ -236,8 +233,6 @@ public class Database {
             mUpdatePlanetarySystemStatement = mConnection
                     .prepareStatement("UPDATE galaxy " + "SET centerid = ?,"
                             + " mass = ? " + "WHERE id = ?");
-            mGetColorsStatement = mConnection
-                    .prepareStatement("SELECT * FROM colors");
         } catch (SQLException e) {
             throw new DatabaseException("Couldn't prepare statements: "
                     + e.getMessage());
@@ -713,6 +708,8 @@ public class Database {
     }
 
     public class InvalidUserException extends Exception {
+        private static final long serialVersionUID = 3985999412866921286L;
+
         public InvalidUserException(String e) {
             super(e);
 
@@ -720,6 +717,8 @@ public class Database {
     }
 
     public class DatabaseException extends Exception {
+        private static final long serialVersionUID = 5278742396430531540L;
+
         DatabaseException(String message) {
             super(message);
         }

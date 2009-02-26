@@ -8,14 +8,12 @@ import java.util.logging.Logger;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-import nu.xom.Elements;
-import twoverse.RequestHandlerClient;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
 public class PhysicsVector3d implements Serializable {
     private static final long serialVersionUID = -7483027109043816672L;
     private Properties mConfigFile;
-    private static Logger sLogger = Logger.getLogger(RequestHandlerClient.class
+    private static Logger sLogger = Logger.getLogger(PhysicsVector3d.class
             .getName());
     private Point mUnitVectorPoint;
     private double mMagnitude;

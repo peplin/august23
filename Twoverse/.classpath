@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="library"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry exported="true" kind="lib" path="/usr/share/java/xom.jar"/>
@@ -12,8 +13,11 @@
 	<classpathentry exported="true" kind="lib" path="/usr/share/java/ws-commons-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="/usr/share/java/mysql-connector-java.jar"/>
 	<classpathentry exported="true" kind="lib" path="/usr/share/java/jaxen.jar"/>
-	<classpathentry kind="var" path="PROCESSING_HOME/lib/core.jar"/>
-	<classpathentry kind="var" path="PROCESSING_SKETCHBOOK/tuio/library/javaosc.jar"/>
-	<classpathentry kind="var" path="PROCESSING_SKETCHBOOK/tuio/library/tuio.jar"/>
+	<classpathentry exported="true" kind="var" path="PROCESSING_HOME/lib/core.jar"/>
+	<classpathentry exported="true" kind="var" path="PROCESSING_SKETCHBOOK/tuio/library/javaosc.jar"/>
+	<classpathentry exported="true" kind="var" path="PROCESSING_SKETCHBOOK/tuio/library/tuio.jar"/>
+	<classpathentry exported="true" kind="var" path="PROCESSING_HOME/libraries/opengl/library/opengl.jar"/>
+	<classpathentry exported="true" kind="var" path="PROCESSING_HOME/libraries/opengl/library/jogl.jar"/>
+	<classpathentry kind="var" path="PROCESSING_HOME/libraries/opengl/library/gluegen-rt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

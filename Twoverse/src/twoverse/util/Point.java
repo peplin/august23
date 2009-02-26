@@ -8,13 +8,12 @@ import java.util.logging.Logger;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-import twoverse.RequestHandlerClient;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
 public class Point implements Serializable {
     private static final long serialVersionUID = 6712603407109374020L;
     private Properties mConfigFile;
-    private static Logger sLogger = Logger.getLogger(RequestHandlerClient.class
+    private static Logger sLogger = Logger.getLogger(Point.class
             .getName());
     private double mX;
     private double mY;

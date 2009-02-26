@@ -1,11 +1,8 @@
 package twoverse.object;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Properties;
-import java.util.logging.Level;
-
 import nu.xom.Attribute;
 import nu.xom.Element;
 import twoverse.util.PhysicsVector3d;

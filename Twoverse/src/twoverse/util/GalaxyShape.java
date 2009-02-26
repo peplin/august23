@@ -8,13 +8,12 @@ import java.util.logging.Logger;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-import twoverse.RequestHandlerClient;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
 public class GalaxyShape implements Serializable {
     private static final long serialVersionUID = 6779708232529398026L;
     private Properties mConfigFile;
-    private static Logger sLogger = Logger.getLogger(RequestHandlerClient.class
+    private static Logger sLogger = Logger.getLogger(GalaxyShape.class
             .getName());
     private int mId;
     private String mName;

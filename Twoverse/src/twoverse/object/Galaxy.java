@@ -1,15 +1,10 @@
 package twoverse.object;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import nu.xom.Attribute;
 import nu.xom.Element;
-import twoverse.RequestHandlerClient;
 import twoverse.util.GalaxyShape;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
