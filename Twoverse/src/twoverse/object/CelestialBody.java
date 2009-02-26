@@ -30,6 +30,7 @@ public class CelestialBody implements Serializable {
     private Point mPosition;
     private String mName;
     private static final long serialVersionUID = -6341175711814973441L;
+    private boolean mDirty = true; // dirty if different than version in database
 
     /**
      * Don't call this - needs to be here so its children are serializable.
@@ -294,5 +295,13 @@ public class CelestialBody implements Serializable {
 
     public String getName() {
         return mName;
+    }
+
+    public boolean isDirty() {
+        return mDirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        mDirty = dirty;
     }
 }

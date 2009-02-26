@@ -3,20 +3,19 @@ package twoverse.object.applet;
 import processing.core.PApplet;
 import twoverse.object.PlanetarySystem;
 
-public class AppletPlanetarySystem extends AbstractAppletCelestialBody {
-    private PlanetarySystem mPlanetarySystem;
+public class AppletPlanetarySystem extends PlanetarySystem implements AppletObjectInterface {
+    private PApplet mParent;
 
     public AppletPlanetarySystem(PApplet parent, PlanetarySystem system) {
+        super(system);
         mParent = parent;
-        mPlanetarySystem = system;
     }
 
-    @Override
     public void display() {
         mParent.noStroke();
-        mParent.translate((float) mPlanetarySystem.getPosition().getX(),
-                          (float) mPlanetarySystem.getPosition().getY(),
-                          (float) mPlanetarySystem.getPosition().getZ());
-        mParent.sphere((float) mPlanetarySystem.getMass());
+        mParent.translate((float) getPosition().getX(),
+                          (float) getPosition().getY(),
+                          (float) getPosition().getZ());
+        mParent.sphere((float) getMass());
     }
 }
