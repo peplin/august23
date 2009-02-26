@@ -9,12 +9,12 @@ import java.util.logging.Logger;
 import processing.core.PApplet;
 import tuio.TuioClient;
 import tuio.TuioCursor;
-import twoverse.object.Galaxy;
+import twoverse.object.Planet;
 import twoverse.object.applet.AbstractAppletCelestialBody;
-import twoverse.util.GalaxyShape;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 import twoverse.util.User;
+import twoverse.util.Point.TwoDimensionalException;
 
 @SuppressWarnings("serial")
 public class TwoverseClient extends PApplet {
@@ -58,7 +58,7 @@ public class TwoverseClient extends PApplet {
         mRequestHandler.createAccount(user);
         mRequestHandler.login(user.getUsername(), "foobar");
 
-        mObjectManager.add(new Galaxy(-1,
+        /*mObjectManager.add(new Galaxy(-1,
                 "theBody",
                 -1,
                 new Point(42, 43, 44),
@@ -66,7 +66,7 @@ public class TwoverseClient extends PApplet {
                 new PhysicsVector3d(5, 6, 7, 8),
                 new GalaxyShape(1, "test", "test"),
                 10,
-                10));
+                10));*/
     }
 
     /*
@@ -129,7 +129,13 @@ public class TwoverseClient extends PApplet {
         ArrayList<AbstractAppletCelestialBody> bodies =
                 mObjectManager.getAllBodiesAsApplets(this);
         for (AbstractAppletCelestialBody body : bodies) {
-            body.display();
+            try {
+                body.display();
+            } catch (TwoDimensionalException e) {
+                sLogger.log(Level.WARNING,
+                        "Expected 3D point but was 2D: " + body,
+                        e);
+            }
         }
     }
 
@@ -142,14 +148,12 @@ public class TwoverseClient extends PApplet {
 
     @Override
     public void mousePressed() {
-        System.out.println("foo");
-        mObjectManager.add(new Galaxy(-1,
-                "theBody",
+        mObjectManager.add(new Planet(-1,
+                "Earth",
                 -1,
                 new Point(mouseX, mouseY, 0),
                 new PhysicsVector3d(1, 2, 3, 4),
                 new PhysicsVector3d(5, 6, 7, 8),
-                new GalaxyShape(1, "test", "test"),
                 10,
                 10));
     }

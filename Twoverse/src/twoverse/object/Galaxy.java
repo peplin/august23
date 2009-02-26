@@ -15,7 +15,7 @@ public class Galaxy extends CelestialBody implements Serializable {
     private double mMass;
     private double mDensity;
     private static final long serialVersionUID = 4163663398347532933L;
-    private Properties mConfigFile;
+    private static Properties sConfigFile;
 
     /**
      * A new client side galaxy, ID and birth are set and returned by the server
@@ -56,24 +56,24 @@ public class Galaxy extends CelestialBody implements Serializable {
     }
 
     public Galaxy(Element element) {
-        //TODO can't pull this out to config for some reason
+        //TODO can't pull this out to config as config isn't loaded
         super(element.getFirstChildElement("CelestialBody"));
         loadConfig();
 
         if (!element.getLocalName().equals(
-                mConfigFile.getProperty("GALAXY_TAG"))) {
+                sConfigFile.getProperty("GALAXY_TAG"))) {
             throw new UnexpectedXmlElementException("Element is not a galaxy");
         }
 
-        Element shapeElement = element.getFirstChildElement(mConfigFile
+        Element shapeElement = element.getFirstChildElement(sConfigFile
                 .getProperty("GALAXY_SHAPE_TAG"));
         GalaxyShape shape = new GalaxyShape(shapeElement);
 
         double mass = Double.valueOf(element.getAttribute(
-                mConfigFile.getProperty("MASS_ATTRIBUTE_TAG")).getValue());
+                sConfigFile.getProperty("MASS_ATTRIBUTE_TAG")).getValue());
 
         double density = Double.valueOf(element.getAttribute(
-                mConfigFile.getProperty("DENSITY_ATTRIBUTE_TAG")).getValue());
+                sConfigFile.getProperty("DENSITY_ATTRIBUTE_TAG")).getValue());
 
         initialize(shape, mass, density);
     }
@@ -85,8 +85,8 @@ public class Galaxy extends CelestialBody implements Serializable {
     }
     
     private synchronized void loadConfig() {
-        if (mConfigFile == null) {
-            mConfigFile = loadConfigFile("Galaxy");
+        if (sConfigFile == null) {
+            sConfigFile = loadConfigFile("Galaxy");
         }
     }
 
@@ -116,12 +116,13 @@ public class Galaxy extends CelestialBody implements Serializable {
 
     @Override
     public Element toXmlElement() {
-        Element root = new Element(mConfigFile.getProperty("GALAXY_TAG"));
+        loadConfig();
+        Element root = new Element(sConfigFile.getProperty("GALAXY_TAG"));
         root.appendChild(super.toXmlElement());
-        root.addAttribute(new Attribute(mConfigFile
+        root.addAttribute(new Attribute(sConfigFile
                 .getProperty("MASS_ATTRIBUTE_TAG"), String.valueOf(mMass)));
         root
-                .addAttribute(new Attribute(mConfigFile
+                .addAttribute(new Attribute(sConfigFile
                         .getProperty("DENSITY_ATTRIBUTE_TAG"), String
                         .valueOf(mDensity)));
         root.appendChild(mShape.toXmlElement());

@@ -17,7 +17,7 @@ import twoverse.util.XmlExceptions.UnexpectedXmlAttributeException;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
 public class CelestialBody implements Serializable {
-    private Properties mConfigFile;
+    private static Properties sConfigFile;
     protected static Logger sLogger =
             Logger.getLogger(CelestialBody.class.getName());
     private int mId;
@@ -85,22 +85,22 @@ public class CelestialBody implements Serializable {
         loadConfig();
 
         if (!root.getLocalName()
-                .equals(mConfigFile.getProperty("CELESTIAL_BODY_TAG"))) {
+                .equals(sConfigFile.getProperty("CELESTIAL_BODY_TAG"))) {
             throw new UnexpectedXmlElementException("Element is not a celestial body");
         }
 
         Elements positionElements =
-                root.getChildElements(mConfigFile.getProperty("POINT_TAG"));
+                root.getChildElements(sConfigFile.getProperty("POINT_TAG"));
         Point position = null;
         for (int i = 0; i < positionElements.size() && position == null; i++) {
             Element element = positionElements.get(i);
-            if (element.getAttribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+            if (element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                     .getValue()
-                    .equals(mConfigFile.getProperty("POSITION_ATTRIBUTE_VALUE"))) {
+                    .equals(sConfigFile.getProperty("POSITION_ATTRIBUTE_VALUE"))) {
                 position = new Point(element);
             } else {
                 throw new UnexpectedXmlElementException("Unknown point element with name: "
-                        + element.getAttribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG")));
+                        + element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG")));
             }
         }
 
@@ -109,43 +109,43 @@ public class CelestialBody implements Serializable {
         }
 
         Elements vectorElements =
-                root.getChildElements(mConfigFile.getProperty("VECTOR_TAG"));
+                root.getChildElements(sConfigFile.getProperty("VECTOR_TAG"));
         PhysicsVector3d velocityVector = null;
         PhysicsVector3d accelerationVector = null;
         for (int i = 0; i < vectorElements.size()
                 && (velocityVector == null || accelerationVector == null); i++) {
             Element element = vectorElements.get(i);
-            if (element.getAttribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+            if (element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                     .getValue()
-                    .equals(mConfigFile.getProperty("VELOCITY_ATTRIBUTE_VALUE"))) {
+                    .equals(sConfigFile.getProperty("VELOCITY_ATTRIBUTE_VALUE"))) {
                 velocityVector = new PhysicsVector3d(element);
-            } else if (element.getAttribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+            } else if (element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                     .getValue()
-                    .equals(mConfigFile.getProperty("ACCELERATION_ATTRIBUTE_VALUE"))) {
+                    .equals(sConfigFile.getProperty("ACCELERATION_ATTRIBUTE_VALUE"))) {
                 accelerationVector = new PhysicsVector3d(element);
             } else {
                 throw new UnexpectedXmlAttributeException("Unexpected attribute: "
-                        + element.getAttribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+                        + element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                                 .getValue());
             }
         }
 
         Timestamp deathTime = null;
-        if (root.getAttribute(mConfigFile.getProperty("DEATH_ATTRIBUTE_TAG")) != null) {
+        if (root.getAttribute(sConfigFile.getProperty("DEATH_ATTRIBUTE_TAG")) != null) {
             deathTime =
-                    new Timestamp(Long.valueOf(root.getAttribute(mConfigFile.getProperty("DEATH_ATTRIBUTE_TAG"))
+                    new Timestamp(Long.valueOf(root.getAttribute(sConfigFile.getProperty("DEATH_ATTRIBUTE_TAG"))
                             .getValue()));
         }
-        initialize(Integer.valueOf(root.getAttribute(mConfigFile.getProperty("ID_ATTRIBUTE_TAG"))
+        initialize(Integer.valueOf(root.getAttribute(sConfigFile.getProperty("ID_ATTRIBUTE_TAG"))
                            .getValue()),
-                   Integer.valueOf(root.getAttribute(mConfigFile.getProperty("OWNER_ATTRIBUTE_TAG"))
+                   Integer.valueOf(root.getAttribute(sConfigFile.getProperty("OWNER_ATTRIBUTE_TAG"))
                            .getValue()),
-                   root.getAttribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+                   root.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                            .getValue(),
-                   new Timestamp(Long.valueOf(root.getAttribute(mConfigFile.getProperty("BIRTH_ATTRIBUTE_TAG"))
+                   new Timestamp(Long.valueOf(root.getAttribute(sConfigFile.getProperty("BIRTH_ATTRIBUTE_TAG"))
                            .getValue())),
                    deathTime,
-                   Integer.valueOf(root.getAttribute(mConfigFile.getProperty("PARENT_ID_ATTRIBUTE_TAG"))
+                   Integer.valueOf(root.getAttribute(sConfigFile.getProperty("PARENT_ID_ATTRIBUTE_TAG"))
                            .getValue()),
                    position,
                    velocityVector,
@@ -168,8 +168,8 @@ public class CelestialBody implements Serializable {
     }
 
     private synchronized void loadConfig() {
-        if (mConfigFile == null) {
-            mConfigFile = loadConfigFile("CelestialBody");
+        if (sConfigFile == null) {
+            sConfigFile = loadConfigFile("CelestialBody");
         }
     }
 
@@ -189,37 +189,38 @@ public class CelestialBody implements Serializable {
     }
 
     public Element toXmlElement() {
+        loadConfig();
         Element element =
-                new Element(mConfigFile.getProperty("CELESTIAL_BODY_TAG"));
+                new Element(sConfigFile.getProperty("CELESTIAL_BODY_TAG"));
 
-        element.addAttribute(new Attribute(mConfigFile.getProperty("ID_ATTRIBUTE_TAG"),
+        element.addAttribute(new Attribute(sConfigFile.getProperty("ID_ATTRIBUTE_TAG"),
                 String.valueOf(mId)));
-        element.addAttribute(new Attribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"),
+        element.addAttribute(new Attribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"),
                 mName));
-        element.addAttribute(new Attribute(mConfigFile.getProperty("OWNER_ATTRIBUTE_TAG"),
+        element.addAttribute(new Attribute(sConfigFile.getProperty("OWNER_ATTRIBUTE_TAG"),
                 String.valueOf(mOwnerId)));
-        element.addAttribute(new Attribute(mConfigFile.getProperty("BIRTH_ATTRIBUTE_TAG"),
+        element.addAttribute(new Attribute(sConfigFile.getProperty("BIRTH_ATTRIBUTE_TAG"),
                 String.valueOf(mBirthTime.getTime())));
         if (mDeathTime != null) {
-            element.addAttribute(new Attribute(mConfigFile.getProperty("DEATH_ATTRIBUTE_TAG"),
+            element.addAttribute(new Attribute(sConfigFile.getProperty("DEATH_ATTRIBUTE_TAG"),
                     String.valueOf(mBirthTime.getTime())));
         }
-        element.addAttribute(new Attribute(mConfigFile.getProperty("PARENT_ID_ATTRIBUTE_TAG"),
+        element.addAttribute(new Attribute(sConfigFile.getProperty("PARENT_ID_ATTRIBUTE_TAG"),
                 String.valueOf(mParentId)));
 
         Element velocityElement = mVelocity.toXmlElement();
-        velocityElement.addAttribute(new Attribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"),
-                mConfigFile.getProperty("VELOCITY_ATTRIBUTE_VALUE")));
+        velocityElement.addAttribute(new Attribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"),
+                sConfigFile.getProperty("VELOCITY_ATTRIBUTE_VALUE")));
         element.appendChild(velocityElement);
 
         Element accelerationElement = mAcceleration.toXmlElement();
-        accelerationElement.addAttribute(new Attribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"),
-                mConfigFile.getProperty("ACCELERATION_ATTRIBUTE_VALUE")));
+        accelerationElement.addAttribute(new Attribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"),
+                sConfigFile.getProperty("ACCELERATION_ATTRIBUTE_VALUE")));
         element.appendChild(accelerationElement);
 
         Element positionElement = mPosition.toXmlElement();
-        positionElement.addAttribute(new Attribute(mConfigFile.getProperty("NAME_ATTRIBUTE_TAG"),
-                mConfigFile.getProperty("POSITION_ATTRIBUTE_VALUE")));
+        positionElement.addAttribute(new Attribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"),
+                sConfigFile.getProperty("POSITION_ATTRIBUTE_VALUE")));
         element.appendChild(positionElement);
         return element;
     }
@@ -240,7 +241,7 @@ public class CelestialBody implements Serializable {
         mBirthTime = birthTime;
     }
 
-    private void setOwnerId(int ownerId) {
+    public void setOwnerId(int ownerId) {
         mOwnerId = ownerId;
     }
 
@@ -294,5 +295,17 @@ public class CelestialBody implements Serializable {
 
     public String getName() {
         return mName;
+    }
+    
+    public String toString() {
+        return "[id: " + getId() + ", "
+                + "owner id: " + getOwnerId() + ", "
+                + "name: " + getName() + ", "
+                + "birth: " + getBirthTime() + ", "
+                + "death: " + getDeathTime() + ", "
+                + "parent id: " + getParentId() + ", "
+                + "velocity: " + getVelocity() + ", "
+                + "acceleration: " + getAcceleration() + ", "
+                + "position: " + getPosition() + "]";
     }
 }

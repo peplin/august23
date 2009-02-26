@@ -23,8 +23,8 @@ public class ImageButton extends Button {
     @Override
     public void update(Point cursor) {
         super.update(cursor);
-        if (isVisible()) {
-            if (isLocked()) {
+        if(isVisible()) {
+            if(isLocked()) {
                 highlight();
             } else {
                 display();
@@ -33,15 +33,18 @@ public class ImageButton extends Button {
     }
 
     void display() {
+        mParentApplet.pushMatrix();
         mParentApplet.noStroke();
         mParentApplet.noFill();
         mParentApplet.tint(255, 100);
         mParentApplet.image(getImage(),
                 (float) (getCenter().getX() - getRadius() / 2),
                 (float) (getCenter().getY() - getRadius() / 2));
+        mParentApplet.popMatrix();
     }
 
     void highlight() {
+        mParentApplet.pushMatrix();
         mParentApplet.noStroke();
         mParentApplet.noFill();
         mParentApplet.tint(255, 40000);
@@ -49,6 +52,7 @@ public class ImageButton extends Button {
                 (float) (getCenter().getX() - getRadius() / 2),
                 (float) (getCenter().getY() - getRadius() / 2));
         mParentApplet.tint(255, 100);
+        mParentApplet.popMatrix();
     }
 
     public void setImage(PImage image) {

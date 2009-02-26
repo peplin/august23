@@ -12,7 +12,7 @@ import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
 public class GalaxyShape implements Serializable {
     private static final long serialVersionUID = 6779708232529398026L;
-    private Properties mConfigFile;
+    private static Properties sConfigFile;
     private static Logger sLogger = Logger.getLogger(GalaxyShape.class
             .getName());
     private int mId;
@@ -28,19 +28,19 @@ public class GalaxyShape implements Serializable {
         loadConfig();
 
         if (!element.getLocalName().equals(
-                mConfigFile.getProperty("GALAXY_SHAPE_TAG"))) {
+                sConfigFile.getProperty("GALAXY_SHAPE_TAG"))) {
             throw new UnexpectedXmlElementException(
                     "Element is not a galaxy shape");
         }
 
         int id = Integer.valueOf(element.getAttribute(
-                mConfigFile.getProperty("ID_ATTRIBUTE_TAG")).getValue());
+                sConfigFile.getProperty("ID_ATTRIBUTE_TAG")).getValue());
 
         String name = element.getAttribute(
-                mConfigFile.getProperty("NAME_ATTRIBUTE_TAG")).getValue();
+                sConfigFile.getProperty("NAME_ATTRIBUTE_TAG")).getValue();
 
         String textureFile = element.getAttribute(
-                mConfigFile.getProperty("TEXTURE_FILE_ATTRIBUTE_TAG"))
+                sConfigFile.getProperty("TEXTURE_FILE_ATTRIBUTE_TAG"))
                 .getValue();
 
         initialize(id, name, textureFile);
@@ -54,8 +54,8 @@ public class GalaxyShape implements Serializable {
 
     private void loadConfig() {
         try {
-            mConfigFile = new Properties();
-            mConfigFile
+            sConfigFile = new Properties();
+            sConfigFile
                     .load(this.getClass().getClassLoader().getResourceAsStream(
                             "twoverse/conf/GalaxyShape.properties"));
         } catch (IOException e) {
@@ -89,12 +89,13 @@ public class GalaxyShape implements Serializable {
     }
 
     public Element toXmlElement() {
-        Element root = new Element(mConfigFile.getProperty("GALAXY_SHAPE_TAG"));
-        root.addAttribute(new Attribute(mConfigFile
+        loadConfig();
+        Element root = new Element(sConfigFile.getProperty("GALAXY_SHAPE_TAG"));
+        root.addAttribute(new Attribute(sConfigFile
                 .getProperty("ID_ATTRIBUTE_TAG"), String.valueOf(mId)));
-        root.addAttribute(new Attribute(mConfigFile
+        root.addAttribute(new Attribute(sConfigFile
                 .getProperty("NAME_ATTRIBUTE_TAG"), mName));
-        root.addAttribute(new Attribute(mConfigFile.getProperty("TEXTURE_FILE_ATTRIBUTE_TAG"), mTextureFile));
+        root.addAttribute(new Attribute(sConfigFile.getProperty("TEXTURE_FILE_ATTRIBUTE_TAG"), mTextureFile));
         return root;
     }
 }

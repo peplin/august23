@@ -13,10 +13,12 @@ import nu.xom.Elements;
 import nu.xom.ParsingException;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
+import twoverse.object.Planet;
 import twoverse.object.PlanetarySystem;
 import twoverse.object.applet.AbstractAppletCelestialBody;
 import twoverse.object.applet.AppletGalaxy;
 import twoverse.object.applet.AppletManmadeBody;
+import twoverse.object.applet.AppletPlanet;
 import twoverse.object.applet.AppletPlanetarySystem;
 
 public class ObjectManagerClient extends ObjectManager {
@@ -37,24 +39,37 @@ public class ObjectManagerClient extends ObjectManager {
     private void pullFeed() {
         try {
             Document doc = mParser.build(mConfigFile.getProperty("FEED_URL"));
-            // TODO test this works
             // TODO how do we pick up deleted objects?
-            Elements galaxies = doc.getRootElement()
-                    .getChildElements(mConfigFile.getProperty("GALAXY_TAG"));
+            Elements galaxies =
+                    doc.getRootElement()
+                            .getChildElements(mConfigFile.getProperty("GALAXY_TAG"));
             for (int i = 0; i < galaxies.size(); i++) {
                 Galaxy g = new Galaxy(galaxies.get(i));
+                System.out.println(g);
                 update(g);
             }
 
-            Elements planetarySystems = doc.getRootElement()
-                    .getChildElements(mConfigFile.getProperty("PLANETARY_SYSTEM_TAG"));
+            Elements planetarySystems =
+                    doc.getRootElement()
+                            .getChildElements(mConfigFile.getProperty("PLANETARY_SYSTEM_TAG"));
             for (int i = 0; i < planetarySystems.size(); i++) {
-                PlanetarySystem system = new PlanetarySystem(planetarySystems.get(i));
+                PlanetarySystem system =
+                        new PlanetarySystem(planetarySystems.get(i));
                 update(system);
             }
 
-            Elements manmadeBodies = doc.getRootElement()
-                    .getChildElements(mConfigFile.getProperty("CELESTIAL_BODY_TAG"));
+            Elements planets =
+                    doc.getRootElement()
+                            .getChildElements(mConfigFile.getProperty("PLANET_TAG"));
+            for (int i = 0; i < planets.size(); i++) {
+                Planet planet =
+                        new Planet(planets.get(i));
+                update(planet);
+            }
+
+            Elements manmadeBodies =
+                    doc.getRootElement()
+                            .getChildElements(mConfigFile.getProperty("CELESTIAL_BODY_TAG"));
             for (int i = 0; i < manmadeBodies.size(); i++) {
                 ManmadeBody manmadeBody = new ManmadeBody(manmadeBodies.get(i));
                 update(manmadeBody);
@@ -70,7 +85,8 @@ public class ObjectManagerClient extends ObjectManager {
     public ArrayList<AbstractAppletCelestialBody> getAllBodiesAsApplets(
             PApplet parent) {
         mLock.readLock().lock();
-        ArrayList<AbstractAppletCelestialBody> allBodies = new ArrayList<AbstractAppletCelestialBody>();
+        ArrayList<AbstractAppletCelestialBody> allBodies =
+                new ArrayList<AbstractAppletCelestialBody>();
         Collection<Galaxy> galaxies = mGalaxies.values();
         for (Galaxy galaxy : galaxies) {
             allBodies.add(new AppletGalaxy(parent, galaxy));
@@ -78,6 +94,10 @@ public class ObjectManagerClient extends ObjectManager {
         Collection<PlanetarySystem> systems = mPlanetarySystems.values();
         for (PlanetarySystem system : systems) {
             allBodies.add(new AppletPlanetarySystem(parent, system));
+        }
+        Collection<Planet> planets = mPlanets.values();
+        for (Planet planet : planets) {
+            allBodies.add(new AppletPlanet(parent, planet));
         }
         Collection<ManmadeBody> manmadeBodies = mManmadeBodies.values();
         for (ManmadeBody body : manmadeBodies) {
@@ -94,8 +114,9 @@ public class ObjectManagerClient extends ObjectManager {
     @Override
     public void add(Galaxy galaxy) {
         mLock.writeLock().lock();
-        super.add(galaxy);
         mRequestHandler.addGalaxy(galaxy);
+        System.out.println(galaxy);
+        super.add(galaxy);
         mLock.writeLock().unlock();
     }
 
@@ -105,8 +126,16 @@ public class ObjectManagerClient extends ObjectManager {
     @Override
     public void add(PlanetarySystem system) {
         mLock.writeLock().lock();
-        super.add(system);
         mRequestHandler.addPlanetarySystem(system);
+        super.add(system);
+        mLock.writeLock().unlock();
+    }
+
+    @Override
+    public void add(Planet planet) {
+        mLock.writeLock().lock();
+        mRequestHandler.addPlanet(planet);
+        super.add(planet);
         mLock.writeLock().unlock();
     }
 
@@ -116,32 +145,40 @@ public class ObjectManagerClient extends ObjectManager {
     @Override
     public void add(ManmadeBody manmadeBody) {
         mLock.writeLock().lock();
-        super.add(manmadeBody);
         mRequestHandler.addManmadeBody(manmadeBody);
+        super.add(manmadeBody);
         mLock.writeLock().unlock();
     }
 
     @Override
     public void update(Galaxy galaxy) {
         mLock.writeLock().lock();
-        super.update(galaxy);
         // mRequestHandler.updateGalaxy(galaxy); TODO
+        super.update(galaxy);
         mLock.writeLock().unlock();
     }
 
     @Override
     public void update(PlanetarySystem system) {
         mLock.writeLock().lock();
-        super.update(system);
         // mRequestHandler.updatePlanetarySystem(system);
+        super.update(system);
+        mLock.writeLock().unlock();
+    }
+
+    @Override
+    public void update(Planet planet) {
+        mLock.writeLock().lock();
+        // mRequestHandler.updatePlanet(system);
+        super.update(planet);
         mLock.writeLock().unlock();
     }
 
     @Override
     public void update(ManmadeBody manmadeBody) {
         mLock.writeLock().lock();
-        super.update(manmadeBody);
         // mRequestHandler.updateManmadeBody(manmadeBody);
+        super.update(manmadeBody);
         mLock.writeLock().unlock();
     }
 

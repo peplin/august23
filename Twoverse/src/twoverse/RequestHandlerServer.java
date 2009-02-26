@@ -17,6 +17,7 @@ import twoverse.SessionManager.ExistingUserException;
 import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
+import twoverse.object.Planet;
 import twoverse.object.PlanetarySystem;
 import twoverse.util.Session;
 import twoverse.util.User;
@@ -27,9 +28,10 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         TwoversePublicApi {
     private static ObjectManagerServer sObjectManager;
     private static SessionManager sSessionManager;
-    private static Logger sLogger = Logger.getLogger(RequestHandlerServer.class
-            .getName());
-    private static HashMap<String, Boolean> sMethodAuthorization = new HashMap<String, Boolean>();
+    private static Logger sLogger =
+            Logger.getLogger(RequestHandlerServer.class.getName());
+    private static HashMap<String, Boolean> sMethodAuthorization =
+            new HashMap<String, Boolean>();
 
     public RequestHandlerServer() {
     }
@@ -47,6 +49,7 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         sMethodAuthorization.put("RequestHandlerServer.addManmadeBody", true);
         sMethodAuthorization.put("RequestHandlerServer.addPlanetarySystem",
                 true);
+        sMethodAuthorization.put("RequestHandlerServer.addPlanet", true);
         sMethodAuthorization.put("RequestHandlerServer.getHashedPassword",
                 false);
     }
@@ -71,8 +74,8 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     public void changeName(Session session, int objectId, String newName) {
         try {
             CelestialBody body = sObjectManager.getCelestialBody(objectId);
-            if (isAuthenticated(session.getUser().getUsername(), session
-                    .getUser().getHashedPassword())
+            if(isAuthenticated(session.getUser().getUsername(),
+                    session.getUser().getHashedPassword())
                     && session.getUser().getId() == body.getOwnerId()) {
                 body.setName(newName);
             }
@@ -99,6 +102,12 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         return system;
     }
 
+    @Override
+    public Planet addPlanet(Planet planet) {
+        sObjectManager.add(planet);
+        return planet;
+    }
+
     public String getHashedPassword(String username) {
         return sSessionManager.getUser(username).getHashedPassword();
     }
@@ -114,20 +123,26 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     @Override
     protected XmlRpcHandlerMapping newXmlRpcHandlerMapping()
             throws XmlRpcException {
-        PropertyHandlerMapping mapping = (PropertyHandlerMapping) super
-                .newXmlRpcHandlerMapping();
-        AbstractReflectiveHandlerMapping.AuthenticationHandler handler = new AbstractReflectiveHandlerMapping.AuthenticationHandler() {
-            public boolean isAuthorized(XmlRpcRequest pRequest) {
-                if (sMethodAuthorization.get(pRequest.getMethodName())) {
-                    XmlRpcHttpRequestConfig config = (XmlRpcHttpRequestConfig) pRequest
-                            .getConfig();
-                    return isAuthenticated(config.getBasicUserName(), config
-                            .getBasicPassword());
-                } else {
-                    return true;
-                }
-            };
-        };
+        PropertyHandlerMapping mapping =
+                (PropertyHandlerMapping) super.newXmlRpcHandlerMapping();
+        AbstractReflectiveHandlerMapping.AuthenticationHandler handler =
+                new AbstractReflectiveHandlerMapping.AuthenticationHandler() {
+                    public boolean isAuthorized(XmlRpcRequest pRequest)
+                            throws XmlRpcException {
+                        if(sMethodAuthorization == null) {
+                            throw new XmlRpcException("Missing authentication information for method: "
+                                    + pRequest.getMethodName());
+                        }
+                        if(sMethodAuthorization.get(pRequest.getMethodName())) {
+                            XmlRpcHttpRequestConfig config =
+                                    (XmlRpcHttpRequestConfig) pRequest.getConfig();
+                            return isAuthenticated(config.getBasicUserName(),
+                                    config.getBasicPassword());
+                        } else {
+                            return true;
+                        }
+                    };
+                };
         mapping.setAuthenticationHandler(handler);
         return mapping;
     }

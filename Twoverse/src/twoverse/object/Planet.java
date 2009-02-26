@@ -9,72 +9,64 @@ import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
-public class PlanetarySystem extends CelestialBody implements Serializable {
+public class Planet extends CelestialBody implements Serializable {
     private static final long serialVersionUID = -1152118681822794656L;
     private static Properties sConfigFile;
-    private int mCenterId;
+    private double mRadius;
     private double mMass;
 
-    public PlanetarySystem(int ownerId, String name, int parentId,
+    public Planet(int ownerId, String name, int parentId,
             Point position, PhysicsVector3d velocity,
-            PhysicsVector3d acceleration, int centerStarId, double mass) {
+            PhysicsVector3d acceleration, double mass, double radius) {
         super(ownerId, name, parentId, position, velocity, acceleration);
         loadConfig();
-        initialize(centerStarId, mass);
+        initialize(radius, mass);
     }
 
-    public PlanetarySystem(int id, int ownerId, String name,
+    public Planet(int id, int ownerId, String name,
             Timestamp birthTime, Timestamp deathTime, int parentId,
             Point position, PhysicsVector3d velocity,
-            PhysicsVector3d acceleration, int centerStarId, double mass) {
+            PhysicsVector3d acceleration, double mass, double radius) {
         super(id, ownerId, name, birthTime, deathTime, parentId, position,
                 velocity, acceleration);
         loadConfig();
-        initialize(centerStarId, mass);
+        initialize(radius, mass);
     }
 
-    public PlanetarySystem(CelestialBody body, int centerStarId, double mass) {
+    public Planet(CelestialBody body, double mass, double radius) {
         super(body);
         loadConfig();
-        initialize(centerStarId, mass);
+        initialize(radius, mass);
     }
 
-    public PlanetarySystem(Element element) {
+    public Planet(Element element) {
         super(element.getFirstChildElement("CelestialBody"));
         loadConfig();
 
         if (!element.getLocalName().equals(
-                sConfigFile.getProperty("PLANETARY_SYSTEM_TAG"))) {
+                sConfigFile.getProperty("PLANET_TAG"))) {
             throw new UnexpectedXmlElementException(
                     "Element is not a planetary system");
         }
 
-        int centerStarId = Integer.valueOf(element.getAttribute(
-                sConfigFile.getProperty("CENTER_ID_ATTRIBUTE_TAG")).getValue());
+        double radius = Double.valueOf(element.getAttribute(
+                sConfigFile.getProperty("RADIUS_ATTRIBUTE_TAG")).getValue());
 
         double mass = Double.valueOf(element.getAttribute(
                 sConfigFile.getProperty("MASS_ATTRIBUTE_TAG")).getValue());
 
-        initialize(centerStarId, mass);
+        initialize(radius, mass);
     }
 
-    private void initialize(int centerStarId, double mass) {
-        setCenter(centerStarId);
+    private void initialize(double radius, double mass) {
+        setRadius(radius);
         setMass(mass);
     }
     
     private synchronized void loadConfig() {
         if (sConfigFile == null) {
-            sConfigFile = loadConfigFile("PlanetarySystem");
+            sConfigFile = loadConfigFile("Planet");
         }
-    }
-
-    public void setCenter(int center) {
-        mCenterId = center;
-    }
-
-    public int getCenterId() {
-        return mCenterId;
     }
 
     public void setMass(double mass) {
@@ -85,17 +77,25 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
         return mMass;
     }
 
+    public void setRadius(double mRadius) {
+        this.mRadius = mRadius;
+    }
+
+    public double getRadius() {
+        return mRadius;
+    }
+
     @Override
     public Element toXmlElement() {
         loadConfig();
         Element root = new Element(sConfigFile
-                .getProperty("PLANETARY_SYSTEM_TAG"));
+                .getProperty("PLANET_TAG"));
         root.appendChild(super.toXmlElement());
         root.addAttribute(new Attribute(sConfigFile
-                .getProperty("CENTER_ID_ATTRIBUTE_TAG"), String
-                .valueOf(mCenterId)));
+                .getProperty("RADIUS_ATTRIBUTE_TAG"), String
+                .valueOf(getRadius())));
         root.addAttribute(new Attribute(sConfigFile
-                .getProperty("MASS_ATTRIBUTE_TAG"), String.valueOf(mMass)));
+                .getProperty("MASS_ATTRIBUTE_TAG"), String.valueOf(getMass())));
         return root;
     }
 }

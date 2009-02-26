@@ -12,9 +12,9 @@ import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
 public class PhysicsVector3d implements Serializable {
     private static final long serialVersionUID = -7483027109043816672L;
-    private Properties mConfigFile;
-    private static Logger sLogger = Logger.getLogger(PhysicsVector3d.class
-            .getName());
+    private static Properties sConfigFile;
+    private static Logger sLogger =
+            Logger.getLogger(PhysicsVector3d.class.getName());
     private Point mUnitVectorPoint;
     private double mMagnitude;
 
@@ -30,25 +30,24 @@ public class PhysicsVector3d implements Serializable {
 
     public PhysicsVector3d(Element element) {
         loadConfig();
-        if (!element.getLocalName().equals(
-                mConfigFile.getProperty("VECTOR_TAG"))) {
+        if (!element.getLocalName()
+                .equals(sConfigFile.getProperty("VECTOR_TAG"))) {
             throw new UnexpectedXmlElementException("Element is not a vector");
         }
 
-        Element directionElement = element.getFirstChildElement(mConfigFile
-                .getProperty("POINT_TAG"));
+        Element directionElement =
+                element.getFirstChildElement(sConfigFile.getProperty("POINT_TAG"));
         Point direction = new Point(directionElement);
-        if (!directionElement.getAttribute(
-                mConfigFile.getProperty("NAME_ATTRIBUTE_TAG")).getValue().equals(
-                mConfigFile.getProperty("DIRECTION_ATTRIBUTE_VALUE"))
+        if (!directionElement.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+                .getValue()
+                .equals(sConfigFile.getProperty("DIRECTION_ATTRIBUTE_VALUE"))
                 || direction == null) {
-            throw new UnexpectedXmlElementException(
-                    "Unexpected point (or invalid point) for name: "
-                            + directionElement.getAttribute(mConfigFile
-                                    .getProperty("NAME_ATTRIBUTE_TAG")));
+            throw new UnexpectedXmlElementException("Unexpected point (or invalid point) for name: "
+                    + directionElement.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG")));
         }
-        double magnitude = Double.valueOf(element.getAttribute(
-                mConfigFile.getProperty("MAGNITUDE_ATTRIBUTE_TAG")).getValue());
+        double magnitude =
+                Double.valueOf(element.getAttribute(sConfigFile.getProperty("MAGNITUDE_ATTRIBUTE_TAG"))
+                        .getValue());
         initialize(direction, magnitude);
     }
 
@@ -59,10 +58,12 @@ public class PhysicsVector3d implements Serializable {
 
     private void loadConfig() {
         try {
-            mConfigFile = new Properties();
-            mConfigFile.load(this.getClass().getClassLoader()
-                    .getResourceAsStream(
-                            "twoverse/conf/PhysicsVector3d.properties"));
+            if (sConfigFile == null) {
+                sConfigFile = new Properties();
+                sConfigFile.load(this.getClass()
+                        .getClassLoader()
+                        .getResourceAsStream("twoverse/conf/PhysicsVector3d.properties"));
+            }
         } catch (IOException e) {
             sLogger.log(Level.SEVERE, "Unable to laod config: "
                     + e.getMessage(), e);
@@ -84,15 +85,20 @@ public class PhysicsVector3d implements Serializable {
     public double getMagnitude() {
         return mMagnitude;
     }
+    
+    public String toString() {
+        return "[direction: " + getUnitDirection() + ", "
+                + "magnitude: " + getMagnitude() + "]";
+    }
 
     public Element toXmlElement() {
-        Element root = new Element(mConfigFile.getProperty("VECTOR_TAG"));
+        loadConfig();
+        Element root = new Element(sConfigFile.getProperty("VECTOR_TAG"));
         Element point = mUnitVectorPoint.toXmlElement();
-        point.addAttribute(new Attribute("name", mConfigFile
-                .getProperty("DIRECTION_ATTRIBUTE_VALUE")));
-        root.addAttribute(new Attribute(mConfigFile
-                .getProperty("MAGNITUDE_ATTRIBUTE_TAG"), String
-                .valueOf(mMagnitude)));
+        point.addAttribute(new Attribute("name",
+                sConfigFile.getProperty("DIRECTION_ATTRIBUTE_VALUE")));
+        root.addAttribute(new Attribute(sConfigFile.getProperty("MAGNITUDE_ATTRIBUTE_TAG"),
+                String.valueOf(mMagnitude)));
         root.appendChild(point);
         return root;
     }

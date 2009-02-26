@@ -3,6 +3,7 @@ package twoverse;
 import twoverse.SessionManager.ExistingUserException;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
+import twoverse.object.Planet;
 import twoverse.object.PlanetarySystem;
 import twoverse.util.Session;
 import twoverse.util.User;
@@ -55,6 +56,8 @@ public interface TwoversePublicApi {
      * @return ID for new object
      */
     public PlanetarySystem addPlanetarySystem(PlanetarySystem system);
+    
+    public Planet addPlanet(Planet planet);
 
     /**
      * 

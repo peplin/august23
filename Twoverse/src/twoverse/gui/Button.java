@@ -14,8 +14,7 @@ public abstract class Button {
     private String mName;
     private ArrayList<Button> mChildren;
     protected PApplet mParentApplet;
-
-    // TODO push matrix before doing any display, pop after
+    
     public Button(PApplet parentApplet, Point center, int baseColor,
             int highlightColor, String name) {
         setCenter(center);

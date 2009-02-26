@@ -69,8 +69,9 @@ public class SessionManager extends TimerTask {
             mUsers.put(user.getUsername(), user);
         } else {
             mUsersLock.writeLock().unlock();
-            throw new ExistingUserException("Username " + user.getUsername()
+            sLogger.log(Level.SEVERE, "Username " + user.getUsername()
                     + " is already in use");
+            return mUsers.get(user.getUsername()).getId();
         }
         mUsersLock.writeLock().unlock();
         return user.getId();

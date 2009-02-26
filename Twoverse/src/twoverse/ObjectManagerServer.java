@@ -12,6 +12,7 @@ import nu.xom.Element;
 import nu.xom.Serializer;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
+import twoverse.object.Planet;
 import twoverse.object.PlanetarySystem;
 
 public class ObjectManagerServer extends ObjectManager {
@@ -40,6 +41,13 @@ public class ObjectManagerServer extends ObjectManager {
         }
         {
             Iterator<PlanetarySystem> it = mPlanetarySystems.values()
+                    .iterator();
+            while (it.hasNext()) {
+                root.appendChild(it.next().toXmlElement());
+            }
+        }
+        {
+            Iterator<Planet> it = mPlanets.values()
                     .iterator();
             while (it.hasNext()) {
                 root.appendChild(it.next().toXmlElement());
@@ -79,8 +87,10 @@ public class ObjectManagerServer extends ObjectManager {
     @Override
     public void add(Galaxy galaxy) {
         mLock.writeLock().lock();
-        super.add(galaxy);
+        // Make sure to add to DB first, since it sets the ID
         mDatabase.add(galaxy); //TODO should this be queued? will block now.
+        //TODO don't allow adding objects without ID set
+        super.add(galaxy);
         mLock.writeLock().unlock();
     }
 
@@ -90,8 +100,19 @@ public class ObjectManagerServer extends ObjectManager {
     @Override
     public void add(PlanetarySystem system) {
         mLock.writeLock().lock();
-        super.add(system);
         mDatabase.add(system);
+        super.add(system);
+        mLock.writeLock().unlock();
+    }
+    
+    /**
+     * Modifies system, sets ID and birth time
+     */
+    @Override
+    public void add(Planet planet) {
+        mLock.writeLock().lock();
+        mDatabase.add(planet);
+        super.add(planet);
         mLock.writeLock().unlock();
     }
 
@@ -101,32 +122,40 @@ public class ObjectManagerServer extends ObjectManager {
     @Override
     public void add(ManmadeBody manmadeBody) {
         mLock.writeLock().lock();
-        super.add(manmadeBody);
         mDatabase.add(manmadeBody);
+        super.add(manmadeBody);
         mLock.writeLock().unlock();
     }
     
     @Override
     public void update(Galaxy galaxy) {
         mLock.writeLock().lock();
-        super.update(galaxy);
         //mDatabase.update(galaxy); TODO when does this update? queued?
+        super.update(galaxy);
         mLock.writeLock().unlock();
     }
 
     @Override
     public void update(PlanetarySystem system) {
         mLock.writeLock().lock();
+        //mDatabase.update(system);
         super.update(system);
-      //mDatabase.update(system);
+        mLock.writeLock().unlock();
+    }
+    
+    @Override
+    public void update(Planet planet) {
+        mLock.writeLock().lock();
+        //mDatabase.update(planet);
+        super.update(planet);
         mLock.writeLock().unlock();
     }
 
     @Override
     public void update(ManmadeBody manmadeBody) {
         mLock.writeLock().lock();
+        //mDatabase.update(manmadeBody);
         super.update(manmadeBody);
-      //mDatabase.update(manmadeBody);
         mLock.writeLock().unlock();
     }
 }

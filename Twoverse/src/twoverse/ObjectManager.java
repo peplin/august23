@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
+import twoverse.object.Planet;
 import twoverse.object.PlanetarySystem;
 import twoverse.util.User;
 
@@ -19,9 +20,11 @@ public abstract class ObjectManager extends TimerTask {
     protected HashMap<Integer, Galaxy> mGalaxies;
     protected HashMap<Integer, PlanetarySystem> mPlanetarySystems;
     protected HashMap<Integer, ManmadeBody> mManmadeBodies;
+    protected HashMap<Integer, Planet> mPlanets;
     protected ReentrantReadWriteLock mLock;
     protected Properties mConfigFile;
-    protected static Logger sLogger = Logger.getLogger(ObjectManager.class.getName());
+    protected static Logger sLogger =
+            Logger.getLogger(ObjectManager.class.getName());
 
     public ObjectManager() {
         try {
@@ -38,11 +41,12 @@ public abstract class ObjectManager extends TimerTask {
         mGalaxies = new HashMap<Integer, Galaxy>();
         mPlanetarySystems = new HashMap<Integer, PlanetarySystem>();
         mManmadeBodies = new HashMap<Integer, ManmadeBody>();
+        mPlanets = new HashMap<Integer, Planet>();
 
         Timer feedPushTimer = new Timer();
         feedPushTimer.scheduleAtFixedRate(this,
-                                          1000,
-                                          Long.valueOf(mConfigFile.getProperty("FEED_DELAY")));
+                1000,
+                Long.valueOf(mConfigFile.getProperty("FEED_DELAY")));
     }
 
     public ArrayList<CelestialBody> getAllBodies() {
@@ -51,6 +55,11 @@ public abstract class ObjectManager extends TimerTask {
         allBodies.addAll(mGalaxies.values());
         allBodies.addAll(mPlanetarySystems.values());
         allBodies.addAll(mManmadeBodies.values());
+        allBodies.addAll(mPlanets.values());
+        // TODO maybe these should be inside the system - what if the DB
+        // loaded top down - ie. everything in top level, then children, etc
+        // work this out on paper, figure out bottlenecks
+        // adding new funcs every time for new types is obnoxious
         mLock.readLock().unlock();
         return allBodies;
     }
@@ -64,14 +73,23 @@ public abstract class ObjectManager extends TimerTask {
 
     public ArrayList<PlanetarySystem> getPlanetarySystems() {
         mLock.readLock().lock();
-        ArrayList<PlanetarySystem> result = new ArrayList<PlanetarySystem>(mPlanetarySystems.values());
+        ArrayList<PlanetarySystem> result =
+                new ArrayList<PlanetarySystem>(mPlanetarySystems.values());
         mLock.readLock().unlock();
         return result;
     }
 
     public ArrayList<ManmadeBody> getManmadeBodies() {
         mLock.readLock().lock();
-        ArrayList<ManmadeBody> result = new ArrayList<ManmadeBody>(mManmadeBodies.values());
+        ArrayList<ManmadeBody> result =
+                new ArrayList<ManmadeBody>(mManmadeBodies.values());
+        mLock.readLock().unlock();
+        return result;
+    }
+
+    public ArrayList<Planet> getPlanets() {
+        mLock.readLock().lock();
+        ArrayList<Planet> result = new ArrayList<Planet>(mPlanets.values());
         mLock.readLock().unlock();
         return result;
     }
@@ -80,12 +98,14 @@ public abstract class ObjectManager extends TimerTask {
             throws UnhandledCelestialBodyException {
         CelestialBody result = null;
         mLock.readLock().lock();
-        if (mGalaxies.containsKey(objectId)) {
+        if(mGalaxies.containsKey(objectId)) {
             result = mGalaxies.get(objectId);
-        } else if (mPlanetarySystems.containsKey(objectId)) {
+        } else if(mPlanetarySystems.containsKey(objectId)) {
             result = mPlanetarySystems.get(objectId);
-        } else if (mManmadeBodies.containsKey(objectId)) {
+        } else if(mManmadeBodies.containsKey(objectId)) {
             result = mManmadeBodies.get(objectId);
+        } else if(mPlanets.containsKey(objectId)) {
+            result = mPlanets.get(objectId);
         } else {
             mLock.readLock().unlock();
             throw new UnhandledCelestialBodyException("No such object ID");
@@ -116,6 +136,13 @@ public abstract class ObjectManager extends TimerTask {
         mLock.readLock().unlock();
         return result;
     }
+    
+    public Planet getPlanet(int id) {
+        mLock.readLock().lock();
+        Planet result = mPlanets.get(id);
+        mLock.readLock().unlock();
+        return result;
+    }
 
     public ManmadeBody getManmadeBody(int id) {
         mLock.readLock().lock();
@@ -130,6 +157,10 @@ public abstract class ObjectManager extends TimerTask {
 
     public void add(PlanetarySystem system) {
         mPlanetarySystems.put(system.getId(), system);
+    }
+    
+    public void add(Planet planet) {
+        mPlanets.put(planet.getId(), planet);
     }
 
     public void add(ManmadeBody manmadeBody) {
@@ -153,7 +184,11 @@ public abstract class ObjectManager extends TimerTask {
     public void update(PlanetarySystem system) {
         mPlanetarySystems.put(system.getId(), system);
     }
-
+    
+    public void update(Planet planet) {
+        mPlanets.put(planet.getId(), planet);
+    }
+    
     public void update(ManmadeBody manmadeBody) {
         mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
     }
