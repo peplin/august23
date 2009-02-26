@@ -16,7 +16,7 @@ import twoverse.object.Planet;
 import twoverse.object.PlanetarySystem;
 
 public class ObjectManagerServer extends ObjectManager {
-    Database mDatabase;
+    private Database mDatabase;
 
     public ObjectManagerServer(Database database) {
         super();
@@ -75,7 +75,26 @@ public class ObjectManagerServer extends ObjectManager {
         }
     }
 
+    protected void flushToDatabase() {
+        mLock.writeLock().lock();
+        //TODO write flushToDatabase
+        // simulation calls this when done with a timestep
+        ArrayList<CelestialBody> allBodies = getAllBodies();
+        for(CelestialBody body : bodies) {
+            if(body.isDirty()) {
+                mDatabase.update(body); //TODO how do we get the actual type here?
+                //it seems like I should add to the celestialbody interface
+                //methods to commit to db, etc...but it seems wrong to make them
+                //know about the database
+                body.setDirty(false);
+            }
+        }
+        mLock.writeLock().unlock();
+    }
+
     private void initialize() {
+        //TODO coming directly from DB, mark these as clean or make
+        // a constructor to do so
         mGalaxies.putAll(mDatabase.getGalaxies());
         mPlanetarySystems.putAll(mDatabase.getPlanetarySystems());
         mManmadeBodies.putAll(mDatabase.getManmadeBodies());
@@ -91,6 +110,7 @@ public class ObjectManagerServer extends ObjectManager {
         mDatabase.add(galaxy); //TODO should this be queued? will block now.
         //TODO don't allow adding objects without ID set
         super.add(galaxy);
+        galaxy.setDirty(false);
         mLock.writeLock().unlock();
     }
 
@@ -102,6 +122,7 @@ public class ObjectManagerServer extends ObjectManager {
         mLock.writeLock().lock();
         mDatabase.add(system);
         super.add(system);
+        system.setDirty(false);
         mLock.writeLock().unlock();
     }
     
@@ -113,6 +134,7 @@ public class ObjectManagerServer extends ObjectManager {
         mLock.writeLock().lock();
         mDatabase.add(planet);
         super.add(planet);
+        planet.setDirty(false);
         mLock.writeLock().unlock();
     }
 
@@ -124,38 +146,43 @@ public class ObjectManagerServer extends ObjectManager {
         mLock.writeLock().lock();
         mDatabase.add(manmadeBody);
         super.add(manmadeBody);
+        manmadeBody.setDirty(false);
         mLock.writeLock().unlock();
     }
     
     @Override
     public void update(Galaxy galaxy) {
         mLock.writeLock().lock();
-        //mDatabase.update(galaxy); TODO when does this update? queued?
+        mDatabase.update(galaxy);
         super.update(galaxy);
+        galaxy.setDirty(false);
         mLock.writeLock().unlock();
     }
 
     @Override
     public void update(PlanetarySystem system) {
         mLock.writeLock().lock();
-        //mDatabase.update(system);
         super.update(system);
+        mDatabase.update(system);
+        system.setDirty(false);
         mLock.writeLock().unlock();
     }
     
     @Override
     public void update(Planet planet) {
         mLock.writeLock().lock();
-        //mDatabase.update(planet);
         super.update(planet);
+        mDatabase.update(planet);
+        planet.setDirty(false);
         mLock.writeLock().unlock();
     }
 
     @Override
     public void update(ManmadeBody manmadeBody) {
         mLock.writeLock().lock();
-        //mDatabase.update(manmadeBody);
         super.update(manmadeBody);
+        mDatabase.update(manmadeBody);
+        manmadeBody.setDirty(false);
         mLock.writeLock().unlock();
     }
 }
