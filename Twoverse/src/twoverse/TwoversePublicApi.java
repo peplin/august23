@@ -12,8 +12,8 @@ import twoverse.util.User.UnsetPasswordException;
 public interface TwoversePublicApi {
 
     /**
-     * @throws UnsetPasswordException 
-     * Create a new account in the system
+     * @throws UnsetPasswordException
+     *             Create a new account in the system
      * 
      * @param username
      * @param hashedPassword
@@ -22,7 +22,10 @@ public interface TwoversePublicApi {
      * @return ID for new user account
      * @throws
      */
-    public int createAccount(User user) throws ExistingUserException, UnsetPasswordException;
+    public int createAccount(User user) throws ExistingUserException,
+            UnsetPasswordException;
+
+    public int deleteAccount(User user);
 
     public Session login(User user) throws UnsetPasswordException;
 
@@ -35,8 +38,9 @@ public interface TwoversePublicApi {
      * 
      * @param username
      * @param session
+     * @return value is meaningless, but XML-RPC doesn't support void functions
      */
-    public void logout(Session session);
+    public int logout(Session session);
 
     /**
      * These functions modify galaxy, but over XML-RPC that doesn't really work.
@@ -56,7 +60,7 @@ public interface TwoversePublicApi {
      * @return ID for new object
      */
     public PlanetarySystem addPlanetarySystem(PlanetarySystem system);
-    
+
     public Planet addPlanet(Planet planet);
 
     /**
@@ -81,8 +85,7 @@ public interface TwoversePublicApi {
      */
 
     /**
-     * Change the name of an existing object.
-     * User must own the object.
+     * Change the name of an existing object. User must own the object.
      * 
      * @param objectId
      * @param newName

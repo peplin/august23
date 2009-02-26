@@ -44,6 +44,7 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         sMethodAuthorization.put("RequestHandlerServer.login", false);
         sMethodAuthorization.put("RequestHandlerServer.logout", true);
         sMethodAuthorization.put("RequestHandlerServer.createAccount", false);
+        sMethodAuthorization.put("RequestHandlerServer.deleteAccount", true);
         sMethodAuthorization.put("RequestHandlerServer.changeName", true);
         sMethodAuthorization.put("RequestHandlerServer.addGalaxy", true);
         sMethodAuthorization.put("RequestHandlerServer.addManmadeBody", true);
@@ -60,14 +61,21 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     }
 
     @Override
-    public void logout(Session session) {
+    public int logout(Session session) {
         sSessionManager.logout(session);
+        return 0;
     }
 
     @Override
     public int createAccount(User user) throws ExistingUserException,
             UnsetPasswordException {
         return sSessionManager.createAccount(user);
+    }
+    
+    @Override
+    public int deleteAccount(User user) {
+        sSessionManager.deleteAccount(user);
+        return 0;
     }
 
     @Override

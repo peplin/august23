@@ -115,7 +115,6 @@ public class ObjectManagerClient extends ObjectManager {
     public void add(Galaxy galaxy) {
         mLock.writeLock().lock();
         mRequestHandler.addGalaxy(galaxy);
-        System.out.println(galaxy);
         super.add(galaxy);
         mLock.writeLock().unlock();
     }

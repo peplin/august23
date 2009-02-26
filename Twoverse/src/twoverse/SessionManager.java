@@ -33,7 +33,7 @@ public class SessionManager extends TimerTask {
             mConfigFile.load(this.getClass()
                     .getClassLoader()
                     .getResourceAsStream("twoverse/conf/SessionManager.properties"));
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
         }
         mDatabase = database;
@@ -58,13 +58,12 @@ public class SessionManager extends TimerTask {
         cleanup();
     }
 
-    public int createAccount(User user) throws ExistingUserException,
-            UnsetPasswordException {
-        if (user.getHashedPassword() == null) {
+    public int createAccount(User user) throws UnsetPasswordException {
+        if(user.getHashedPassword() == null) {
             throw new User.UnsetPasswordException("User doesn't have password set");
         }
         mUsersLock.writeLock().lock();
-        if (!mUsers.containsKey(user.getUsername())) {
+        if(!mUsers.containsKey(user.getUsername())) {
             mDatabase.addUser(user);
             mUsers.put(user.getUsername(), user);
         } else {
@@ -75,6 +74,25 @@ public class SessionManager extends TimerTask {
         }
         mUsersLock.writeLock().unlock();
         return user.getId();
+    }
+
+    /**
+     * TODO change to accept SEssion instead? More secure if you can only delete
+     * the account you're logged into
+     * 
+     * @param user
+     */
+    public void deleteAccount(User user) {
+        mUsersLock.writeLock().lock();
+        if(mUsers.containsKey(user.getUsername())) {
+            mDatabase.deleteUser(user);
+            mSessions.remove(user.getUsername());
+            mUsers.remove(user.getUsername());
+        } else {
+            sLogger.log(Level.SEVERE, "Username " + user.getUsername()
+                    + " does not exist");
+        }
+        mUsersLock.writeLock().unlock();
     }
 
     /**
@@ -91,9 +109,9 @@ public class SessionManager extends TimerTask {
         mSessionsLock.writeLock().lock();
         User actualUser = mUsers.get(user.getUsername());
         try {
-            if (actualUser != null && actualUser.validate(user)) {
+            if(actualUser != null && actualUser.validate(user)) {
                 Session userSession = mSessions.get(actualUser.getUsername());
-                if (userSession == null) {
+                if(userSession == null) {
                     mSessions.put(actualUser.getUsername(),
                             new Session(actualUser));
                     mDatabase.updateLoginTime(actualUser);
@@ -102,7 +120,7 @@ public class SessionManager extends TimerTask {
                 mSessionsLock.writeLock().unlock();
                 return mSessions.get(actualUser.getUsername());
             }
-        } catch (UnsetPasswordException e) {
+        } catch(UnsetPasswordException e) {
             sLogger.log(Level.INFO,
                     "Tried to login with user with uninitialized password",
                     e);
@@ -114,7 +132,7 @@ public class SessionManager extends TimerTask {
 
     public void logout(Session session) {
         mSessionsLock.writeLock().lock();
-        if (mSessions.get(session.getUser().getUsername()).equals(session)) {
+        if(mSessions.get(session.getUser().getUsername()).equals(session)) {
             mSessions.remove(session.getUser().getUsername());
         }
         mSessionsLock.writeLock().unlock();
@@ -128,9 +146,9 @@ public class SessionManager extends TimerTask {
         Timestamp timeNow = new Timestamp((new java.util.Date()).getTime());
         Iterator<Map.Entry<String, Session>> it =
                 mSessions.entrySet().iterator();
-        while (it.hasNext()) {
-            Session session = (Session) it.next();
-            if (timeNow.getTime() - session.getLastRefresh().getTime() > Long.valueOf(mConfigFile.getProperty("SESSION_TIMEOUT"))) {
+        while(it.hasNext()) {
+            Session session = (Session) it.next().getValue();
+            if(timeNow.getTime() - session.getLastRefresh().getTime() > Long.valueOf(mConfigFile.getProperty("SESSION_TIMEOUT"))) {
                 it.remove();
             }
         }
@@ -138,6 +156,7 @@ public class SessionManager extends TimerTask {
     }
 
     public User getUser(String username) {
+        // TODO check that user exists
         mUsersLock.readLock().lock();
         User user = mUsers.get(username);
         mUsersLock.readLock().unlock();
@@ -150,14 +169,14 @@ public class SessionManager extends TimerTask {
         User user = mUsers.get(username);
         boolean result = false;
         try {
-            if (user != null && user.validateHashedPassword(hashedPassword)) {
+            if(user != null && user.validateHashedPassword(hashedPassword)) {
                 Session userSession = mSessions.get(username);
-                if (userSession != null) {
+                if(userSession != null) {
                     mSessions.get(username).refresh();
                     result = true;
                 }
             }
-        } catch (UnsetPasswordException e) {
+        } catch(UnsetPasswordException e) {
             sLogger.log(Level.INFO,
                     "Tried to login with user with uninitialized password",
                     e);

@@ -34,14 +34,14 @@ public class RequestHandlerClient implements TwoversePublicApi {
             mConfigFile.load(this.getClass()
                     .getClassLoader()
                     .getResourceAsStream("twoverse/conf/RequestHandlerClient.properties"));
-        } catch (IOException e) {
+        } catch(IOException e) {
 
         }
 
         mXmlRpcConfig = new XmlRpcClientConfigImpl();
         try {
             mXmlRpcConfig.setServerURL(new URL(mConfigFile.getProperty("XMLRPCSERVER")));
-        } catch (MalformedURLException e) {
+        } catch(MalformedURLException e) {
             sLogger.log(Level.WARNING,
                     "Unable to parse URL for XML-RPC server: "
                             + mConfigFile.getProperty("XMLRPCSERVER"),
@@ -63,6 +63,9 @@ public class RequestHandlerClient implements TwoversePublicApi {
     @Override
     /*
      * Normal client will not call this function.
+     * 
+     * TODO should be private, modify api to share less
+     * 
      * @param user must already have correctly hashed password candidate
      */
     public Session login(User user) {
@@ -70,7 +73,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
         try {
             return (Session) (mXmlRpcClient.execute("RequestHandlerServer.login",
                     parameters));
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.INFO, "Unknown user " + user, e);
             return null;
         }
@@ -94,31 +97,39 @@ public class RequestHandlerClient implements TwoversePublicApi {
             candidateUser.setHashedPassword(BCrypt.hashpw(plaintextPassword,
                     actualHash));
             mSession = login(candidateUser);
-            if (mSession != null) {
+            if(mSession != null) {
                 setAuthentication(username, actualHash);
                 return mSession;
             }
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.INFO, "Unknown user " + username, e);
             return null;
         }
         return null;
     }
 
+    private void clearAuthentication() {
+        mSession = null;
+        mXmlRpcConfig.setBasicUserName("");
+        mXmlRpcConfig.setBasicPassword("");
+    }
+
     public void logout() {
-        if (mSession != null) {
+        if(mSession != null) {
             logout(mSession);
+            clearAuthentication();
         }
     }
 
     @Override
-    public void logout(Session session) {
+    public int logout(Session session) {
         Object[] parameters = new Object[] { session };
         try {
             mXmlRpcClient.execute("RequestHandlerServer.logout", parameters);
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC logout", e);
         }
+        return 0;
     }
 
     @Override
@@ -131,7 +142,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
                             parameters);
             galaxy.setId(returnedGalaxy.getId());
             galaxy.setBirthTime(returnedGalaxy.getBirthTime());
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
         return galaxy;
@@ -147,7 +158,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
                             parameters);
             body.setId(returnedBody.getId());
             body.setBirthTime(returnedBody.getBirthTime());
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
         return body;
@@ -163,7 +174,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
                             parameters);
             system.setId(returnedSystem.getId());
             system.setBirthTime(returnedSystem.getBirthTime());
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
         return system;
@@ -179,12 +190,12 @@ public class RequestHandlerClient implements TwoversePublicApi {
                             parameters);
             planet.setId(returnedSystem.getId());
             planet.setBirthTime(returnedSystem.getBirthTime());
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
         return planet;
     }
-    
+
     @Override
     public int createAccount(User user) {
         Object[] parameters = new Object[] { user };
@@ -194,10 +205,30 @@ public class RequestHandlerClient implements TwoversePublicApi {
                             parameters);
             user.setId(newId);
             return newId;
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
         return -1;
+    }
+
+    public void deleteAccount() {
+        if(mSession != null) {
+            deleteAccount(mSession.getUser());
+        }
+    }
+
+    @Override
+    /*  TODO should be private, client doesn't use this */
+    public int deleteAccount(User user) {
+        Object[] parameters = new Object[] { user };
+        try {
+            mXmlRpcClient.execute("RequestHandlerServer.deleteAccount",
+                    parameters);
+            clearAuthentication();
+        } catch(XmlRpcException e) {
+            sLogger.log(Level.WARNING, e.getMessage(), e);
+        }
+        return 0;
     }
 
     @Override
@@ -205,7 +236,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
         Object[] parameters = new Object[] { mSession, objectId, newName };
         try {
             mXmlRpcClient.execute("RequestHandlerServer.changeName", parameters);
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
         }
     }

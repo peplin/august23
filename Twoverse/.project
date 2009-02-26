@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>library</name>
-			<type>2</type>
-			<location>/home/peplin/processing-1.0.2/libraries/opengl/library</location>
-		</link>
-	</linkedResources>
 </projectDescription>

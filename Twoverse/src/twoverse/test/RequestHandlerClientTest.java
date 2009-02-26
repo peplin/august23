@@ -64,16 +64,21 @@ public class RequestHandlerClientTest {
         int idBefore = users[0].getId();
         Assert.assertTrue(0 < client.createAccount(users[0]));
         Assert.assertFalse(idBefore == users[0].getId());
-        database.deleteUser(users[0]);
+        client.deleteAccount();
     }
 
     @Test
     public void testLogin() {
+        client.createAccount(users[0]);
         Assert.assertTrue(client.login("xmlrpcfirst", "firstpass") != null);
+        client.deleteAccount();
     }
 
     @Test
     public void testAddGalaxy() {
+        client.createAccount(users[0]);
+        client.login("xmlrpcfirst", "firstpass");
+        
         Galaxy galaxy = new Galaxy(0, -1, "theBody", null, null, -1, new Point(
                 42, 43, 44), new PhysicsVector3d(1, 2, 3, 4),
                 new PhysicsVector3d(5, 6, 7, 8), new GalaxyShape(1, "test",
@@ -81,5 +86,6 @@ public class RequestHandlerClientTest {
         objectManagerClient.add(galaxy);
         Assert.assertTrue(galaxy.getId() != 0);
         database.delete(galaxy);
+        client.deleteAccount();
     }
 }
