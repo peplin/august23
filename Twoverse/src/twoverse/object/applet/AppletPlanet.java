@@ -4,22 +4,23 @@ import processing.core.PApplet;
 import twoverse.object.Planet;
 import twoverse.util.Point.TwoDimensionalException;
 
-public class AppletPlanet extends AbstractAppletCelestialBody {
-    private Planet mPlanet;
-
-    public AppletPlanet(PApplet parent, Planet planet) {
-        mParent = parent;
-        mPlanet = planet;
+@SuppressWarnings("serial")
+public class AppletPlanet extends Planet implements AppletBodyInterface {
+	private PApplet mParent;
+	
+	public AppletPlanet(PApplet parent, Planet planet) {
+        super(planet);
+		mParent = parent;
     }
 
     @Override
     public void display() throws TwoDimensionalException {
         mParent.pushMatrix();
         mParent.noStroke();
-        mParent.translate((float) mPlanet.getPosition().getX(),
-                (float) mPlanet.getPosition().getY(),
-                (float) mPlanet.getPosition().getZ());
-        mParent.sphere((float) mPlanet.getRadius());
+        mParent.translate((float) getPosition().getX(),
+                (float) getPosition().getY(),
+                (float) getPosition().getZ());
+        mParent.sphere((float) getRadius());
         mParent.popMatrix();
     }
 

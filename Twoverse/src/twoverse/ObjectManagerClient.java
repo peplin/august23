@@ -15,9 +15,9 @@ import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.Planet;
 import twoverse.object.PlanetarySystem;
-import twoverse.object.applet.AbstractAppletCelestialBody;
 import twoverse.object.applet.AppletGalaxy;
 import twoverse.object.applet.AppletManmadeBody;
+import twoverse.object.applet.AppletBodyInterface;
 import twoverse.object.applet.AppletPlanet;
 import twoverse.object.applet.AppletPlanetarySystem;
 
@@ -82,11 +82,11 @@ public class ObjectManagerClient extends ObjectManager {
         }
     }
 
-    public ArrayList<AbstractAppletCelestialBody> getAllBodiesAsApplets(
+    public ArrayList<AppletBodyInterface> getAllBodiesAsApplets(
             PApplet parent) {
         mLock.readLock().lock();
-        ArrayList<AbstractAppletCelestialBody> allBodies =
-                new ArrayList<AbstractAppletCelestialBody>();
+        ArrayList<AppletBodyInterface> allBodies =
+                new ArrayList<AppletBodyInterface>();
         Collection<Galaxy> galaxies = mGalaxies.values();
         for (Galaxy galaxy : galaxies) {
             allBodies.add(new AppletGalaxy(parent, galaxy));

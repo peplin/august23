@@ -477,6 +477,7 @@ public class Database {
                                         resultSet.getString("galaxy_shape.texture")),
                                 resultSet.getDouble("mass"),
                                 resultSet.getDouble("density"));
+                galaxy.setDirty(false);
                 galaxies.put(galaxy.getId(), galaxy);
             }
             resultSet.close();
@@ -501,6 +502,7 @@ public class Database {
                         new PlanetarySystem(body,
                                 resultSet.getInt("centerid"),
                                 resultSet.getDouble("mass"));
+                system.setDirty(false);
                 systems.put(system.getId(), system);
             }
             resultSet.close();
@@ -525,6 +527,7 @@ public class Database {
                         new Planet(body,
                                 resultSet.getDouble("mass"),
                                 resultSet.getDouble("radius"));
+                planet.setDirty(false);
                 planets.put(planet.getId(), planet);
             }
             resultSet.close();
@@ -546,6 +549,7 @@ public class Database {
                     throw new SQLException("Mismatch between manmade and celestial bodies");
                 }
                 ManmadeBody manmadeBody = new ManmadeBody(body);
+                manmadeBody.setDirty(false);
                 manmadeBodies.put(manmadeBody.getId(), manmadeBody);
             }
             resultSet.close();
@@ -565,6 +569,7 @@ public class Database {
             mAddGalaxyStatement.setDouble(3, galaxy.getMass());
             mAddGalaxyStatement.setDouble(4, galaxy.getDensity());
             mAddGalaxyStatement.executeUpdate();
+            galaxy.setDirty(false);
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not add galaxy " + galaxy, e);
         }
@@ -584,6 +589,7 @@ public class Database {
 
             mAddPlanetarySystemStatement.setDouble(3, system.getMass());
             mAddPlanetarySystemStatement.executeUpdate();
+            system.setDirty(false);
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not add system " + system, e);
         }
@@ -597,6 +603,7 @@ public class Database {
             mAddPlanetStatement.setDouble(2, planet.getMass());
             mAddPlanetStatement.setDouble(3, planet.getRadius());
             mAddPlanetStatement.executeUpdate();
+            planet.setDirty(false);
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not add system " + planet, e);
         }
@@ -608,6 +615,7 @@ public class Database {
 
             mAddManmadeBodyStatement.setInt(1, manmadeBody.getId());
             mAddManmadeBodyStatement.executeUpdate();
+            manmadeBody.setDirty(false);
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not add manmade body "
                     + manmadeBody, e);
@@ -794,7 +802,7 @@ public class Database {
         }
     }
 
-    private void update(PlanetarySystem system) {
+    public void update(PlanetarySystem system) {
         try {
             updateCelestialBody(system);
 
@@ -802,13 +810,14 @@ public class Database {
             mUpdatePlanetarySystemStatement.setDouble(2, system.getMass());
             mUpdatePlanetarySystemStatement.setDouble(3, system.getId());
             mUpdatePlanetarySystemStatement.executeUpdate();
+            system.setDirty(false);
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not update planetary system "
                     + system, e);
         }
     }
     
-    private void update(Planet planet) {
+    public void update(Planet planet) {
         try {
             updateCelestialBody(planet);
 
@@ -816,13 +825,14 @@ public class Database {
             mUpdatePlanetStatement.setDouble(2, planet.getRadius());
             mUpdatePlanetStatement.setDouble(3, planet.getId());
             mUpdatePlanetStatement.executeUpdate();
+            planet.setDirty(false);
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not update planetary system "
                     + planet, e);
         }
     }
 
-    private void update(Galaxy galaxy) {
+    public void update(Galaxy galaxy) {
         try {
             updateCelestialBody(galaxy);
 
@@ -831,14 +841,16 @@ public class Database {
             mUpdateGalaxyStatement.setDouble(3, galaxy.getDensity());
             mUpdateGalaxyStatement.setInt(4, galaxy.getId());
             mUpdateGalaxyStatement.executeUpdate();
+            galaxy.setDirty(false);
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not update galaxy " + galaxy, e);
         }
     }
 
-    private void update(ManmadeBody manmadeBody) {
+    public void update(ManmadeBody manmadeBody) {
         try {
             updateCelestialBody(manmadeBody);
+            manmadeBody.setDirty(false);
         } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not update manmade body "
                     + manmadeBody, e);

@@ -56,8 +56,7 @@ public class Galaxy extends CelestialBody implements Serializable {
     }
 
     public Galaxy(Element element) {
-        //TODO can't pull this out to config as config isn't loaded
-        super(element.getFirstChildElement("CelestialBody"));
+        super(element.getFirstChildElement(CelestialBody.XML_TAG));
         loadConfig();
 
         if (!element.getLocalName().equals(
@@ -78,7 +77,12 @@ public class Galaxy extends CelestialBody implements Serializable {
         initialize(shape, mass, density);
     }
 
-    private void initialize(GalaxyShape shape, double mass, double density) {
+    public Galaxy(Galaxy galaxy) {
+		super(galaxy);
+		initialize(galaxy.getShape(), galaxy.getMass(), galaxy.getDensity());
+	}
+
+	private void initialize(GalaxyShape shape, double mass, double density) {
         setShape(shape);
         setMass(mass);
         setDensity(density);

@@ -40,7 +40,7 @@ public class Planet extends CelestialBody implements Serializable {
     }
 
     public Planet(Element element) {
-        super(element.getFirstChildElement("CelestialBody"));
+        super(element.getFirstChildElement(CelestialBody.XML_TAG));
         loadConfig();
 
         if (!element.getLocalName().equals(
@@ -58,7 +58,12 @@ public class Planet extends CelestialBody implements Serializable {
         initialize(radius, mass);
     }
 
-    private void initialize(double radius, double mass) {
+    public Planet(Planet planet) {
+		super(planet);
+		initialize(planet.getRadius(), planet.getMass());
+	}
+
+	private void initialize(double radius, double mass) {
         setRadius(radius);
         setMass(mass);
     }

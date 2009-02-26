@@ -1,5 +1,7 @@
 package twoverse.object.applet;
 
-public interface AppletObjectInterface {
+import twoverse.util.Point.TwoDimensionalException;
+
+public interface AppletBodyInterface {
     public abstract void display() throws TwoDimensionalException;
 }

@@ -10,9 +10,7 @@ import processing.core.PApplet;
 import tuio.TuioClient;
 import tuio.TuioCursor;
 import twoverse.object.Planet;
-import twoverse.object.Galaxy;
-import twoverse.object.applet.AppletObjectInterface;
-import twoverse.util.GalaxyShape;
+import twoverse.object.applet.AppletBodyInterface;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 import twoverse.util.User;
@@ -128,14 +126,14 @@ public class TwoverseClient extends PApplet {
 
     void updateUniverse() {
         lights();
-        ArrayList<AppletObjectInterface> bodies =
+        ArrayList<AppletBodyInterface> bodies =
                 mObjectManager.getAllBodiesAsApplets(this);
-        for (AppletObjectInterface object : objects) {
+        for (AppletBodyInterface body : bodies) {
             try {
-                object.display();
+            	body.display();
             } catch (TwoDimensionalException e) {
                 sLogger.log(Level.WARNING,
-                        "Expected 3D point but was 2D: " + object,
+                        "Expected 3D point but was 2D: " + body,
                         e);
             }
         }

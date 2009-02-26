@@ -4,7 +4,8 @@ import processing.core.PApplet;
 import twoverse.object.PlanetarySystem;
 import twoverse.util.Point.TwoDimensionalException;
 
-public class AppletPlanetarySystem extends PlanetarySystem implements AppletObjectInterface {
+@SuppressWarnings("serial")
+public class AppletPlanetarySystem extends PlanetarySystem implements AppletBodyInterface {
     private PApplet mParent;
 
     public AppletPlanetarySystem(PApplet parent, PlanetarySystem system) {

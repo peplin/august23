@@ -40,7 +40,7 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
     }
 
     public PlanetarySystem(Element element) {
-        super(element.getFirstChildElement("CelestialBody"));
+        super(element.getFirstChildElement(CelestialBody.XML_TAG));
         loadConfig();
 
         if (!element.getLocalName().equals(
@@ -58,7 +58,12 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
         initialize(centerStarId, mass);
     }
 
-    private void initialize(int centerStarId, double mass) {
+    public PlanetarySystem(PlanetarySystem system) {
+		super(system);
+		initialize(system.getCenterId(), system.getMass());
+	}
+
+	private void initialize(int centerStarId, double mass) {
         setCenter(centerStarId);
         setMass(mass);
     }

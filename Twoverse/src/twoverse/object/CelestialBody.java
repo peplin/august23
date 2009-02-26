@@ -30,7 +30,12 @@ public class CelestialBody implements Serializable {
     private Point mPosition;
     private String mName;
     private static final long serialVersionUID = -6341175711814973441L;
-    private boolean mDirty = true; // dirty if different than version in database
+    private boolean mDirty = true; // dirty if different than version in
+                                   // database
+
+    // can't pull out to config file, as we need it before the constructor in
+    // derived classes
+    protected final static String XML_TAG = "CelestialBody";
 
     /**
      * Don't call this - needs to be here so its children are serializable.
@@ -43,14 +48,14 @@ public class CelestialBody implements Serializable {
             PhysicsVector3d acceleration) {
         loadConfig();
         initialize(-1,
-                   ownerId,
-                   name,
-                   null,
-                   null,
-                   parentId,
-                   position,
-                   velocity,
-                   acceleration);
+                ownerId,
+                name,
+                null,
+                null,
+                parentId,
+                position,
+                velocity,
+                acceleration);
 
     }
 
@@ -59,33 +64,33 @@ public class CelestialBody implements Serializable {
             PhysicsVector3d velocity, PhysicsVector3d acceleration) {
         loadConfig();
         initialize(id,
-                   ownerId,
-                   name,
-                   birthTime,
-                   deathTime,
-                   parentId,
-                   position,
-                   velocity,
-                   acceleration);
+                ownerId,
+                name,
+                birthTime,
+                deathTime,
+                parentId,
+                position,
+                velocity,
+                acceleration);
     }
 
     public CelestialBody(CelestialBody body) {
         loadConfig();
         initialize(body.getId(),
-                   body.getOwnerId(),
-                   body.getName(),
-                   body.getBirthTime(),
-                   body.getDeathTime(),
-                   body.getParentId(),
-                   body.getPosition(),
-                   body.getVelocity(),
-                   body.getAcceleration());
+                body.getOwnerId(),
+                body.getName(),
+                body.getBirthTime(),
+                body.getDeathTime(),
+                body.getParentId(),
+                body.getPosition(),
+                body.getVelocity(),
+                body.getAcceleration());
     }
 
     public CelestialBody(Element root) throws UnexpectedXmlElementException {
         loadConfig();
 
-        if (!root.getLocalName()
+        if(!root.getLocalName()
                 .equals(sConfigFile.getProperty("CELESTIAL_BODY_TAG"))) {
             throw new UnexpectedXmlElementException("Element is not a celestial body");
         }
@@ -93,9 +98,9 @@ public class CelestialBody implements Serializable {
         Elements positionElements =
                 root.getChildElements(sConfigFile.getProperty("POINT_TAG"));
         Point position = null;
-        for (int i = 0; i < positionElements.size() && position == null; i++) {
+        for(int i = 0; i < positionElements.size() && position == null; i++) {
             Element element = positionElements.get(i);
-            if (element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+            if(element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                     .getValue()
                     .equals(sConfigFile.getProperty("POSITION_ATTRIBUTE_VALUE"))) {
                 position = new Point(element);
@@ -105,7 +110,7 @@ public class CelestialBody implements Serializable {
             }
         }
 
-        if (position == null) {
+        if(position == null) {
             throw new MissingXmlElementException("Expected point object for position");
         }
 
@@ -113,14 +118,14 @@ public class CelestialBody implements Serializable {
                 root.getChildElements(sConfigFile.getProperty("VECTOR_TAG"));
         PhysicsVector3d velocityVector = null;
         PhysicsVector3d accelerationVector = null;
-        for (int i = 0; i < vectorElements.size()
+        for(int i = 0; i < vectorElements.size()
                 && (velocityVector == null || accelerationVector == null); i++) {
             Element element = vectorElements.get(i);
-            if (element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+            if(element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                     .getValue()
                     .equals(sConfigFile.getProperty("VELOCITY_ATTRIBUTE_VALUE"))) {
                 velocityVector = new PhysicsVector3d(element);
-            } else if (element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+            } else if(element.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                     .getValue()
                     .equals(sConfigFile.getProperty("ACCELERATION_ATTRIBUTE_VALUE"))) {
                 accelerationVector = new PhysicsVector3d(element);
@@ -132,25 +137,25 @@ public class CelestialBody implements Serializable {
         }
 
         Timestamp deathTime = null;
-        if (root.getAttribute(sConfigFile.getProperty("DEATH_ATTRIBUTE_TAG")) != null) {
+        if(root.getAttribute(sConfigFile.getProperty("DEATH_ATTRIBUTE_TAG")) != null) {
             deathTime =
                     new Timestamp(Long.valueOf(root.getAttribute(sConfigFile.getProperty("DEATH_ATTRIBUTE_TAG"))
                             .getValue()));
         }
         initialize(Integer.valueOf(root.getAttribute(sConfigFile.getProperty("ID_ATTRIBUTE_TAG"))
-                           .getValue()),
-                   Integer.valueOf(root.getAttribute(sConfigFile.getProperty("OWNER_ATTRIBUTE_TAG"))
-                           .getValue()),
-                   root.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
-                           .getValue(),
-                   new Timestamp(Long.valueOf(root.getAttribute(sConfigFile.getProperty("BIRTH_ATTRIBUTE_TAG"))
-                           .getValue())),
-                   deathTime,
-                   Integer.valueOf(root.getAttribute(sConfigFile.getProperty("PARENT_ID_ATTRIBUTE_TAG"))
-                           .getValue()),
-                   position,
-                   velocityVector,
-                   accelerationVector);
+                .getValue()),
+                Integer.valueOf(root.getAttribute(sConfigFile.getProperty("OWNER_ATTRIBUTE_TAG"))
+                        .getValue()),
+                root.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+                        .getValue(),
+                new Timestamp(Long.valueOf(root.getAttribute(sConfigFile.getProperty("BIRTH_ATTRIBUTE_TAG"))
+                        .getValue())),
+                deathTime,
+                Integer.valueOf(root.getAttribute(sConfigFile.getProperty("PARENT_ID_ATTRIBUTE_TAG"))
+                        .getValue()),
+                position,
+                velocityVector,
+                accelerationVector);
     }
 
     private void initialize(int id, int ownerId, String name,
@@ -169,7 +174,7 @@ public class CelestialBody implements Serializable {
     }
 
     private synchronized void loadConfig() {
-        if (sConfigFile == null) {
+        if(sConfigFile == null) {
             sConfigFile = loadConfigFile("CelestialBody");
         }
     }
@@ -182,7 +187,7 @@ public class CelestialBody implements Serializable {
                     .getClassLoader()
                     .getResourceAsStream("twoverse/conf/" + className
                             + ".properties"));
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.SEVERE, "Unable to load config: "
                     + e.getMessage(), e);
         }
@@ -202,7 +207,7 @@ public class CelestialBody implements Serializable {
                 String.valueOf(mOwnerId)));
         element.addAttribute(new Attribute(sConfigFile.getProperty("BIRTH_ATTRIBUTE_TAG"),
                 String.valueOf(mBirthTime.getTime())));
-        if (mDeathTime != null) {
+        if(mDeathTime != null) {
             element.addAttribute(new Attribute(sConfigFile.getProperty("DEATH_ATTRIBUTE_TAG"),
                     String.valueOf(mBirthTime.getTime())));
         }
@@ -307,15 +312,11 @@ public class CelestialBody implements Serializable {
     }
 
     public String toString() {
-        return "[id: " + getId() + ", "
-                + "owner id: " + getOwnerId() + ", "
-                + "name: " + getName() + ", "
-                + "birth: " + getBirthTime() + ", "
-                + "death: " + getDeathTime() + ", "
-                + "parent id: " + getParentId() + ", "
-                + "velocity: " + getVelocity() + ", "
-                + "acceleration: " + getAcceleration() + ", "
-                + "position: " + getPosition() + ", ",
-                + "dirty: " + isDirty() + "]";
+        return "[id: " + getId() + ", " + "owner id: " + getOwnerId() + ", "
+                + "name: " + getName() + ", " + "birth: " + getBirthTime()
+                + ", " + "death: " + getDeathTime() + ", " + "parent id: "
+                + getParentId() + ", " + "velocity: " + getVelocity() + ", "
+                + "acceleration: " + getAcceleration() + ", " + "position: "
+                + getPosition() + ", " + "dirty: " + isDirty() + "]";
     }
 }

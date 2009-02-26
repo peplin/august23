@@ -4,7 +4,8 @@ import processing.core.PApplet;
 import twoverse.object.ManmadeBody;
 import twoverse.util.Point.TwoDimensionalException;
 
-public class AppletManmadeBody extends ManmadeBody implements AppletObjectInterface {
+@SuppressWarnings("serial")
+public class AppletManmadeBody extends ManmadeBody implements AppletBodyInterface {
     private PApplet mParent;
 
     public AppletManmadeBody(PApplet parent, ManmadeBody body) {

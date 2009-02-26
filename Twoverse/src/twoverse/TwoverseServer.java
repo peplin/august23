@@ -38,7 +38,6 @@ public class TwoverseServer {
                     .getConfig();
             config.setEnabledForExtensions(true);
 
-            mSimulation.start(); // run simulation
             mWebServer.start(); // accept requests
         } catch (DatabaseException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);

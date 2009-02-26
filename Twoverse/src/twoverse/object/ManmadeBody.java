@@ -34,8 +34,7 @@ public class ManmadeBody extends CelestialBody implements Serializable {
     }
 
     public ManmadeBody(Element element) {
-        //TODO same problem as in galaxy
-        super(element.getFirstChildElement("CelestialBody"));
+        super(element.getFirstChildElement(CelestialBody.XML_TAG));
         loadConfig();
     }
 

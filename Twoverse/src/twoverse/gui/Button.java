@@ -36,7 +36,6 @@ public abstract class Button {
                 setLocked(false);
             } else {
                 setLocked(true);
-                // TODO clear all others
             }
         }
     }

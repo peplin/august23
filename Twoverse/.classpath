@@ -16,8 +16,7 @@
 	<classpathentry exported="true" kind="var" path="PROCESSING_HOME/lib/core.jar"/>
 	<classpathentry exported="true" kind="var" path="PROCESSING_SKETCHBOOK/tuio/library/javaosc.jar"/>
 	<classpathentry exported="true" kind="var" path="PROCESSING_SKETCHBOOK/tuio/library/tuio.jar"/>
-	<classpathentry exported="true" kind="var" path="PROCESSING_HOME/libraries/opengl/library/opengl.jar"/>
-	<classpathentry exported="true" kind="var" path="PROCESSING_HOME/libraries/opengl/library/jogl.jar"/>
-	<classpathentry kind="var" path="PROCESSING_HOME/libraries/opengl/library/gluegen-rt.jar"/>
+	<classpathentry kind="var" path="PROCESSING_SKETCHBOOK"/>
+	<classpathentry kind="var" path="PROCESSING_HOME"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

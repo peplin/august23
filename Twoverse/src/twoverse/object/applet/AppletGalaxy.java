@@ -4,7 +4,8 @@ import processing.core.PApplet;
 import twoverse.object.Galaxy;
 import twoverse.util.Point.TwoDimensionalException;
 
-public class AppletGalaxy extends Galaxy implements AppletObjectInterface {
+@SuppressWarnings("serial")
+public class AppletGalaxy extends Galaxy implements AppletBodyInterface {
     private PApplet mParent;
 
     public AppletGalaxy(PApplet parent, Galaxy galaxy) {
