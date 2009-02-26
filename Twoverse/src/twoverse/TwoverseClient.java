@@ -57,16 +57,6 @@ public class TwoverseClient extends PApplet {
         user.setPlaintextPassword("foobar");
         mRequestHandler.createAccount(user);
         mRequestHandler.login(user.getUsername(), "foobar");
-
-        /*mObjectManager.add(new Galaxy(-1,
-                "theBody",
-                -1,
-                new Point(42, 43, 44),
-                new PhysicsVector3d(1, 2, 3, 4),
-                new PhysicsVector3d(5, 6, 7, 8),
-                new GalaxyShape(1, "test", "test"),
-                10,
-                10));*/
     }
 
     /*

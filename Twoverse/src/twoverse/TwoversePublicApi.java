@@ -25,22 +25,15 @@ public interface TwoversePublicApi {
     public int createAccount(User user) throws ExistingUserException,
             UnsetPasswordException;
 
-    public int deleteAccount(User user);
-
-    public Session login(User user) throws UnsetPasswordException;
-
     /**
      * Unregisters a currently active session. Confirm that session number
      * belongs to requesting user.
-     * 
-     * We don't need a login method as each RPC call is individually
-     * authenticated. The first request will "login".
      * 
      * @param username
      * @param session
      * @return value is meaningless, but XML-RPC doesn't support void functions
      */
-    public int logout(Session session);
+    //public int logout(Session session);
 
     /**
      * These functions modify galaxy, but over XML-RPC that doesn't really work.

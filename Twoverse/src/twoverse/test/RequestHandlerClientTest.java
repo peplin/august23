@@ -64,6 +64,7 @@ public class RequestHandlerClientTest {
         int idBefore = users[0].getId();
         Assert.assertTrue(0 < client.createAccount(users[0]));
         Assert.assertFalse(idBefore == users[0].getId());
+        client.login("xmlrpcfirst", "firstpass");
         client.deleteAccount();
     }
 

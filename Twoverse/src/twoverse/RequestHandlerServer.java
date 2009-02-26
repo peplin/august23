@@ -14,6 +14,7 @@ import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
 import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.SessionManager.ExistingUserException;
+import twoverse.SessionManager.UnknownUserException;
 import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
@@ -55,12 +56,10 @@ public class RequestHandlerServer extends XmlRpcServlet implements
                 false);
     }
 
-    @Override
     public Session login(User user) throws UnsetPasswordException {
         return sSessionManager.login(user);
     }
 
-    @Override
     public int logout(Session session) {
         sSessionManager.logout(session);
         return 0;
@@ -72,9 +71,8 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         return sSessionManager.createAccount(user);
     }
     
-    @Override
-    public int deleteAccount(User user) {
-        sSessionManager.deleteAccount(user);
+    public int deleteAccount(Session session) {
+        sSessionManager.deleteAccount(session);
         return 0;
     }
 
@@ -116,7 +114,7 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         return planet;
     }
 
-    public String getHashedPassword(String username) {
+    public String getHashedPassword(String username) throws UnknownUserException {
         return sSessionManager.getUser(username).getHashedPassword();
     }
 

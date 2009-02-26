@@ -33,7 +33,7 @@ public class SessionManager extends TimerTask {
             mConfigFile.load(this.getClass()
                     .getClassLoader()
                     .getResourceAsStream("twoverse/conf/SessionManager.properties"));
-        } catch(IOException e) {
+        } catch (IOException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
         }
         mDatabase = database;
@@ -68,7 +68,7 @@ public class SessionManager extends TimerTask {
             mUsers.put(user.getUsername(), user);
         } else {
             mUsersLock.writeLock().unlock();
-            sLogger.log(Level.SEVERE, "Username " + user.getUsername()
+            sLogger.log(Level.WARNING, "Username " + user.getUsername()
                     + " is already in use");
             return mUsers.get(user.getUsername()).getId();
         }
@@ -77,20 +77,20 @@ public class SessionManager extends TimerTask {
     }
 
     /**
-     * TODO change to accept SEssion instead? More secure if you can only delete
-     * the account you're logged into
      * 
      * @param user
      */
-    public void deleteAccount(User user) {
+    public void deleteAccount(Session session) {
         mUsersLock.writeLock().lock();
-        if(mUsers.containsKey(user.getUsername())) {
-            mDatabase.deleteUser(user);
-            mSessions.remove(user.getUsername());
-            mUsers.remove(user.getUsername());
+        mSessionsLock.writeLock().lock();
+        if(mSessions.get(session.getUser().getUsername()).equals(session)) {
+            mDatabase.deleteUser(session.getUser());
+            mSessions.remove(session.getUser().getUsername());
+            mUsers.remove(session.getUser().getUsername());
         } else {
-            sLogger.log(Level.SEVERE, "Username " + user.getUsername()
-                    + " does not exist");
+            sLogger.log(Level.WARNING, "Username "
+                    + session.getUser().getUsername() + " does not exist or"
+                    + "is not logged in");
         }
         mUsersLock.writeLock().unlock();
     }
@@ -120,8 +120,8 @@ public class SessionManager extends TimerTask {
                 mSessionsLock.writeLock().unlock();
                 return mSessions.get(actualUser.getUsername());
             }
-        } catch(UnsetPasswordException e) {
-            sLogger.log(Level.INFO,
+        } catch (UnsetPasswordException e) {
+            sLogger.log(Level.WARNING,
                     "Tried to login with user with uninitialized password",
                     e);
         }
@@ -146,7 +146,7 @@ public class SessionManager extends TimerTask {
         Timestamp timeNow = new Timestamp((new java.util.Date()).getTime());
         Iterator<Map.Entry<String, Session>> it =
                 mSessions.entrySet().iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Session session = (Session) it.next().getValue();
             if(timeNow.getTime() - session.getLastRefresh().getTime() > Long.valueOf(mConfigFile.getProperty("SESSION_TIMEOUT"))) {
                 it.remove();
@@ -155,10 +155,12 @@ public class SessionManager extends TimerTask {
         mSessionsLock.writeLock().unlock();
     }
 
-    public User getUser(String username) {
-        // TODO check that user exists
+    public User getUser(String username) throws UnknownUserException {
         mUsersLock.readLock().lock();
         User user = mUsers.get(username);
+        if(user == null) {
+            throw new UnknownUserException("Unknown user " + user);
+        }
         mUsersLock.readLock().unlock();
         return user;
     }
@@ -176,8 +178,8 @@ public class SessionManager extends TimerTask {
                     result = true;
                 }
             }
-        } catch(UnsetPasswordException e) {
-            sLogger.log(Level.INFO,
+        } catch (UnsetPasswordException e) {
+            sLogger.log(Level.WARNING,
                     "Tried to login with user with uninitialized password",
                     e);
             result = false;
@@ -191,6 +193,14 @@ public class SessionManager extends TimerTask {
         private static final long serialVersionUID = 5064882885554598200L;
 
         public ExistingUserException(String e) {
+            super(e);
+        }
+    }
+
+    public class UnknownUserException extends Exception {
+        private static final long serialVersionUID = -8589966171614031273L;
+
+        public UnknownUserException(String e) {
             super(e);
         }
     }

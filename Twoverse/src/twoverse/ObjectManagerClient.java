@@ -45,7 +45,6 @@ public class ObjectManagerClient extends ObjectManager {
                             .getChildElements(mConfigFile.getProperty("GALAXY_TAG"));
             for (int i = 0; i < galaxies.size(); i++) {
                 Galaxy g = new Galaxy(galaxies.get(i));
-                System.out.println(g);
                 update(g);
             }
 

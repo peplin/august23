@@ -46,7 +46,7 @@ public class Planet extends CelestialBody implements Serializable {
         if (!element.getLocalName().equals(
                 sConfigFile.getProperty("PLANET_TAG"))) {
             throw new UnexpectedXmlElementException(
-                    "Element is not a planetary system");
+                    "Element is not a planet");
         }
 
         double radius = Double.valueOf(element.getAttribute(
