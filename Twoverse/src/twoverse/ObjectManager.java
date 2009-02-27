@@ -171,11 +171,7 @@ public abstract class ObjectManager extends TimerTask {
      * 
      * So, if this is a new object coming in over an XML feed, i need to match
      * it with its ID. Okay.
-     * 
-     * TODO This overwrites - is that okay? No...need ID for objects sent from
-     * client, so need to insert into database first.
-     * 
-     * TODO do we need upate for arrays of objects to match the DB?
+     * Careful - for now, this overwrites any data we already have!
      */
     public void update(Galaxy galaxy) {
         mGalaxies.put(galaxy.getId(), galaxy);

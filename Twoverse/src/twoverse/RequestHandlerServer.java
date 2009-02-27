@@ -37,7 +37,7 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     public RequestHandlerServer() {
     }
 
-    //TODO in general, add info log statements EVERYWHERE
+    // TODO in general, add info log statements EVERYWHERE
     public static void init(ObjectManagerServer objectManager,
             SessionManager sessionManager) {
         sObjectManager = objectManager;
@@ -55,13 +55,17 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         sMethodAuthorization.put("RequestHandlerServer.addPlanet", true);
         sMethodAuthorization.put("RequestHandlerServer.getHashedPassword",
                 false);
+        sLogger.log(Level.CONFIG, "Method authorization configuration is: "
+                + sMethodAuthorization);
     }
 
     public Session login(User user) throws UnsetPasswordException {
+        sLogger.log(Level.INFO, "Attempting to login with user: " + user);
         return sSessionManager.login(user);
     }
 
     public int logout(Session session) {
+        sLogger.log(Level.INFO, "Attempting to logout of session: " + session);
         sSessionManager.logout(session);
         return 0;
     }
@@ -69,10 +73,14 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     @Override
     public int createAccount(User user) throws ExistingUserException,
             UnsetPasswordException {
+        sLogger.log(Level.INFO, "Attempting to create account for user: "
+                + user);
         return sSessionManager.createAccount(user);
     }
-    
+
     public int deleteAccount(Session session) {
+        sLogger.log(Level.INFO, "Attempting to delete account from session: "
+                + session);
         sSessionManager.deleteAccount(session);
         return 0;
     }
@@ -81,41 +89,54 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     public void changeName(Session session, int objectId, String newName) {
         try {
             CelestialBody body = sObjectManager.getCelestialBody(objectId);
-            if(isAuthenticated(session.getUser().getUsername(),
-                    session.getUser().getHashedPassword())
+            sLogger.log(Level.INFO, "Attempting to change name of object: "
+                    + body + " to: " + newName + " from session: " + session);
+            if(body != null
+                    && isAuthenticated(session.getUser().getUsername(),
+                            session.getUser().getHashedPassword())
                     && session.getUser().getId() == body.getOwnerId()) {
                 body.setName(newName);
+            } else {
+                sLogger.log(Level.WARNING,
+                        "Object doesn't exist or session is not authenticated as the owner");
             }
         } catch (UnhandledCelestialBodyException e) {
-            sLogger.log(Level.WARNING, e.getMessage(), e);
+            sLogger.log(Level.WARNING, "Unknown type of CelestialBody", e);
         }
     }
 
     @Override
     public Galaxy addGalaxy(Galaxy galaxy) {
+        sLogger.log(Level.INFO, "Attempting to add galaxy: " + galaxy);
         sObjectManager.add(galaxy);
         return galaxy;
     }
 
     @Override
     public ManmadeBody addManmadeBody(ManmadeBody body) {
+        sLogger.log(Level.INFO, "Attempting to add manmade body: " + body);
         sObjectManager.add(body);
         return body;
     }
 
     @Override
     public PlanetarySystem addPlanetarySystem(PlanetarySystem system) {
+        sLogger.log(Level.INFO, "Attempting to add planetary system: " + system);
         sObjectManager.add(system);
         return system;
     }
 
     @Override
     public Planet addPlanet(Planet planet) {
+        sLogger.log(Level.INFO, "Attempting to add planet: " + planet);
         sObjectManager.add(planet);
         return planet;
     }
 
-    public String getHashedPassword(String username) throws UnknownUserException {
+    public String getHashedPassword(String username)
+            throws UnknownUserException {
+        sLogger.log(Level.INFO,
+                "Attemping to get hashed password for username: " + username);
         return sSessionManager.getUser(username).getHashedPassword();
     }
 
@@ -124,6 +145,9 @@ public class RequestHandlerServer extends XmlRpcServlet implements
      * a new session and return true to the client.
      */
     private boolean isAuthenticated(String username, String hashedPassword) {
+        sLogger.log(Level.FINE,
+                "RPC request request authentication for username: " + username
+                        + " and hashedPassword: " + hashedPassword);
         return sSessionManager.isLoggedIn(username, hashedPassword);
     }
 

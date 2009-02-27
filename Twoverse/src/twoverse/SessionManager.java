@@ -50,16 +50,22 @@ public class SessionManager extends TimerTask {
     }
 
     private void initializeUsers() {
+        sLogger.log(Level.INFO, "Initializing user from database");
         mUsers = mDatabase.getUsers();
     }
 
     @Override
     public void run() {
+        sLogger.log(Level.FINE, "Cleaning up user sessions");
         cleanup();
+        sLogger.log(Level.FINE, "Done cleaning up user sessions");
     }
 
     public int createAccount(User user) throws UnsetPasswordException {
+        sLogger.log(Level.INFO, "Attempting to create account for user: "
+                + user);
         if(user.getHashedPassword() == null) {
+            sLogger.log(Level.WARNING, "User doesn't have password set");
             throw new User.UnsetPasswordException("User doesn't have password set");
         }
         mUsersLock.writeLock().lock();
@@ -68,11 +74,11 @@ public class SessionManager extends TimerTask {
             mUsers.put(user.getUsername(), user);
         } else {
             mUsersLock.writeLock().unlock();
-            sLogger.log(Level.WARNING, "Username " + user.getUsername()
-                    + " is already in use");
+            sLogger.log(Level.WARNING, "User " + user + " already exists");
             return mUsers.get(user.getUsername()).getId();
         }
         mUsersLock.writeLock().unlock();
+        sLogger.log(Level.INFO, "Added user is: " + user);
         return user.getId();
     }
 
@@ -81,12 +87,15 @@ public class SessionManager extends TimerTask {
      * @param user
      */
     public void deleteAccount(Session session) {
+        sLogger.log(Level.INFO, "Attempting to delete account from session: "
+                + session);
         mUsersLock.writeLock().lock();
         mSessionsLock.writeLock().lock();
         if(mSessions.get(session.getUser().getUsername()).equals(session)) {
             mDatabase.deleteUser(session.getUser());
             mSessions.remove(session.getUser().getUsername());
             mUsers.remove(session.getUser().getUsername());
+            sLogger.log(Level.INFO, "Account deleted for session: " + session);
         } else {
             sLogger.log(Level.WARNING, "Username "
                     + session.getUser().getUsername() + " does not exist or"
@@ -103,9 +112,11 @@ public class SessionManager extends TimerTask {
      * @throws Exception
      */
     public Session login(User user) throws UnsetPasswordException {
+        sLogger.log(Level.INFO, "Attempting to login with user: " + user);
         mUsersLock.readLock().lock();
         mSessionsLock.writeLock().lock();
         User actualUser = mUsers.get(user.getUsername());
+        sLogger.log(Level.INFO, "Found corresponding local user: " + actualUser);
         try {
             if(actualUser != null && actualUser.validate(user)) {
                 Session userSession = mSessions.get(actualUser.getUsername());
@@ -113,6 +124,13 @@ public class SessionManager extends TimerTask {
                     mSessions.put(actualUser.getUsername(),
                             new Session(actualUser));
                     mDatabase.updateLoginTime(actualUser);
+                    sLogger.log(Level.INFO, "Created session: "
+                            + mSessions.get(user.getUsername()) + " for user: "
+                            + user);
+
+                } else {
+                    sLogger.log(Level.INFO, "User: " + user
+                            + " already has existing session: " + userSession);
                 }
                 mUsersLock.readLock().unlock();
                 mSessionsLock.writeLock().unlock();
@@ -129,9 +147,14 @@ public class SessionManager extends TimerTask {
     }
 
     public void logout(Session session) {
+        sLogger.log(Level.INFO, "Attempting to logout from session: " + session);
         mSessionsLock.writeLock().lock();
         if(mSessions.get(session.getUser().getUsername()).equals(session)) {
             mSessions.remove(session.getUser().getUsername());
+            sLogger.log(Level.INFO, "Logged out from session: " + session);
+        } else {
+            sLogger.log(Level.WARNING,
+                    "Unable to logout from nonexistant session: " + session);
         }
         mSessionsLock.writeLock().unlock();
     }
@@ -154,16 +177,21 @@ public class SessionManager extends TimerTask {
     }
 
     public User getUser(String username) throws UnknownUserException {
+        sLogger.log(Level.INFO, "Requesting user for username: " + username);
         mUsersLock.readLock().lock();
         User user = mUsers.get(username);
         if(user == null) {
-            throw new UnknownUserException("Unknown user " + user);
+            sLogger.log(Level.WARNING, "Unknown username: " + username);
+            throw new UnknownUserException("Unknown username: " + username);
         }
         mUsersLock.readLock().unlock();
+        sLogger.log(Level.INFO, "Found user: " + user);
         return user;
     }
 
     public boolean isLoggedIn(String username, String hashedPassword) {
+        sLogger.log(Level.INFO, "Attempted to get login status of username : "
+                + username + " with hashed password: " + hashedPassword);
         mUsersLock.readLock().lock();
         mSessionsLock.writeLock().lock();
         User user = mUsers.get(username);
@@ -174,7 +202,16 @@ public class SessionManager extends TimerTask {
                 if(userSession != null) {
                     mSessions.get(username).refresh();
                     result = true;
+                    sLogger.log(Level.INFO,
+                            "User has an existing session, which was refreshed");
+                } else {
+                    sLogger.log(Level.INFO,
+                            "User does not have an existing session");
                 }
+            } else {
+                sLogger.log(Level.WARNING,
+                        "Unknown username or bad password for username: "
+                                + username + " and password: " + hashedPassword);
             }
         } catch (UnsetPasswordException e) {
             sLogger.log(Level.WARNING,

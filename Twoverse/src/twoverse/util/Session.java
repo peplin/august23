@@ -8,6 +8,10 @@ public class Session implements Serializable {
      * 
      */
     private static final long serialVersionUID = 3290251644990110932L;
+    private User mUser;
+    private int mId;
+    private Timestamp mLastRefresh;
+    private static int sNextId = 0;
 
     public Session(User user) {
         refresh();
@@ -61,9 +65,10 @@ public class Session implements Serializable {
     public boolean equals(Session other) {
         return mId == other.mId && mUser.equals(other.mUser);
     }
-
-    private User mUser;
-    private int mId;
-    private Timestamp mLastRefresh;
-    private static int sNextId = 0;
+    
+    public String toString() {
+        return "[id: " + getId() + ", "
+                + "user: " + getUser() + ", "
+                + "last refresh: " + getLastRefresh() + "]";
+    }
 }

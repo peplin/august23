@@ -61,8 +61,7 @@ public class ObjectManagerClient extends ObjectManager {
                     doc.getRootElement()
                             .getChildElements(mConfigFile.getProperty("PLANET_TAG"));
             for (int i = 0; i < planets.size(); i++) {
-                Planet planet =
-                        new Planet(planets.get(i));
+                Planet planet = new Planet(planets.get(i));
                 update(planet);
             }
 
@@ -73,7 +72,6 @@ public class ObjectManagerClient extends ObjectManager {
                 ManmadeBody manmadeBody = new ManmadeBody(manmadeBodies.get(i));
                 update(manmadeBody);
             }
-
         } catch (ParsingException e) {
             sLogger.log(Level.WARNING, "Feed may be malformed", e);
         } catch (IOException e) {
@@ -81,8 +79,7 @@ public class ObjectManagerClient extends ObjectManager {
         }
     }
 
-    public ArrayList<AppletBodyInterface> getAllBodiesAsApplets(
-            PApplet parent) {
+    public ArrayList<AppletBodyInterface> getAllBodiesAsApplets(PApplet parent) {
         mLock.readLock().lock();
         ArrayList<AppletBodyInterface> allBodies =
                 new ArrayList<AppletBodyInterface>();
@@ -104,7 +101,6 @@ public class ObjectManagerClient extends ObjectManager {
         }
         mLock.readLock().unlock();
         return allBodies;
-
     }
 
     /**
@@ -112,6 +108,7 @@ public class ObjectManagerClient extends ObjectManager {
      */
     @Override
     public void add(Galaxy galaxy) {
+        sLogger.log(Level.INFO, "Attemping to add galaxy: " + galaxy);
         mLock.writeLock().lock();
         mRequestHandler.addGalaxy(galaxy);
         super.add(galaxy);
@@ -123,6 +120,7 @@ public class ObjectManagerClient extends ObjectManager {
      */
     @Override
     public void add(PlanetarySystem system) {
+        sLogger.log(Level.INFO, "Attemping to add planetary system: " + system);
         mLock.writeLock().lock();
         mRequestHandler.addPlanetarySystem(system);
         super.add(system);
@@ -131,6 +129,7 @@ public class ObjectManagerClient extends ObjectManager {
 
     @Override
     public void add(Planet planet) {
+        sLogger.log(Level.INFO, "Attemping to add planet: " + planet);
         mLock.writeLock().lock();
         mRequestHandler.addPlanet(planet);
         super.add(planet);
@@ -142,6 +141,7 @@ public class ObjectManagerClient extends ObjectManager {
      */
     @Override
     public void add(ManmadeBody manmadeBody) {
+        sLogger.log(Level.INFO, "Attemping to add manmade body: " + manmadeBody);
         mLock.writeLock().lock();
         mRequestHandler.addManmadeBody(manmadeBody);
         super.add(manmadeBody);
@@ -150,6 +150,7 @@ public class ObjectManagerClient extends ObjectManager {
 
     @Override
     public void update(Galaxy galaxy) {
+        sLogger.log(Level.INFO, "Attemping to update galaxy: " + galaxy);
         mLock.writeLock().lock();
         // mRequestHandler.updateGalaxy(galaxy); TODO
         super.update(galaxy);
@@ -158,6 +159,8 @@ public class ObjectManagerClient extends ObjectManager {
 
     @Override
     public void update(PlanetarySystem system) {
+        sLogger.log(Level.INFO, "Attemping to update planetary system: "
+                + system);
         mLock.writeLock().lock();
         // mRequestHandler.updatePlanetarySystem(system);
         super.update(system);
@@ -166,6 +169,7 @@ public class ObjectManagerClient extends ObjectManager {
 
     @Override
     public void update(Planet planet) {
+        sLogger.log(Level.INFO, "Attemping to update planet: " + planet);
         mLock.writeLock().lock();
         // mRequestHandler.updatePlanet(system);
         super.update(planet);
@@ -174,6 +178,8 @@ public class ObjectManagerClient extends ObjectManager {
 
     @Override
     public void update(ManmadeBody manmadeBody) {
+        sLogger.log(Level.INFO, "Attemping to update manmade body: "
+                + manmadeBody);
         mLock.writeLock().lock();
         // mRequestHandler.updateManmadeBody(manmadeBody);
         super.update(manmadeBody);

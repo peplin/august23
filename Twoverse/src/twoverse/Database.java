@@ -217,8 +217,8 @@ public class Database {
                     mConnection.prepareStatement("INSERT INTO planetary_system (id, centerid, mass) "
                             + "VALUES (?, ?, ?)");
             mAddPlanetStatement =
-                mConnection.prepareStatement("INSERT INTO planet (id, mass, radius) "
-                        + "VALUES (?, ?, ?)");
+                    mConnection.prepareStatement("INSERT INTO planet (id, mass, radius) "
+                            + "VALUES (?, ?, ?)");
             mAddManmadeBodyStatement =
                     mConnection.prepareStatement("INSERT INTO manmade (id) "
                             + "VALUES (?)");
@@ -241,10 +241,9 @@ public class Database {
                             + "LEFT JOIN (user) "
                             + "ON (object.owner = user.id)");
             mGetPlanetsStatement =
-                mConnection.prepareStatement("SELECT * FROM object "
-                        + "NATURAL JOIN planet "
-                        + "LEFT JOIN (user) "
-                        + "ON (object.owner = user.id)");
+                    mConnection.prepareStatement("SELECT * FROM object "
+                            + "NATURAL JOIN planet " + "LEFT JOIN (user) "
+                            + "ON (object.owner = user.id)");
             mGetManmadeBodiesStatement =
                     mConnection.prepareStatement("SELECT * FROM object "
                             + "NATURAL JOIN manmade " + "LEFT JOIN (user) "
@@ -275,9 +274,8 @@ public class Database {
                             + "SET centerid = ?," + " mass = ? "
                             + "WHERE id = ?");
             mUpdatePlanetStatement =
-                mConnection.prepareStatement("UPDATE planet "
-                        + "SET mass = ?," + " radius = ? "
-                        + "WHERE id = ?");
+                    mConnection.prepareStatement("UPDATE planet "
+                            + "SET mass = ?," + " radius = ? " + "WHERE id = ?");
         } catch (SQLException e) {
             throw new DatabaseException("Couldn't prepare statements: "
                     + e.getMessage());
@@ -423,6 +421,7 @@ public class Database {
     }
 
     public synchronized int addUser(User user) {
+        sLogger.log(Level.INFO, "Attempting to add user: " + user);
         try {
             mAddUserStatement.setString(1, user.getUsername());
             mAddUserStatement.setString(2, user.getHashedPassword());
@@ -441,6 +440,8 @@ public class Database {
     }
 
     public synchronized void updateLoginTime(User user) {
+        sLogger.log(Level.INFO, "Attempting to update login time for user: "
+                + user);
         try {
             mUpdateUserLastLoginStatement.setInt(1, user.getId());
             mUpdateUserLastLoginStatement.executeUpdate();
@@ -450,6 +451,7 @@ public class Database {
     }
 
     public synchronized void deleteUser(User user) {
+        sLogger.log(Level.INFO, "Attempting to delete user: " + user);
         try {
             mDeleteUserStatement.setInt(1, user.getId());
             mDeleteUserStatement.executeUpdate();
@@ -511,10 +513,9 @@ public class Database {
         }
         return systems;
     }
-    
+
     public synchronized HashMap<Integer, Planet> getPlanets() {
-        HashMap<Integer, Planet> planets =
-                new HashMap<Integer, Planet>();
+        HashMap<Integer, Planet> planets = new HashMap<Integer, Planet>();
         try {
             ResultSet resultSet = mGetPlanetsStatement.executeQuery();
             ArrayList<CelestialBody> bodies = parseCelestialBodies(resultSet);
@@ -561,6 +562,7 @@ public class Database {
     }
 
     public synchronized void add(Galaxy galaxy) {
+        sLogger.log(Level.INFO, "Attempting to add galaxy: " + galaxy);
         try {
             addCelestialBody(galaxy);
 
@@ -576,6 +578,7 @@ public class Database {
     }
 
     public synchronized void add(PlanetarySystem system) {
+        sLogger.log(Level.INFO, "Attempting to add system: " + system);
         try {
             addCelestialBody(system);
 
@@ -596,6 +599,7 @@ public class Database {
     }
 
     public void add(Planet planet) {
+        sLogger.log(Level.INFO, "Attempting to add planet: " + planet);
         try {
             addCelestialBody(planet);
 
@@ -610,6 +614,8 @@ public class Database {
     }
 
     public synchronized void add(ManmadeBody manmadeBody) {
+        sLogger.log(Level.INFO, "Attempting to add manmade body: "
+                + manmadeBody);
         try {
             addCelestialBody(manmadeBody);
 
@@ -623,6 +629,7 @@ public class Database {
     }
 
     public void delete(CelestialBody body) {
+        sLogger.log(Level.INFO, "Attempting to delete body: " + body);
         try {
             mDeleteObjectStatement.setInt(1, body.getId());
             mDeleteObjectStatement.executeUpdate();
@@ -668,7 +675,7 @@ public class Database {
             sLogger.log(Level.WARNING, "Could not add planetary systems", e);
         }
     }
-    
+
     public synchronized void addPlanets(Planet[] planets) {
         try {
             mConnection.setAutoCommit(false);
@@ -763,7 +770,7 @@ public class Database {
             sLogger.log(Level.WARNING, "Could not update planetary systems", e);
         }
     }
-    
+
     public synchronized void updatePlanets(Planet[] planets) {
         try {
             mConnection.setAutoCommit(false);
@@ -803,6 +810,8 @@ public class Database {
     }
 
     public void update(PlanetarySystem system) {
+        sLogger.log(Level.INFO, "Attempting to update planetary system: "
+                + system);
         try {
             updateCelestialBody(system);
 
@@ -816,8 +825,9 @@ public class Database {
                     + system, e);
         }
     }
-    
+
     public void update(Planet planet) {
+        sLogger.log(Level.INFO, "Attempting to update planet: " + planet);
         try {
             updateCelestialBody(planet);
 
@@ -833,6 +843,7 @@ public class Database {
     }
 
     public void update(Galaxy galaxy) {
+        sLogger.log(Level.INFO, "Attempting to update galaxy: " + galaxy);
         try {
             updateCelestialBody(galaxy);
 
@@ -848,6 +859,7 @@ public class Database {
     }
 
     public void update(ManmadeBody manmadeBody) {
+        sLogger.log(Level.INFO, "Attempting to update manmade body: " + manmadeBody);
         try {
             updateCelestialBody(manmadeBody);
             manmadeBody.setDirty(false);
