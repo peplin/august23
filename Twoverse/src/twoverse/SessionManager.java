@@ -98,8 +98,6 @@ public class SessionManager extends TimerTask {
     /**
      * Create session if not logged in, else ignore.
      * 
-     * @param username
-     * @param password
      * @return successful login or existing session
      * @throws UnsetPasswordException
      * @throws Exception

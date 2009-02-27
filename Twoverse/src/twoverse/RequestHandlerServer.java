@@ -37,6 +37,7 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     public RequestHandlerServer() {
     }
 
+    //TODO in general, add info log statements EVERYWHERE
     public static void init(ObjectManagerServer objectManager,
             SessionManager sessionManager) {
         sObjectManager = objectManager;
