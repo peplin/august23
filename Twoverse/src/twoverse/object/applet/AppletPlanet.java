@@ -13,7 +13,6 @@ public class AppletPlanet extends Planet implements AppletBodyInterface {
 		mParent = parent;
     }
 
-    @Override
     public void display() throws TwoDimensionalException {
         mParent.pushMatrix();
         mParent.noStroke();

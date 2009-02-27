@@ -133,7 +133,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         }
     }
 
-    @Override
     public Galaxy addGalaxy(Galaxy galaxy) {
         sLogger.log(Level.INFO, "Seting owner of galaxy: " + galaxy
                 + " to user: " + mSession.getUser());
@@ -153,7 +152,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         return galaxy;
     }
 
-    @Override
     public ManmadeBody addManmadeBody(ManmadeBody body) {
         sLogger.log(Level.INFO, "Seting owner of manmade body: " + body
                 + " to user: " + mSession.getUser());
@@ -176,7 +174,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         return body;
     }
 
-    @Override
     public PlanetarySystem addPlanetarySystem(PlanetarySystem system) {
         sLogger.log(Level.INFO, "Seting owner of planetary system: " + system
                 + " to user: " + mSession.getUser());
@@ -200,7 +197,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         return system;
     }
 
-    @Override
     public Planet addPlanet(Planet planet) {
         sLogger.log(Level.INFO, "Seting owner of planet: " + planet
                 + " to user: " + mSession.getUser());
@@ -220,7 +216,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         return planet;
     }
 
-    @Override
     public int createAccount(User user) {
         Object[] parameters = new Object[] { user };
         try {
@@ -256,7 +251,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         }
     }
 
-    @Override
     public void changeName(Session session, int objectId, String newName) {
         Object[] parameters = new Object[] { mSession, objectId, newName };
         try {

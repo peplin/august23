@@ -48,18 +48,18 @@ public class TwoverseClient extends PApplet {
         size(Integer.valueOf(mConfigFile.getProperty("WINDOW_WIDTH")),
                 Integer.valueOf(mConfigFile.getProperty("WINDOW_HEIGHT")),
                 P3D); // TODO try OPENGL on a 32-bit computer
+        smooth();
 
-        mCamera =
-                new Camera(this,
-                        (float) (width / 2.0),
-                        (float) (height / 2.0),
-                        (float) ((height / 2.0) / tan((float) (PI * 60.0 / 360.0))),
-                        (float) (width / 2.0),
-                        (float) (height / 2.0),
-                        0,
-                        0,
-                        1,
-                        0);
+        mCamera = new Camera(this, 0, 0, 1,
+                // (float) (width / 2.0),
+                // (float) (height / 2.0),
+                //(float) ((height / 2.0) / tan((float) (PI * 60.0 / 360.0))),
+                (float) (width / 2.0),
+                (float) (height / 2.0),
+                0,
+                0,
+                1,
+                0);
 
         mRequestHandler = new RequestHandlerClient();
         mObjectManager = new ObjectManagerClient(mRequestHandler);
@@ -115,19 +115,30 @@ public class TwoverseClient extends PApplet {
 
     @Override
     public void mousePressed() {
-        mObjectManager.add(new Planet(-1, "Earth", -1, new Point(modelX(mouseX,
-                mouseY,
-                0), modelY(mouseX, mouseY, 0), 0), new PhysicsVector3d(1,
-                2,
-                3,
-                4), new PhysicsVector3d(5, 6, 7, 8), 10, 10));
+        if(mouseButton == LEFT) {
+            mObjectManager.add(new Planet(-1,
+                    "Earth",
+                    -1,
+                    new Point(modelX(mouseX, mouseY, 0), modelY(mouseX,
+                            mouseY,
+                            0), 0),
+                    new PhysicsVector3d(1, 2, 3, 4),
+                    new PhysicsVector3d(5, 6, 7, 8),
+                    10,
+                    10));
+        }
     }
 
     @Override
     public void mouseDragged() {
         // TODO to spin around a central point, we need to modify Z as well
         // polar coordinates may be useful
-        mCamera.moveEye(mouseX - pmouseX, mouseY - pmouseY, 0);
+        if(mouseButton == RIGHT) {
+            mCamera.moveEye(-1 * radians(mouseY - pmouseY), radians(mouseX
+                    - pmouseX), 0);
+        } else if(mouseButton == CENTER) {
+            mCamera.moveEye(0, 0, (float)(-.01 * (mouseY - pmouseY)));
+        }
     }
 
     public static void main(String args[]) {

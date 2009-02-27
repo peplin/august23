@@ -70,7 +70,6 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         return 0;
     }
 
-    @Override
     public int createAccount(User user) throws ExistingUserException,
             UnsetPasswordException {
         sLogger.log(Level.INFO, "Attempting to create account for user: "
@@ -85,7 +84,6 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         return 0;
     }
 
-    @Override
     public void changeName(Session session, int objectId, String newName) {
         try {
             CelestialBody body = sObjectManager.getCelestialBody(objectId);
@@ -105,28 +103,24 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         }
     }
 
-    @Override
     public Galaxy addGalaxy(Galaxy galaxy) {
         sLogger.log(Level.INFO, "Attempting to add galaxy: " + galaxy);
         sObjectManager.add(galaxy);
         return galaxy;
     }
 
-    @Override
     public ManmadeBody addManmadeBody(ManmadeBody body) {
         sLogger.log(Level.INFO, "Attempting to add manmade body: " + body);
         sObjectManager.add(body);
         return body;
     }
 
-    @Override
     public PlanetarySystem addPlanetarySystem(PlanetarySystem system) {
         sLogger.log(Level.INFO, "Attempting to add planetary system: " + system);
         sObjectManager.add(system);
         return system;
     }
 
-    @Override
     public Planet addPlanet(Planet planet) {
         sLogger.log(Level.INFO, "Attempting to add planet: " + planet);
         sObjectManager.add(planet);
