@@ -3,6 +3,7 @@ package twoverse.object;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +17,7 @@ import twoverse.util.XmlExceptions.MissingXmlElementException;
 import twoverse.util.XmlExceptions.UnexpectedXmlAttributeException;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
+//TODO write getChildren function
 public class CelestialBody implements Serializable {
     private static Properties sConfigFile;
     protected static Logger sLogger =
@@ -29,6 +31,7 @@ public class CelestialBody implements Serializable {
     private PhysicsVector3d mAcceleration;
     private Point mPosition;
     private String mName;
+    private ArrayList<CelestialBody> mChildren;
     private static final long serialVersionUID = -6341175711814973441L;
     private boolean mDirty = true; // dirty if different than version in
                                    // database
@@ -171,6 +174,8 @@ public class CelestialBody implements Serializable {
         setPosition(position);
         setVelocity(velocity);
         setAcceleration(acceleration);
+        
+        mChildren = new ArrayList<CelestialBody>();
     }
 
     private synchronized void loadConfig() {

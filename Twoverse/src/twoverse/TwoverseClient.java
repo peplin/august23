@@ -18,6 +18,8 @@ import twoverse.util.User;
 import twoverse.util.Point.TwoDimensionalException;
 
 @SuppressWarnings("serial")
+// TODO ultimately, pull this out into a regular PDE where you just import the
+// Twoverse.jar file - that will make random clients easier
 public class TwoverseClient extends PApplet {
     private Properties mConfigFile;
     protected static Logger sLogger =
@@ -40,26 +42,24 @@ public class TwoverseClient extends PApplet {
             mConfigFile.load(this.getClass()
                     .getClassLoader()
                     .getResourceAsStream("twoverse/conf/TwoverseClient.properties"));
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
         }
 
         frameRate(Integer.valueOf(mConfigFile.getProperty("FRAME_RATE")));
         size(Integer.valueOf(mConfigFile.getProperty("WINDOW_WIDTH")),
                 Integer.valueOf(mConfigFile.getProperty("WINDOW_HEIGHT")),
-                P3D); // TODO try OPENGL on a 32-bit computer
+                P3D);
         smooth();
 
-        mCamera = new Camera(this, 0, 0, 1,
-                // (float) (width / 2.0),
-                // (float) (height / 2.0),
-                //(float) ((height / 2.0) / tan((float) (PI * 60.0 / 360.0))),
-                (float) (width / 2.0),
-                (float) (height / 2.0),
-                0,
-                0,
-                1,
-                0);
+        mCamera =
+                new Camera(this,
+                        (float) (width / 2.0),
+                        (float) (height),
+                        (float) ((height / 2.0) / tan((float) (PI * 60.0 / 360.0))),
+                        0,
+                        0,
+                        0);
 
         mRequestHandler = new RequestHandlerClient();
         mObjectManager = new ObjectManagerClient(mRequestHandler);
@@ -83,7 +83,7 @@ public class TwoverseClient extends PApplet {
                 && Boolean.valueOf(mConfigFile.getProperty("USE_TUIO"))) {
             // Draw each cursor to the screen for debugging
             TuioCursor[] tuioCursorList = mTuioClient.getTuioCursors();
-            for (TuioCursor element : tuioCursorList) {
+            for(TuioCursor element : tuioCursorList) {
                 rect(element.getScreenX(width),
                         element.getScreenY(height),
                         10,
@@ -96,10 +96,10 @@ public class TwoverseClient extends PApplet {
         lights();
         ArrayList<AppletBodyInterface> bodies =
                 mObjectManager.getAllBodiesAsApplets(this);
-        for (AppletBodyInterface body : bodies) {
+        for(AppletBodyInterface body : bodies) {
             try {
                 body.display();
-            } catch (TwoDimensionalException e) {
+            } catch(TwoDimensionalException e) {
                 sLogger.log(Level.WARNING, "Expected 3D point but was 2D: "
                         + body, e);
             }
@@ -131,13 +131,10 @@ public class TwoverseClient extends PApplet {
 
     @Override
     public void mouseDragged() {
-        // TODO to spin around a central point, we need to modify Z as well
-        // polar coordinates may be useful
         if(mouseButton == RIGHT) {
-            mCamera.moveEye(-1 * radians(mouseY - pmouseY), radians(mouseX
-                    - pmouseX), 0);
+            mCamera.moveCenter(mouseX - pmouseX, mouseY - pmouseY, 0);
         } else if(mouseButton == CENTER) {
-            mCamera.moveEye(0, 0, (float)(-.01 * (mouseY - pmouseY)));
+            mCamera.moveEye(0, 0, (float) (-.01 * (mouseY - pmouseY)));
         }
     }
 
