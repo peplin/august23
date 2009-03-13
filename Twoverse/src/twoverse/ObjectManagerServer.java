@@ -79,6 +79,7 @@ public class ObjectManagerServer extends ObjectManager {
             mCelestialBodies.putAll(Galaxy.selectAllFromDatabase());
             mCelestialBodies.putAll(PlanetarySystem.selectAllFromDatabase());
             mCelestialBodies.putAll(ManmadeBody.selectAllFromDatabase());
+            mCelestialBodies.putAll(Planet.selectAllFromDatabase());
         } catch (SQLException e) {
             // TODO log message
         }

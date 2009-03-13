@@ -16,11 +16,7 @@ import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.Planet;
 import twoverse.object.PlanetarySystem;
-import twoverse.object.applet.AppletGalaxy;
-import twoverse.object.applet.AppletManmadeBody;
 import twoverse.object.applet.AppletBodyInterface;
-import twoverse.object.applet.AppletPlanet;
-import twoverse.object.applet.AppletPlanetarySystem;
 
 public class ObjectManagerClient extends ObjectManager {
     private Builder mParser;

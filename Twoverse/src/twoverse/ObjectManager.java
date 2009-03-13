@@ -10,10 +10,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
-import twoverse.object.Galaxy;
-import twoverse.object.ManmadeBody;
-import twoverse.object.Planet;
-import twoverse.object.PlanetarySystem;
 import twoverse.util.User;
 
 public abstract class ObjectManager extends TimerTask {

@@ -6,21 +6,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
-import twoverse.object.Galaxy;
-import twoverse.object.ManmadeBody;
-import twoverse.object.Planet;
-import twoverse.object.PlanetarySystem;
-import twoverse.util.GalaxyShape;
-import twoverse.util.PhysicsVector3d;
-import twoverse.util.Point;
 import twoverse.util.User;
 import twoverse.util.Point.TwoDimensionalException;
 
@@ -28,7 +19,6 @@ public class Database {
     private final String DB_CLASS_NAME = "com.mysql.jdbc.Driver";
     private Connection mConnection = null;
     private Properties mConfigFile;
-    private PreparedStatement mSelectUserStatement;
     private PreparedStatement mAddUserStatement;
     private PreparedStatement mUpdateUserLastLoginStatement;
     private PreparedStatement mDeleteUserStatement; // cascade update
@@ -78,9 +68,6 @@ public class Database {
 
     private void prepareStatements() throws DatabaseException {
         try {
-            mSelectUserStatement =
-                    mConnection.prepareStatement("SELECT * FROM user "
-                            + "WHERE id = ?");
             mAddUserStatement =
                     mConnection.prepareStatement("INSERT INTO user (username, password, email, sms) "
                             + "VALUES (?, ?, ?, ?)");

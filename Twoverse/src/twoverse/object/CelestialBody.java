@@ -19,7 +19,6 @@ import processing.core.PApplet;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
-import twoverse.Database.DatabaseException;
 import twoverse.object.applet.AppletBodyInterface;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;

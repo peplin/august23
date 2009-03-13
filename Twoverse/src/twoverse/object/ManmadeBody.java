@@ -20,7 +20,6 @@ public class ManmadeBody extends CelestialBody implements Serializable {
     private static Properties sConfigFile;
     private static PreparedStatement sSelectAllManmadeBodiesStatement;
     private static PreparedStatement sInsertManmadeBodyStatement;
-    private static PreparedStatement sUpdateManmadeBodyStatement;
     private static Connection sConnection;
 
     public ManmadeBody(int ownerId, String name, int parentId, Point position,
@@ -72,10 +71,6 @@ public class ManmadeBody extends CelestialBody implements Serializable {
         sInsertManmadeBodyStatement =
                 sConnection.prepareStatement("INSERT INTO manmade (id) "
                         + "VALUES (?)");
-        sUpdateManmadeBodyStatement =
-                sConnection.prepareStatement("SELECT * FROM object "
-                        + "NATURAL JOIN manmade " + "LEFT JOIN (user) "
-                        + "ON (object.owner = user.id)");
     }
 
     public static synchronized HashMap<Integer, CelestialBody> selectAllFromDatabase()
