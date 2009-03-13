@@ -31,9 +31,11 @@ public class DatabaseTest {
         database = new Database();
         users = new User[4];
         users[0] = new User(0, "first", "first@first.org", "1111111111", 100);
-        users[1] = new User(0, "second", "second@second.org", "2222222222", 100);
+        users[1] =
+                new User(0, "second", "second@second.org", "2222222222", 100);
         users[2] = new User(0, "third", "third@third.org", "3333333333", 100);
-        users[3] = new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
+        users[3] =
+                new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
 
         users[0].setPlaintextPassword("firstpass");
         users[1].setPlaintextPassword("secondpass");
@@ -45,9 +47,16 @@ public class DatabaseTest {
         database.addUser(users[2]);
         database.addUser(users[3]);
 
-        body = new CelestialBody(0, -1, "theBody", null, null, -1, new Point(
-                42, 43, 44), new PhysicsVector3d(1, 2, 3, 4),
-                new PhysicsVector3d(5, 6, 7, 8));
+        body =
+                new CelestialBody(0,
+                        -1,
+                        "theBody",
+                        null,
+                        null,
+                        -1,
+                        new Point(42, 43, 44),
+                        new PhysicsVector3d(1, 2, 3, 4),
+                        new PhysicsVector3d(5, 6, 7, 8));
     }
 
     @AfterClass
@@ -85,8 +94,7 @@ public class DatabaseTest {
     public void testGetUsers() throws Exception {
         HashMap<String, User> returnedUsers = database.getUsers();
         Assert.assertEquals(4, returnedUsers.size());
-        Assert.assertTrue(users[0].equals(returnedUsers.get(users[0]
-                .getUsername())));
+        Assert.assertTrue(users[0].equals(returnedUsers.get(users[0].getUsername())));
     }
 
     @Test
@@ -98,11 +106,12 @@ public class DatabaseTest {
 
     @Test
     public void testDeleteManmadeBody() throws SQLException {
-        int previousCount = database.getManmadeBodies().size();
+        int previousCount = ManmadeBody.selectAllFromDatabase().size();
         ManmadeBody manmadeBody = new ManmadeBody(body);
         database.add(manmadeBody);
         database.delete(manmadeBody);
-        Assert.assertEquals(previousCount, database.getManmadeBodies().size());
+        Assert.assertEquals(previousCount, ManmadeBody.selectAllFromDatabase()
+                .size());
     }
 
     @Test
@@ -113,89 +122,105 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testDeletePlanetarySystem() {
-        int previousCount = database.getPlanetarySystems().size();
+    public void testDeletePlanetarySystem() throws SQLException {
+        int previousCount = PlanetarySystem.selectAllFromDatabase().size();
         PlanetarySystem system = new PlanetarySystem(body, -1, 1000.1);
         database.add(system);
         database.delete(system);
-        Assert.assertEquals(previousCount, database.getPlanetarySystems()
-                .size());
+        Assert.assertEquals(previousCount,
+                PlanetarySystem.selectAllFromDatabase().size());
     }
 
     @Test
     public void testAddGalaxy() {
-        Galaxy galaxy = new Galaxy(body, new GalaxyShape(1, "test", "test"),
-                1000.5, 2000.20);
+        Galaxy galaxy =
+                new Galaxy(body,
+                        new GalaxyShape(1, "test", "test"),
+                        1000.5,
+                        2000.20);
         database.add(galaxy);
         Assert.assertNotNull(galaxy.getBirthTime());
         database.delete(galaxy);
     }
 
     @Test
-    public void testDeleteGalaxy() {
-        int previousCount = database.getGalaxies().size();
-        Galaxy galaxy = new Galaxy(body, new GalaxyShape(1, "test", "test"),
-                1000.5, 2000.20);
+    public void testDeleteGalaxy() throws SQLException {
+        int previousCount = Galaxy.selectAllFromDatabase().size();
+        Galaxy galaxy =
+                new Galaxy(body,
+                        new GalaxyShape(1, "test", "test"),
+                        1000.5,
+                        2000.20);
         database.add(galaxy);
         database.delete(galaxy);
-        Assert.assertEquals(previousCount, database.getGalaxies().size());
+        Assert.assertEquals(previousCount, Galaxy.selectAllFromDatabase()
+                .size());
     }
 
     @Test
-    public void testGetGalaxies() {
-        database.getGalaxies();
+    public void testGetGalaxies() throws SQLException {
+        Galaxy.selectAllFromDatabase();
     }
 
     @Test
-    public void testGetPlanetarySystems() {
-        database.getPlanetarySystems();
+    public void testGetPlanetarySystems() throws SQLException {
+        PlanetarySystem.selectAllFromDatabase();
     }
 
     @Test
-    public void testGetManmadeBodies() {
-        database.getManmadeBodies();
+    public void testGetManmadeBodies() throws SQLException {
+        ManmadeBody.selectAllFromDatabase();
     }
 
     @Test
-    public void testAddPlanetarySystems() {
+    public void testAddPlanetarySystems() throws SQLException {
         PlanetarySystem[] systems = new PlanetarySystem[10];
         for (int i = 0; i < 10; i++) {
             systems[i] = new PlanetarySystem(body, -1, 1000 + i);
         }
-        int previousCount = database.getPlanetarySystems().size();
-        database.addPlanetarySystems(systems);
-        Assert.assertEquals(previousCount + 10, database.getPlanetarySystems()
-                .size());
+        int previousCount = PlanetarySystem.selectAllFromDatabase().size();
+        for (PlanetarySystem system : systems) {
+            system.insertInDatabase();
+        }
+        Assert.assertEquals(previousCount + 10,
+                PlanetarySystem.selectAllFromDatabase().size());
         for (int i = 0; i < 10; i++) {
             database.delete(systems[i]);
         }
     }
 
     @Test
-    public void testAddManmadeBodies() {
+    public void testAddManmadeBodies() throws SQLException {
         ManmadeBody[] manmadeBodies = new ManmadeBody[10];
         for (int i = 0; i < 10; i++) {
             manmadeBodies[i] = new ManmadeBody(body);
         }
-        int previousCount = database.getManmadeBodies().size();
-        database.addManmadeBodies(manmadeBodies);
-        Assert.assertEquals(previousCount + 10, database.getManmadeBodies()
-                .size());
+        int previousCount = ManmadeBody.selectAllFromDatabase().size();
+        for (ManmadeBody body : manmadeBodies) {
+            body.insertInDatabase();
+        }
+        Assert.assertEquals(previousCount + 10,
+                ManmadeBody.selectAllFromDatabase().size());
         for (int i = 0; i < 10; i++) {
             database.delete(manmadeBodies[i]);
         }
     }
 
     @Test
-    public void testAddGalaxies() {
+    public void testAddGalaxies() throws SQLException {
         Galaxy[] galaxies = new Galaxy[10];
         for (int i = 0; i < 10; i++) {
-            galaxies[i] = new Galaxy(body, new GalaxyShape(1, "test", "test"),
-                    1000.5 + i, 2000.20 - i);
+            galaxies[i] =
+                    new Galaxy(body,
+                            new GalaxyShape(1, "test", "test"),
+                            1000.5 + i,
+                            2000.20 - i);
         }
-        int previousCount = database.getGalaxies().size();
-        database.addGalaxies(galaxies);
-        Assert.assertEquals(previousCount + 10, database.getGalaxies().size());
+        int previousCount = Galaxy.selectAllFromDatabase().size();
+        for (Galaxy galaxy : galaxies) {
+            galaxy.insertInDatabase();
+        }
+        Assert.assertEquals(previousCount + 10, Galaxy.selectAllFromDatabase());
         for (int i = 0; i < 10; i++) {
             database.delete(galaxies[i]);
         }

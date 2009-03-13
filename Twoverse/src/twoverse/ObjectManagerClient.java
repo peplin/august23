@@ -11,6 +11,7 @@ import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
+import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.Planet;
@@ -83,107 +84,32 @@ public class ObjectManagerClient extends ObjectManager {
         mLock.readLock().lock();
         ArrayList<AppletBodyInterface> allBodies =
                 new ArrayList<AppletBodyInterface>();
-        Collection<Galaxy> galaxies = mGalaxies.values();
-        for (Galaxy galaxy : galaxies) {
-            allBodies.add(new AppletGalaxy(parent, galaxy));
-        }
-        Collection<PlanetarySystem> systems = mPlanetarySystems.values();
-        for (PlanetarySystem system : systems) {
-            allBodies.add(new AppletPlanetarySystem(parent, system));
-        }
-        Collection<Planet> planets = mPlanets.values();
-        for (Planet planet : planets) {
-            allBodies.add(new AppletPlanet(parent, planet));
-        }
-        Collection<ManmadeBody> manmadeBodies = mManmadeBodies.values();
-        for (ManmadeBody body : manmadeBodies) {
-            allBodies.add(new AppletManmadeBody(parent, body));
+        Collection<CelestialBody> bodies = mCelestialBodies.values();
+        for (CelestialBody body : bodies) {
+            allBodies.add(body.getBodyAsApplet(parent));
         }
         mLock.readLock().unlock();
         return allBodies;
     }
 
     /**
-     * Modifies galaxy, sets ID and birth time
+     * Modifies body, sets ID and birth time
      */
     @Override
-    public void add(Galaxy galaxy) {
-        sLogger.log(Level.INFO, "Attemping to add galaxy: " + galaxy);
+    public void add(CelestialBody body) {
+        sLogger.log(Level.INFO, "Attemping to add body: " + body);
         mLock.writeLock().lock();
-        mRequestHandler.addGalaxy(galaxy);
-        super.add(galaxy);
-        mLock.writeLock().unlock();
-    }
-
-    /**
-     * Modifies system, sets ID and birth time
-     */
-    @Override
-    public void add(PlanetarySystem system) {
-        sLogger.log(Level.INFO, "Attemping to add planetary system: " + system);
-        mLock.writeLock().lock();
-        mRequestHandler.addPlanetarySystem(system);
-        super.add(system);
+        mRequestHandler.addCelestialBody(body);
+        super.add(body);
         mLock.writeLock().unlock();
     }
 
     @Override
-    public void add(Planet planet) {
-        sLogger.log(Level.INFO, "Attemping to add planet: " + planet);
+    public void update(CelestialBody body) {
+        sLogger.log(Level.INFO, "Attemping to update body: " + body);
         mLock.writeLock().lock();
-        mRequestHandler.addPlanet(planet);
-        super.add(planet);
+        // mRequestHandler.updateCelestialBody(body); TODO
+        super.update(body);
         mLock.writeLock().unlock();
     }
-
-    /**
-     * Modifies manmadeBody, sets ID and birth time
-     */
-    @Override
-    public void add(ManmadeBody manmadeBody) {
-        sLogger.log(Level.INFO, "Attemping to add manmade body: " + manmadeBody);
-        mLock.writeLock().lock();
-        mRequestHandler.addManmadeBody(manmadeBody);
-        super.add(manmadeBody);
-        mLock.writeLock().unlock();
-    }
-
-    @Override
-    public void update(Galaxy galaxy) {
-        sLogger.log(Level.INFO, "Attemping to update galaxy: " + galaxy);
-        mLock.writeLock().lock();
-        // mRequestHandler.updateGalaxy(galaxy); TODO
-        super.update(galaxy);
-        mLock.writeLock().unlock();
-    }
-
-    @Override
-    public void update(PlanetarySystem system) {
-        sLogger.log(Level.INFO, "Attemping to update planetary system: "
-                + system);
-        mLock.writeLock().lock();
-        // mRequestHandler.updatePlanetarySystem(system);
-        super.update(system);
-        mLock.writeLock().unlock();
-    }
-
-    @Override
-    public void update(Planet planet) {
-        sLogger.log(Level.INFO, "Attemping to update planet: " + planet);
-        mLock.writeLock().lock();
-        // mRequestHandler.updatePlanet(system);
-        super.update(planet);
-        mLock.writeLock().unlock();
-    }
-
-    @Override
-    public void update(ManmadeBody manmadeBody) {
-        sLogger.log(Level.INFO, "Attemping to update manmade body: "
-                + manmadeBody);
-        mLock.writeLock().lock();
-        // mRequestHandler.updateManmadeBody(manmadeBody);
-        super.update(manmadeBody);
-        mLock.writeLock().unlock();
-    }
-
 }

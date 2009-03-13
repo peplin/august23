@@ -17,10 +17,7 @@ import twoverse.object.PlanetarySystem;
 import twoverse.util.User;
 
 public abstract class ObjectManager extends TimerTask {
-    protected HashMap<Integer, Galaxy> mGalaxies;
-    protected HashMap<Integer, PlanetarySystem> mPlanetarySystems;
-    protected HashMap<Integer, ManmadeBody> mManmadeBodies;
-    protected HashMap<Integer, Planet> mPlanets;
+    protected HashMap<Integer, CelestialBody> mCelestialBodies;
     protected ReentrantReadWriteLock mLock;
     protected Properties mConfigFile;
     protected static Logger sLogger =
@@ -38,10 +35,7 @@ public abstract class ObjectManager extends TimerTask {
 
         mLock = new ReentrantReadWriteLock();
 
-        mGalaxies = new HashMap<Integer, Galaxy>();
-        mPlanetarySystems = new HashMap<Integer, PlanetarySystem>();
-        mManmadeBodies = new HashMap<Integer, ManmadeBody>();
-        mPlanets = new HashMap<Integer, Planet>();
+        mCelestialBodies = new HashMap<Integer, CelestialBody>();
 
         Timer feedPushTimer = new Timer();
         feedPushTimer.scheduleAtFixedRate(this,
@@ -52,60 +46,17 @@ public abstract class ObjectManager extends TimerTask {
     public ArrayList<CelestialBody> getAllBodies() {
         mLock.readLock().lock();
         ArrayList<CelestialBody> allBodies = new ArrayList<CelestialBody>();
-        allBodies.addAll(mGalaxies.values());
-        allBodies.addAll(mPlanetarySystems.values());
-        allBodies.addAll(mManmadeBodies.values());
-        allBodies.addAll(mPlanets.values());
-        // TODO maybe these should be inside the system - what if the DB
-        // loaded top down - ie. everything in top level, then children, etc
-        // work this out on paper, figure out bottlenecks
-        // adding new funcs every time for new types is obnoxious
+        allBodies.addAll(mCelestialBodies.values());
         mLock.readLock().unlock();
         return allBodies;
-    }
-
-    public ArrayList<Galaxy> getGalaxies() {
-        mLock.readLock().lock();
-        ArrayList<Galaxy> result = new ArrayList<Galaxy>(mGalaxies.values());
-        mLock.readLock().unlock();
-        return result;
-    }
-
-    public ArrayList<PlanetarySystem> getPlanetarySystems() {
-        mLock.readLock().lock();
-        ArrayList<PlanetarySystem> result =
-                new ArrayList<PlanetarySystem>(mPlanetarySystems.values());
-        mLock.readLock().unlock();
-        return result;
-    }
-
-    public ArrayList<ManmadeBody> getManmadeBodies() {
-        mLock.readLock().lock();
-        ArrayList<ManmadeBody> result =
-                new ArrayList<ManmadeBody>(mManmadeBodies.values());
-        mLock.readLock().unlock();
-        return result;
-    }
-
-    public ArrayList<Planet> getPlanets() {
-        mLock.readLock().lock();
-        ArrayList<Planet> result = new ArrayList<Planet>(mPlanets.values());
-        mLock.readLock().unlock();
-        return result;
     }
 
     public CelestialBody getCelestialBody(int objectId)
             throws UnhandledCelestialBodyException {
         CelestialBody result = null;
         mLock.readLock().lock();
-        if(mGalaxies.containsKey(objectId)) {
-            result = mGalaxies.get(objectId);
-        } else if(mPlanetarySystems.containsKey(objectId)) {
-            result = mPlanetarySystems.get(objectId);
-        } else if(mManmadeBodies.containsKey(objectId)) {
-            result = mManmadeBodies.get(objectId);
-        } else if(mPlanets.containsKey(objectId)) {
-            result = mPlanets.get(objectId);
+        if(mCelestialBodies.containsKey(objectId)) {
+            result = mCelestialBodies.get(objectId);
         } else {
             mLock.readLock().unlock();
             throw new UnhandledCelestialBodyException("No such object ID");
@@ -123,70 +74,25 @@ public abstract class ObjectManager extends TimerTask {
 
     }
 
-    public Galaxy getGalaxy(int id) {
+    public CelestialBody getCelestialBodyBody(int id) {
         mLock.readLock().lock();
-        Galaxy result = mGalaxies.get(id);
+        CelestialBody result = mCelestialBodies.get(id);
         mLock.readLock().unlock();
         return result;
     }
 
-    public PlanetarySystem getPlanetarySystem(int id) {
-        mLock.readLock().lock();
-        PlanetarySystem result = mPlanetarySystems.get(id);
-        mLock.readLock().unlock();
-        return result;
-    }
-    
-    public Planet getPlanet(int id) {
-        mLock.readLock().lock();
-        Planet result = mPlanets.get(id);
-        mLock.readLock().unlock();
-        return result;
-    }
-
-    public ManmadeBody getManmadeBody(int id) {
-        mLock.readLock().lock();
-        ManmadeBody result = mManmadeBodies.get(id);
-        mLock.readLock().unlock();
-        return result;
-    }
-
-    public void add(Galaxy galaxy) {
-        mGalaxies.put(galaxy.getId(), galaxy);
-    }
-
-    public void add(PlanetarySystem system) {
-        mPlanetarySystems.put(system.getId(), system);
-    }
-    
-    public void add(Planet planet) {
-        mPlanets.put(planet.getId(), planet);
-    }
-
-    public void add(ManmadeBody manmadeBody) {
-        mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
+    public void add(CelestialBody body) {
+        mCelestialBodies.put(body.getId(), body);
     }
 
     /**
      * 
      * So, if this is a new object coming in over an XML feed, i need to match
-     * it with its ID. Okay.
-     * Careful - for now, this overwrites any data we already have!
+     * it with its ID. Okay. Careful - for now, this overwrites any data we
+     * already have!
      */
-    public void update(Galaxy galaxy) {
-        mGalaxies.put(galaxy.getId(), galaxy);
-    }
-
-    public void update(PlanetarySystem system) {
-        mPlanetarySystems.put(system.getId(), system);
-    }
-    
-    public void update(Planet planet) {
-        mPlanets.put(planet.getId(), planet);
-    }
-    
-    public void update(ManmadeBody manmadeBody) {
-        mManmadeBodies.put(manmadeBody.getId(), manmadeBody);
+    public void update(CelestialBody body) {
+        mCelestialBodies.put(body.getId(), body);
     }
 
     public class UnhandledCelestialBodyException extends Exception {

@@ -13,6 +13,7 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
+import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
 import twoverse.object.Planet;
@@ -260,6 +261,11 @@ public class RequestHandlerClient implements TwoversePublicApi {
         } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC changeName", e);
         }
+    }
+
+    public void addCelestialBody(CelestialBody body) {
+        // TODO Auto-generated method stub
+        
     }
 
 }
