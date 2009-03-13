@@ -85,6 +85,7 @@ public class RequestHandlerClientTest {
                 new PhysicsVector3d(5, 6, 7, 8), new GalaxyShape(1, "test",
                         "test"), 1000.5, 2000.20);
         objectManagerClient.add(galaxy);
+        //TODO why don't we get hte ID here anymore? seems to hang?
         Assert.assertTrue(galaxy.getId() != 0);
         database.delete(galaxy);
         client.deleteAccount();

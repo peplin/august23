@@ -12,6 +12,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
+import twoverse.object.Galaxy;
+import twoverse.object.ManmadeBody;
+import twoverse.object.Planet;
+import twoverse.object.PlanetarySystem;
 import twoverse.util.User;
 import twoverse.util.Point.TwoDimensionalException;
 
@@ -90,6 +94,18 @@ public class Database {
                             + "accel_vector_z = ? WHERE id = ?");
 
             CelestialBody.prepareDatabaseStatements(DriverManager.getConnection(mConfigFile.getProperty("CONNECTION"),
+                    mConfigFile.getProperty("DB_USER"),
+                    mConfigFile.getProperty("DB_PASSWORD")));
+            Galaxy.prepareDatabaseStatements(DriverManager.getConnection(mConfigFile.getProperty("CONNECTION"),
+                    mConfigFile.getProperty("DB_USER"),
+                    mConfigFile.getProperty("DB_PASSWORD")));
+            Planet.prepareDatabaseStatements(DriverManager.getConnection(mConfigFile.getProperty("CONNECTION"),
+                    mConfigFile.getProperty("DB_USER"),
+                    mConfigFile.getProperty("DB_PASSWORD")));
+            PlanetarySystem.prepareDatabaseStatements(DriverManager.getConnection(mConfigFile.getProperty("CONNECTION"),
+                    mConfigFile.getProperty("DB_USER"),
+                    mConfigFile.getProperty("DB_PASSWORD")));
+            ManmadeBody.prepareDatabaseStatements(DriverManager.getConnection(mConfigFile.getProperty("CONNECTION"),
                     mConfigFile.getProperty("DB_USER"),
                     mConfigFile.getProperty("DB_PASSWORD")));
         } catch (SQLException e) {
