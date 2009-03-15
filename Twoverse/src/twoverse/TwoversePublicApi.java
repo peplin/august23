@@ -30,20 +30,8 @@ public interface TwoversePublicApi {
      * @return ID for new object
      */
     public CelestialBody addCelestialBody(CelestialBody body);
-
-    /**
-     * Methods for creating via Javascript web interface - can't use Serialized
-     * Java objects, so we give explicit constructor looking things
-     * 
-     */
-    /*
-     * public int addGalaxy(User owner, CelestialBody parent, PhysicsVector3d
-     * velocity, PhysicsVector3d acceleration, GalaxyShape shape); public int
-     * addPlanetarySystem(User owner, CelestialBody parent, PhysicsVector3d
-     * velocity, PhysicsVector3d acceleration, Star center); public int
-     * addManmadeBody(User owner, CelestialBody parent, PhysicsVector3d
-     * velocity, PhysicsVector3d acceleration);
-     */
+    
+    public CelestialBody updateCelestialBody(CelestialBody body);
 
     /**
      * Change the name of an existing object. User must own the object.

@@ -11,6 +11,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +28,6 @@ import twoverse.util.XmlExceptions.MissingXmlElementException;
 import twoverse.util.XmlExceptions.UnexpectedXmlAttributeException;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
-//TODO write getChildren function
 public class CelestialBody implements Serializable {
     private static Properties sCelestialBodyConfigFile;
     protected static Logger sLogger =
@@ -41,7 +41,7 @@ public class CelestialBody implements Serializable {
     private PhysicsVector3d mAcceleration;
     private Point mPosition;
     private String mName;
-    private ArrayList<CelestialBody> mChildren;
+    private Vector<Integer> mChildren;
     private static final long serialVersionUID = -6341175711814973441L;
     private boolean mDirty = true; // dirty if different than version in
     // database
@@ -190,7 +190,7 @@ public class CelestialBody implements Serializable {
         setVelocity(velocity);
         setAcceleration(acceleration);
 
-        mChildren = new ArrayList<CelestialBody>();
+        mChildren = new Vector<Integer>();
     }
 
     private synchronized void loadConfig() {
@@ -539,5 +539,9 @@ public class CelestialBody implements Serializable {
 
     public AppletBodyInterface getBodyAsApplet(PApplet parent) {
         return null;
+    }
+
+    public void addChild(int id) {
+        mChildren.add(id);
     }
 }

@@ -75,6 +75,7 @@ public abstract class ObjectManager extends TimerTask {
     public void add(CelestialBody body) {
         mLock.writeLock().lock();
         mCelestialBodies.put(body.getId(), body);
+        mCelestialBodies.get(body.getParentId()).addChild(body.getId());
         mLock.writeLock().unlock();
     }
 

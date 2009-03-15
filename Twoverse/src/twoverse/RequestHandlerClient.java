@@ -190,10 +190,27 @@ public class RequestHandlerClient implements TwoversePublicApi {
                             parameters);
             body.setId(returnedBody.getId());
             body.setBirthTime(returnedBody.getBirthTime());
-            sLogger.log(Level.INFO, "Galaxy returned from add is: " + body);
+            sLogger.log(Level.INFO, "Body returned from add is: " + body);
         } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING,
                     "Unable to execute RPC addCelestialBody",
+                    e);
+        }
+        return body;
+    }
+
+    @Override
+    public CelestialBody updateCelestialBody(CelestialBody body) {
+        try {
+            Object[] parameters = new Object[] { body };
+            sLogger.log(Level.INFO, "Attempting to update body: " + body);
+            CelestialBody returnedBody =
+                    (CelestialBody) mXmlRpcClient.execute("RequestHandlerServer.updateCelestialBody",
+                            parameters);
+            sLogger.log(Level.INFO, "Body returned from update is: " + body);
+        } catch(XmlRpcException e) {
+            sLogger.log(Level.WARNING,
+                    "Unable to execute RPC updateCelestialBody",
                     e);
         }
         return body;

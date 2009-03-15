@@ -104,7 +104,7 @@ public class ObjectManagerClient extends ObjectManager {
     public void update(CelestialBody body) {
         sLogger.log(Level.INFO, "Attemping to update body: " + body);
         mLock.writeLock().lock();
-        // mRequestHandler.updateCelestialBody(body); TODO
+        mRequestHandler.updateCelestialBody(body);
         super.update(body);
         mLock.writeLock().unlock();
     }

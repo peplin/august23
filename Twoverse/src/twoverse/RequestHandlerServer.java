@@ -105,6 +105,13 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         return body;
     }
 
+    @Override
+    public CelestialBody updateCelestialBody(CelestialBody body) {
+        sLogger.log(Level.INFO, "Attempting to update body: " + body);
+        sObjectManager.update(body);
+        return body;
+    }
+
     public String getHashedPassword(String username)
             throws UnknownUserException {
         sLogger.log(Level.INFO,
@@ -149,5 +156,4 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         mapping.setAuthenticationHandler(handler);
         return mapping;
     }
-
 }

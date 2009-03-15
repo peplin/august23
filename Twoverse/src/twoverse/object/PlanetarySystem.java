@@ -99,7 +99,7 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
             sConfigFile = loadConfigFile("PlanetarySystem");
         }
     }
-    
+
     public AppletBodyInterface getBodyAsApplet(PApplet parent) {
         return new AppletPlanetarySystem(parent, this);
     }
@@ -128,7 +128,7 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
                     sSelectAllPlanetarySystemsStatement.executeQuery();
             ArrayList<CelestialBody> bodies = parse(resultSet);
             resultSet.beforeFirst();
-            for (CelestialBody body : bodies) {
+            for(CelestialBody body : bodies) {
                 if(!resultSet.next()) {
                     throw new SQLException("Mismatch between systems and celestial bodies");
                 }
@@ -140,7 +140,7 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
                 systems.put(system.getId(), system);
             }
             resultSet.close();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Unable to get planetary systems", e);
         }
         return systems;
@@ -162,14 +162,27 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
             sInsertPlanetarySystemStatement.setDouble(3, getMass());
             sInsertPlanetarySystemStatement.executeUpdate();
             setDirty(false);
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Could not add system " + this, e);
         }
 
     }
 
     public synchronized void updateInDatabase() throws SQLException {
-            //TODO
+        sLogger.log(Level.INFO, "Attempting to update system: " + this);
+        try {
+            super.updateInDatabase();
+
+            sUpdatePlanetarySystemStatement.setInt(1, getCenterId());
+            sUpdatePlanetarySystemStatement.setDouble(2, getMass());
+            sUpdatePlanetarySystemStatement.setDouble(3, getId());
+            sUpdatePlanetarySystemStatement.executeUpdate();
+            setDirty(false);
+        } catch(SQLException e) {
+            sLogger.log(Level.WARNING, "Could not update planetary system "
+                    + this, e);
+        }
+
     }
 
     public void setCenter(int center) {

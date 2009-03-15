@@ -35,9 +35,14 @@ public class ObjectManagerServer extends ObjectManager {
     }
 
     public void publishFeed() {
+        // TODO long term, or if performance is an issue, figure out if
+        // a feed for each scale is feasible. right now, that wouldn't be very
+        // simple as all objects are stored together, and we would have to
+        // recurse
+        // to figure out the number of feeds
         Element root = new Element(mConfigFile.getProperty("ROOT_TAG"));
         Iterator<CelestialBody> it = mCelestialBodies.values().iterator();
-        while (it.hasNext()) {
+        while(it.hasNext()) {
             root.appendChild(it.next().toXmlElement());
         }
 
@@ -52,7 +57,7 @@ public class ObjectManagerServer extends ObjectManager {
             serializer.setIndent(4);
             serializer.setMaxLength(64);
             serializer.write(doc);
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.WARNING, "Unable to write feed file", e);
         }
     }
@@ -62,7 +67,7 @@ public class ObjectManagerServer extends ObjectManager {
         mLock.writeLock().lock();
         // simulation calls this when done with a timestep
         ArrayList<CelestialBody> allBodies = getAllBodies();
-        for (CelestialBody body : allBodies) {
+        for(CelestialBody body : allBodies) {
             if(body.isDirty()) {
                 mDatabase.update(body);
                 body.setDirty(false);
@@ -80,8 +85,8 @@ public class ObjectManagerServer extends ObjectManager {
             mCelestialBodies.putAll(PlanetarySystem.selectAllFromDatabase());
             mCelestialBodies.putAll(ManmadeBody.selectAllFromDatabase());
             mCelestialBodies.putAll(Planet.selectAllFromDatabase());
-        } catch (SQLException e) {
-            // TODO log message
+        } catch(SQLException e) {
+            sLogger.log(Level.WARNING, "Unable to initialize objects", e);
         }
     }
 
