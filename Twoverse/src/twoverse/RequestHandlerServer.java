@@ -43,12 +43,8 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         sMethodAuthorization.put("RequestHandlerServer.createAccount", false);
         sMethodAuthorization.put("RequestHandlerServer.deleteAccount", true);
         sMethodAuthorization.put("RequestHandlerServer.changeName", true);
-        sMethodAuthorization.put("RequestHandlerServer.addGalaxy", true);
-        sMethodAuthorization.put("RequestHandlerServer.addManmadeBody", true);
-        sMethodAuthorization.put("RequestHandlerServer.addPlanetarySystem",
-                true);
-        sMethodAuthorization.put("RequestHandlerServer.addCelestialBody", true);
-        sMethodAuthorization.put("RequestHandlerServer.addPlanet", true);
+        sMethodAuthorization.put("RequestHandlerServer.add", true);
+        sMethodAuthorization.put("RequestHandlerServer.update", true);
         sMethodAuthorization.put("RequestHandlerServer.getHashedPassword",
                 false);
         sLogger.log(Level.CONFIG, "Method authorization configuration is: "
@@ -99,14 +95,14 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         }
     }
 
-    public CelestialBody addCelestialBody(CelestialBody body) {
+    public CelestialBody add(CelestialBody body) throws UnhandledCelestialBodyException {
         sLogger.log(Level.INFO, "Attempting to add body: " + body);
         sObjectManager.add(body);
         return body;
     }
 
     @Override
-    public CelestialBody updateCelestialBody(CelestialBody body) {
+    public CelestialBody update(CelestialBody body) {
         sLogger.log(Level.INFO, "Attempting to update body: " + body);
         sObjectManager.update(body);
         return body;

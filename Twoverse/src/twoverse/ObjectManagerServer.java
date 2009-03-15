@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
+import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
@@ -41,9 +42,8 @@ public class ObjectManagerServer extends ObjectManager {
         // recurse
         // to figure out the number of feeds
         Element root = new Element(mConfigFile.getProperty("ROOT_TAG"));
-        Iterator<CelestialBody> it = mCelestialBodies.values().iterator();
-        while(it.hasNext()) {
-            root.appendChild(it.next().toXmlElement());
+        for(CelestialBody body : mCelestialBodies.values()) {
+            root.appendChild(body.toXmlElement());
         }
 
         Document doc = new Document(root);
@@ -81,10 +81,19 @@ public class ObjectManagerServer extends ObjectManager {
         sLogger.log(Level.INFO, "Initializing ObjectManager from Database");
         // All of these are marked clean explicitly
         try {
+            mCelestialBodies.put(1, CelestialBody.selectFromDatabase(1));
             mCelestialBodies.putAll(Galaxy.selectAllFromDatabase());
             mCelestialBodies.putAll(PlanetarySystem.selectAllFromDatabase());
             mCelestialBodies.putAll(ManmadeBody.selectAllFromDatabase());
             mCelestialBodies.putAll(Planet.selectAllFromDatabase());
+
+            for(CelestialBody body : mCelestialBodies.values()) {
+                if(body.getParentId() != 0) {
+                    mCelestialBodies.get(body.getParentId())
+                            .addChild(body.getId());
+                }
+
+            }
         } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Unable to initialize objects", e);
         }
@@ -92,9 +101,11 @@ public class ObjectManagerServer extends ObjectManager {
 
     /**
      * Modifies galaxy, sets ID and birth time
+     * 
+     * @throws UnhandledCelestialBodyException
      */
     @Override
-    public void add(CelestialBody body) {
+    public void add(CelestialBody body) throws UnhandledCelestialBodyException {
         sLogger.log(Level.INFO, "Adding body: " + body);
         mLock.writeLock().lock();
         // Make sure to add to DB first, since it sets the ID

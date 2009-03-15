@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.logging.Level;
 
 import processing.core.PApplet;
@@ -58,7 +59,8 @@ public class Galaxy extends CelestialBody implements Serializable {
     public Galaxy(int id, int ownerId, String name, Timestamp birthTime,
             Timestamp deathTime, int parentId, Point position,
             PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            GalaxyShape shape, double mass, double density) {
+            Vector<Integer> children, GalaxyShape shape, double mass,
+            double density) {
         super(id,
                 ownerId,
                 name,
@@ -67,7 +69,8 @@ public class Galaxy extends CelestialBody implements Serializable {
                 parentId,
                 position,
                 velocity,
-                acceleration);
+                acceleration,
+                children);
         loadConfig();
         initialize(shape, mass, density);
     }
@@ -119,8 +122,8 @@ public class Galaxy extends CelestialBody implements Serializable {
             sConfigFile = loadConfigFile("Galaxy");
         }
     }
-    
-    public AppletBodyInterface getBodyAsApplet(PApplet parent) {
+
+    public AppletBodyInterface getAsApplet(PApplet parent) {
         return new AppletGalaxy(parent, this);
     }
 
@@ -184,9 +187,9 @@ public class Galaxy extends CelestialBody implements Serializable {
                 new HashMap<Integer, CelestialBody>();
         try {
             ResultSet resultSet = sSelectAllGalaxiesStatement.executeQuery();
-            ArrayList<CelestialBody> bodies = parse(resultSet);
+            ArrayList<CelestialBody> bodies = parseAll(resultSet);
             resultSet.beforeFirst();
-            for (CelestialBody body : bodies) {
+            for(CelestialBody body : bodies) {
                 if(!resultSet.next()) {
                     throw new SQLException("Mismatch between galaxies and celestial bodies");
                 }
@@ -202,7 +205,7 @@ public class Galaxy extends CelestialBody implements Serializable {
                 galaxies.put(galaxy.getId(), galaxy);
             }
             resultSet.close();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Unable to get galaxies", e);
         }
         return galaxies;
@@ -219,7 +222,7 @@ public class Galaxy extends CelestialBody implements Serializable {
             sInsertGalaxyStatement.setDouble(4, getDensity());
             sInsertGalaxyStatement.executeUpdate();
             setDirty(false);
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Could not add galaxy " + this, e);
         }
     }
@@ -235,7 +238,7 @@ public class Galaxy extends CelestialBody implements Serializable {
             sUpdateGalaxyStatement.setInt(4, getId());
             sUpdateGalaxyStatement.executeUpdate();
             setDirty(false);
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Could not update galaxy " + this, e);
         }
     }

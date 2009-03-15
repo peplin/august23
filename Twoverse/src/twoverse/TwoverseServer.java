@@ -1,6 +1,7 @@
 package twoverse;
 
 import java.io.IOException;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,6 +54,10 @@ public class TwoverseServer {
      */
     public static void main(String[] args) {
         TwoverseServer server = new TwoverseServer();
+        Handler[] handlers = Logger.getLogger("").getHandlers();
+        for(int i =0; i < handlers.length; i++) {
+            handlers[i].setLevel(Level.WARNING);
+        }
         server.run();
     }
 }

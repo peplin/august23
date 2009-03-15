@@ -1,5 +1,6 @@
 package twoverse;
 
+import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.SessionManager.ExistingUserException;
 import twoverse.object.CelestialBody;
 import twoverse.util.Session;
@@ -28,10 +29,11 @@ public interface TwoversePublicApi {
      * 
      * @param body
      * @return ID for new object
+     * @throws UnhandledCelestialBodyException 
      */
-    public CelestialBody addCelestialBody(CelestialBody body);
+    public CelestialBody add(CelestialBody body) throws UnhandledCelestialBodyException;
     
-    public CelestialBody updateCelestialBody(CelestialBody body);
+    public CelestialBody update(CelestialBody body);
 
     /**
      * Change the name of an existing object. User must own the object.

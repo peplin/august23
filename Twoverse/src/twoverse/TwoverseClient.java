@@ -3,12 +3,15 @@ package twoverse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import processing.core.PApplet;
 import tuio.TuioClient;
 import tuio.TuioCursor;
+import twoverse.ObjectManager.UnhandledCelestialBodyException;
+import twoverse.object.CelestialBody;
 import twoverse.object.Planet;
 import twoverse.object.applet.AppletBodyInterface;
 import twoverse.util.Camera;
@@ -34,6 +37,8 @@ public class TwoverseClient extends PApplet {
 
     /** Camera Properties **/
     private Camera mCamera;
+
+    private int mParentId = 1;
 
     @Override
     public void setup() {
@@ -71,6 +76,11 @@ public class TwoverseClient extends PApplet {
         user.setPlaintextPassword("foobar");
         mRequestHandler.createAccount(user);
         mRequestHandler.login(user.getUsername(), "foobar");
+
+        Handler[] handlers = Logger.getLogger("").getHandlers();
+        for(int i = 0; i < handlers.length; i++) {
+            handlers[i].setLevel(Level.WARNING);
+        }
     }
 
     @Override
@@ -94,15 +104,21 @@ public class TwoverseClient extends PApplet {
 
     void updateUniverse() {
         lights();
-        ArrayList<AppletBodyInterface> bodies =
-                mObjectManager.getAllBodiesAsApplets(this);
-        for(AppletBodyInterface body : bodies) {
-            try {
-                body.display();
-            } catch(TwoDimensionalException e) {
-                sLogger.log(Level.WARNING, "Expected 3D point but was 2D: "
-                        + body, e);
+        try {
+            CelestialBody parent = mObjectManager.getCelestialBody(mParentId);
+
+            for(int i : parent.getChildren()) {
+                CelestialBody body =
+                        (CelestialBody) (mObjectManager.getCelestialBody(i));
+                try {
+                    body.getAsApplet(this).display();
+                } catch(TwoDimensionalException e) {
+                    sLogger.log(Level.WARNING, "Expected 3D point but was 2D: "
+                            + body, e);
+                }
             }
+        } catch(UnhandledCelestialBodyException e) {
+            sLogger.log(Level.WARNING, "Unexpected celestial body type", e);
         }
     }
 
@@ -116,9 +132,9 @@ public class TwoverseClient extends PApplet {
     @Override
     public void mousePressed() {
         if(mouseButton == LEFT) {
-            mObjectManager.add(new Planet(-1,
+            mObjectManager.add(new Planet(0,
                     "Earth",
-                    -1,
+                    mParentId,
                     new Point(modelX(mouseX, mouseY, 0), modelY(mouseX,
                             mouseY,
                             0), 0),

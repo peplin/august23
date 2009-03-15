@@ -55,7 +55,7 @@ public abstract class ObjectManager extends TimerTask {
             if(mCelestialBodies.containsKey(objectId)) {
                 result = mCelestialBodies.get(objectId);
             } else {
-                throw new UnhandledCelestialBodyException("No such object ID");
+                throw new UnhandledCelestialBodyException("No such object ID: " + objectId);
             }
         } finally {
             mLock.readLock().unlock();
@@ -72,7 +72,10 @@ public abstract class ObjectManager extends TimerTask {
 
     }
 
-    public void add(CelestialBody body) {
+    public void add(CelestialBody body) throws UnhandledCelestialBodyException {
+        if(body.getParentId() == 0) {
+            throw new UnhandledCelestialBodyException("Parent is required");
+        }
         mLock.writeLock().lock();
         mCelestialBodies.put(body.getId(), body);
         mCelestialBodies.get(body.getParentId()).addChild(body.getId());
@@ -87,7 +90,11 @@ public abstract class ObjectManager extends TimerTask {
      */
     public void update(CelestialBody body) {
         mLock.writeLock().lock();
-        mCelestialBodies.put(body.getId(), body);
+        if(mCelestialBodies.containsKey(body.getId())) {
+            mCelestialBodies.get(body.getId()).update(body);
+        } else {
+            mCelestialBodies.put(body.getId(), body);
+        }
         mLock.writeLock().unlock();
     }
 

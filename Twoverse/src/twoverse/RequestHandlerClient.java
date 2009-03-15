@@ -13,6 +13,7 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
+import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.object.CelestialBody;
 import twoverse.util.Session;
 import twoverse.util.User;
@@ -144,7 +145,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
         } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC createAccount", e);
         }
-        return -1;
+        return 0;
     }
 
     public void deleteAccount() {
@@ -178,7 +179,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
         }
     }
 
-    public CelestialBody addCelestialBody(CelestialBody body) {
+    public CelestialBody add(CelestialBody body) {
         sLogger.log(Level.INFO, "Seting owner of body: " + body + " to user: "
                 + mSession.getUser());
         body.setOwnerId(mSession.getUser().getId());
@@ -186,31 +187,31 @@ public class RequestHandlerClient implements TwoversePublicApi {
             Object[] parameters = new Object[] { body };
             sLogger.log(Level.INFO, "Attempting to add body: " + body);
             CelestialBody returnedBody =
-                    (CelestialBody) mXmlRpcClient.execute("RequestHandlerServer.addCelestialBody",
+                    (CelestialBody) mXmlRpcClient.execute("RequestHandlerServer.add",
                             parameters);
             body.setId(returnedBody.getId());
             body.setBirthTime(returnedBody.getBirthTime());
             sLogger.log(Level.INFO, "Body returned from add is: " + body);
         } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING,
-                    "Unable to execute RPC addCelestialBody",
+                    "Unable to execute RPC add",
                     e);
         }
         return body;
     }
 
     @Override
-    public CelestialBody updateCelestialBody(CelestialBody body) {
+    public CelestialBody update(CelestialBody body) {
         try {
             Object[] parameters = new Object[] { body };
             sLogger.log(Level.INFO, "Attempting to update body: " + body);
             CelestialBody returnedBody =
-                    (CelestialBody) mXmlRpcClient.execute("RequestHandlerServer.updateCelestialBody",
+                    (CelestialBody) mXmlRpcClient.execute("RequestHandlerServer.update",
                             parameters);
             sLogger.log(Level.INFO, "Body returned from update is: " + body);
         } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING,
-                    "Unable to execute RPC updateCelestialBody",
+                    "Unable to execute RPC update",
                     e);
         }
         return body;

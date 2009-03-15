@@ -10,6 +10,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.logging.Level;
 
 import processing.core.PApplet;
@@ -44,7 +45,8 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
     public PlanetarySystem(int id, int ownerId, String name,
             Timestamp birthTime, Timestamp deathTime, int parentId,
             Point position, PhysicsVector3d velocity,
-            PhysicsVector3d acceleration, int centerStarId, double mass) {
+            PhysicsVector3d acceleration, Vector<Integer> children,
+            int centerStarId, double mass) {
         super(id,
                 ownerId,
                 name,
@@ -53,7 +55,8 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
                 parentId,
                 position,
                 velocity,
-                acceleration);
+                acceleration,
+                children);
         loadConfig();
         initialize(centerStarId, mass);
     }
@@ -100,7 +103,7 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
         }
     }
 
-    public AppletBodyInterface getBodyAsApplet(PApplet parent) {
+    public AppletBodyInterface getAsApplet(PApplet parent) {
         return new AppletPlanetarySystem(parent, this);
     }
 
@@ -126,7 +129,7 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
         try {
             ResultSet resultSet =
                     sSelectAllPlanetarySystemsStatement.executeQuery();
-            ArrayList<CelestialBody> bodies = parse(resultSet);
+            ArrayList<CelestialBody> bodies = parseAll(resultSet);
             resultSet.beforeFirst();
             for(CelestialBody body : bodies) {
                 if(!resultSet.next()) {
@@ -153,7 +156,7 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
 
             sInsertPlanetarySystemStatement.setInt(1, getId());
 
-            if(getCenterId() != -1) {
+            if(getCenterId() != 0) {
                 sInsertPlanetarySystemStatement.setInt(2, getCenterId());
             } else {
                 sInsertPlanetarySystemStatement.setNull(2, Types.INTEGER);

@@ -49,11 +49,8 @@ public class DatabaseTest {
 
         body =
                 new CelestialBody(0,
-                        -1,
                         "theBody",
-                        null,
-                        null,
-                        -1,
+                        0,
                         new Point(42, 43, 44),
                         new PhysicsVector3d(1, 2, 3, 4),
                         new PhysicsVector3d(5, 6, 7, 8));
@@ -116,7 +113,7 @@ public class DatabaseTest {
 
     @Test
     public void testAddPlanetarySystem() {
-        PlanetarySystem system = new PlanetarySystem(body, -1, 1000.1);
+        PlanetarySystem system = new PlanetarySystem(body, 0, 1000.1);
         database.insert(system);
         database.delete(system);
     }
@@ -124,7 +121,7 @@ public class DatabaseTest {
     @Test
     public void testDeletePlanetarySystem() throws SQLException {
         int previousCount = PlanetarySystem.selectAllFromDatabase().size();
-        PlanetarySystem system = new PlanetarySystem(body, -1, 1000.1);
+        PlanetarySystem system = new PlanetarySystem(body, 0, 1000.1);
         database.insert(system);
         database.delete(system);
         Assert.assertEquals(previousCount,
@@ -176,7 +173,7 @@ public class DatabaseTest {
     public void testAddPlanetarySystems() throws SQLException {
         PlanetarySystem[] systems = new PlanetarySystem[10];
         for(int i = 0; i < 10; i++) {
-            systems[i] = new PlanetarySystem(body, -1, 1000 + i);
+            systems[i] = new PlanetarySystem(body, 0, 1000 + i);
         }
         int previousCount = PlanetarySystem.selectAllFromDatabase().size();
         for(PlanetarySystem system : systems) {
