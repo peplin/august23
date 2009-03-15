@@ -93,7 +93,7 @@ public class ObjectManagerServer extends ObjectManager {
         sLogger.log(Level.INFO, "Adding body: " + body);
         mLock.writeLock().lock();
         // Make sure to add to DB first, since it sets the ID
-        mDatabase.add(body);
+        mDatabase.insert(body);
         super.add(body);
         mLock.writeLock().unlock();
         sLogger.log(Level.INFO, "Galaxy added is: " + body);

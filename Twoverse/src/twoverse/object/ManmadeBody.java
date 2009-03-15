@@ -64,6 +64,7 @@ public class ManmadeBody extends CelestialBody implements Serializable {
     public static void prepareDatabaseStatements(Connection connection)
             throws SQLException {
         sConnection = connection;
+        //super.prepareDatabaseStatements(sConnection);
         sSelectAllManmadeBodiesStatement =
                 sConnection.prepareStatement("SELECT * FROM object "
                         + "NATURAL JOIN manmade " + "LEFT JOIN (user) "

@@ -1,10 +1,7 @@
 package twoverse;
 
 import twoverse.SessionManager.ExistingUserException;
-import twoverse.object.Galaxy;
-import twoverse.object.ManmadeBody;
-import twoverse.object.Planet;
-import twoverse.object.PlanetarySystem;
+import twoverse.object.CelestialBody;
 import twoverse.util.Session;
 import twoverse.util.User;
 import twoverse.util.User.UnsetPasswordException;
@@ -26,42 +23,13 @@ public interface TwoversePublicApi {
             UnsetPasswordException;
 
     /**
-     * Unregisters a currently active session. Confirm that session number
-     * belongs to requesting user.
-     * 
-     * @param username
-     * @param session
-     * @return value is meaningless, but XML-RPC doesn't support void functions
-     */
-    //public int logout(Session session);
-
-    /**
      * These functions modify galaxy, but over XML-RPC that doesn't really work.
      * Need to explicitly return the new object
-     * 
-     * These must also have explicitly different names - we can't just rely on
-     * method overloading, as parameters from XML-RPC are received as Object.
-     * 
-     * @param galaxy
-     * @return ID for new object
-     */
-    public Galaxy addGalaxy(Galaxy galaxy);
-
-    /**
-     * 
-     * @param system
-     * @return ID for new object
-     */
-    public PlanetarySystem addPlanetarySystem(PlanetarySystem system);
-
-    public Planet addPlanet(Planet planet);
-
-    /**
      * 
      * @param body
      * @return ID for new object
      */
-    public ManmadeBody addManmadeBody(ManmadeBody body);
+    public CelestialBody addCelestialBody(CelestialBody body);
 
     /**
      * Methods for creating via Javascript web interface - can't use Serialized

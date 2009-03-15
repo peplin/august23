@@ -94,15 +94,15 @@ public class CelestialBody implements Serializable {
 
     public CelestialBody(CelestialBody body) {
         loadConfig();
-        initialize(getId(),
-                getOwnerId(),
-                getName(),
-                getBirthTime(),
-                getDeathTime(),
-                getParentId(),
-                getPosition(),
-                getVelocity(),
-                getAcceleration());
+        initialize(body.getId(),
+                body.getOwnerId(),
+                body.getName(),
+                body.getBirthTime(),
+                body.getDeathTime(),
+                body.getParentId(),
+                body.getPosition(),
+                body.getVelocity(),
+                body.getAcceleration());
     }
 
     public CelestialBody(Element root) throws UnexpectedXmlElementException {

@@ -16,10 +16,6 @@ import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.SessionManager.ExistingUserException;
 import twoverse.SessionManager.UnknownUserException;
 import twoverse.object.CelestialBody;
-import twoverse.object.Galaxy;
-import twoverse.object.ManmadeBody;
-import twoverse.object.Planet;
-import twoverse.object.PlanetarySystem;
 import twoverse.util.Session;
 import twoverse.util.User;
 import twoverse.util.User.UnsetPasswordException;
@@ -51,6 +47,7 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         sMethodAuthorization.put("RequestHandlerServer.addManmadeBody", true);
         sMethodAuthorization.put("RequestHandlerServer.addPlanetarySystem",
                 true);
+        sMethodAuthorization.put("RequestHandlerServer.addCelestialBody", true);
         sMethodAuthorization.put("RequestHandlerServer.addPlanet", true);
         sMethodAuthorization.put("RequestHandlerServer.getHashedPassword",
                 false);
@@ -97,33 +94,15 @@ public class RequestHandlerServer extends XmlRpcServlet implements
                 sLogger.log(Level.WARNING,
                         "Object doesn't exist or session is not authenticated as the owner");
             }
-        } catch (UnhandledCelestialBodyException e) {
+        } catch(UnhandledCelestialBodyException e) {
             sLogger.log(Level.WARNING, "Unknown type of CelestialBody", e);
         }
     }
 
-    public Galaxy addGalaxy(Galaxy galaxy) {
-        sLogger.log(Level.INFO, "Attempting to add galaxy: " + galaxy);
-        sObjectManager.add(galaxy);
-        return galaxy;
-    }
-
-    public ManmadeBody addManmadeBody(ManmadeBody body) {
-        sLogger.log(Level.INFO, "Attempting to add manmade body: " + body);
+    public CelestialBody addCelestialBody(CelestialBody body) {
+        sLogger.log(Level.INFO, "Attempting to add body: " + body);
         sObjectManager.add(body);
         return body;
-    }
-
-    public PlanetarySystem addPlanetarySystem(PlanetarySystem system) {
-        sLogger.log(Level.INFO, "Attempting to add planetary system: " + system);
-        sObjectManager.add(system);
-        return system;
-    }
-
-    public Planet addPlanet(Planet planet) {
-        sLogger.log(Level.INFO, "Attempting to add planet: " + planet);
-        sObjectManager.add(planet);
-        return planet;
     }
 
     public String getHashedPassword(String username)

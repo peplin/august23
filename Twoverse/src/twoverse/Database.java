@@ -226,7 +226,7 @@ public class Database {
         }
     }
 
-    public synchronized void add(CelestialBody body) {
+    public synchronized void insert(CelestialBody body) {
         try {
             body.insertInDatabase();
         } catch (SQLException e) {
@@ -236,7 +236,7 @@ public class Database {
 
     public synchronized void delete(CelestialBody body) {
         try {
-            body.insertInDatabase();
+            body.deleteFromDatabase();
         } catch (SQLException e) {
 
         }
@@ -244,7 +244,7 @@ public class Database {
 
     public synchronized void update(CelestialBody body) {
         try {
-            body.insertInDatabase();
+            body.updateInDatabase();
         } catch (SQLException e) {
 
         }
