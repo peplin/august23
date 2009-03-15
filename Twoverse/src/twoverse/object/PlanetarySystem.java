@@ -12,8 +12,13 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import processing.core.PApplet;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
+import twoverse.object.applet.AppletBodyInterface;
+import twoverse.object.applet.AppletGalaxy;
+import twoverse.object.applet.AppletPlanetarySystem;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
@@ -93,6 +98,10 @@ public class PlanetarySystem extends CelestialBody implements Serializable {
         if(sConfigFile == null) {
             sConfigFile = loadConfigFile("PlanetarySystem");
         }
+    }
+    
+    public AppletBodyInterface getBodyAsApplet(PApplet parent) {
+        return new AppletPlanetarySystem(parent, this);
     }
 
     public static void prepareDatabaseStatements(Connection connection)

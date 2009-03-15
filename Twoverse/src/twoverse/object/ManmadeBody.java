@@ -11,7 +11,12 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import processing.core.PApplet;
+
 import nu.xom.Element;
+import twoverse.object.applet.AppletBodyInterface;
+import twoverse.object.applet.AppletGalaxy;
+import twoverse.object.applet.AppletManmadeBody;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 
@@ -59,6 +64,10 @@ public class ManmadeBody extends CelestialBody implements Serializable {
         if(sConfigFile == null) {
             sConfigFile = loadConfigFile("ManmadeBody");
         }
+    }
+    
+    public AppletBodyInterface getBodyAsApplet(PApplet parent) {
+        return new AppletManmadeBody(parent, this);
     }
 
     public static void prepareDatabaseStatements(Connection connection)

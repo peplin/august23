@@ -538,7 +538,6 @@ public class CelestialBody implements Serializable {
     }
 
     public AppletBodyInterface getBodyAsApplet(PApplet parent) {
-        // TODO Auto-generated method stub
         return null;
     }
 }

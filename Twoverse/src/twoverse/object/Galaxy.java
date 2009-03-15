@@ -11,8 +11,12 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import processing.core.PApplet;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
+import twoverse.object.applet.AppletBodyInterface;
+import twoverse.object.applet.AppletGalaxy;
 import twoverse.util.GalaxyShape;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
@@ -114,6 +118,10 @@ public class Galaxy extends CelestialBody implements Serializable {
         if(sConfigFile == null) {
             sConfigFile = loadConfigFile("Galaxy");
         }
+    }
+    
+    public AppletBodyInterface getBodyAsApplet(PApplet parent) {
+        return new AppletGalaxy(parent, this);
     }
 
     public static void prepareDatabaseStatements(Connection connection)
