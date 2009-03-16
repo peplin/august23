@@ -38,7 +38,7 @@ private int mParentId = 1;
 
 void setup() {
     frameRate(FRAME_RATE);
-    size(WINDOW_WIDTH, WINDOW_HEIGHT, OPENGL);
+    size(WINDOW_WIDTH, WINDOW_HEIGHT, P3D);
     smooth();
 
     mCamera =
@@ -48,10 +48,9 @@ void setup() {
                     (float) ((height / 2.0) / tan((float) (PI * 60.0 / 360.0))),
                     0,
                     0,
-                    0);
+                    0, 1);
 
     mRequestHandler = new RequestHandlerClient();
-    mObjectManager = new ObjectManagerClient(mRequestHandler);
     mTuioClient = new TuioClient(this);
 
     // temporary stuff to test client/server connection
@@ -60,6 +59,8 @@ void setup() {
     user.setPlaintextPassword("foobar");
     mRequestHandler.createAccount(user);
     mRequestHandler.login(user.getUsername(), "foobar");
+
+    mObjectManager = new ObjectManagerClient(mRequestHandler);
 
     Handler[] handlers = Logger.getLogger("").getHandlers();
     for(int i = 0; i < handlers.length; i++) {
@@ -129,6 +130,6 @@ void mouseDragged() {
     if(mouseButton == RIGHT) {
         mCamera.moveCenter(mouseX - pmouseX, mouseY - pmouseY, 0);
     } else if(mouseButton == CENTER) {
-        mCamera.moveEye(0, 0, (float) (-.01 * (mouseY - pmouseY)));
+        mCamera.zoom((float) (-.01 * (mouseY - pmouseY)));
     }
 }

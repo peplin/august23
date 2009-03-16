@@ -9,16 +9,18 @@ public class Camera {
     private float mCenterX; // where the eye is looking (center of screen)
     private float mCenterY;
     private float mCenterZ;
+    private float mScale;
     private PApplet mParent;
 
     public Camera(PApplet parent, float eyeX, float eyeY, float eyeZ,
-            float centerX, float centerY, int centerZ) {
+            float centerX, float centerY, int centerZ, float scale) {
         mEyeX = eyeX;
         mEyeY = eyeY;
         mEyeZ = eyeZ;
         mCenterX = centerX;
         mCenterY = centerY;
         mCenterZ = centerZ;
+        mScale = scale;
         mParent = parent;
     }
 
@@ -32,13 +34,23 @@ public class Camera {
                 0,
                 1,
                 0);
+
+        mParent.translate(mParent.width / 2,
+                mParent.height / 2);
+        mParent.scale(mScale);
+        mParent.translate(-mParent.width / 2, -mParent.height / 2);
         mParent.translate(mCenterX, mCenterY);
+        
     }
 
     public void moveEye(float differenceX, float differenceY, float differenceZ) {
         mEyeX += differenceX;
         mEyeY += differenceY;
         mEyeZ += differenceZ;
+    }
+
+    public void zoom(float difference) {
+        mScale += difference;
     }
 
     public void moveCenter(float differenceX, float differenceY,
