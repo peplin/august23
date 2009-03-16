@@ -101,7 +101,6 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         return body;
     }
 
-    @Override
     public CelestialBody update(CelestialBody body) {
         sLogger.log(Level.INFO, "Attempting to update body: " + body);
         sObjectManager.update(body);

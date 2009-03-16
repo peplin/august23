@@ -13,7 +13,6 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
-import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.object.CelestialBody;
 import twoverse.util.Session;
 import twoverse.util.User;
@@ -32,14 +31,14 @@ public class RequestHandlerClient implements TwoversePublicApi {
             mConfigFile.load(this.getClass()
                     .getClassLoader()
                     .getResourceAsStream("twoverse/conf/RequestHandlerClient.properties"));
-        } catch(IOException e) {
+        } catch (IOException e) {
 
         }
 
         mXmlRpcConfig = new XmlRpcClientConfigImpl();
         try {
             mXmlRpcConfig.setServerURL(new URL(mConfigFile.getProperty("XMLRPCSERVER")));
-        } catch(MalformedURLException e) {
+        } catch (MalformedURLException e) {
             sLogger.log(Level.SEVERE,
                     "Unable to parse URL for XML-RPC server: "
                             + mConfigFile.getProperty("XMLRPCSERVER"),
@@ -69,7 +68,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
             sLogger.log(Level.INFO, "Attempting to login with user " + user);
             return (Session) (mXmlRpcClient.execute("RequestHandlerServer.login",
                     parameters));
-        } catch(XmlRpcException e) {
+        } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unknown user " + user, e);
             return null;
         }
@@ -100,7 +99,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
                 setAuthentication(username, actualHash);
                 return mSession;
             }
-        } catch(XmlRpcException e) {
+        } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to login with username: "
                     + username, e);
             return null;
@@ -122,7 +121,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
                 sLogger.log(Level.INFO, "Attempting to logout with session: "
                         + mSession);
                 mXmlRpcClient.execute("RequestHandlerServer.logout", parameters);
-            } catch(XmlRpcException e) {
+            } catch (XmlRpcException e) {
                 sLogger.log(Level.WARNING, "Unable to execute RPC logout", e);
             }
         } else {
@@ -142,7 +141,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
             user.setId(newId);
             sLogger.log(Level.INFO, "User created is: " + user);
             return newId;
-        } catch(XmlRpcException e) {
+        } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC createAccount", e);
         }
         return 0;
@@ -157,7 +156,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
                 mXmlRpcClient.execute("RequestHandlerServer.deleteAccount",
                         parameters);
                 clearAuthentication();
-            } catch(XmlRpcException e) {
+            } catch (XmlRpcException e) {
                 sLogger.log(Level.WARNING,
                         "Unable to execute RPC deleteAccount",
                         e);
@@ -174,7 +173,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
             sLogger.log(Level.INFO, "Attempting to change name of objectId: "
                     + objectId + " to " + newName);
             mXmlRpcClient.execute("RequestHandlerServer.changeName", parameters);
-        } catch(XmlRpcException e) {
+        } catch (XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC changeName", e);
         }
     }
@@ -192,27 +191,20 @@ public class RequestHandlerClient implements TwoversePublicApi {
             body.setId(returnedBody.getId());
             body.setBirthTime(returnedBody.getBirthTime());
             sLogger.log(Level.INFO, "Body returned from add is: " + body);
-        } catch(XmlRpcException e) {
-            sLogger.log(Level.WARNING,
-                    "Unable to execute RPC add",
-                    e);
+        } catch (XmlRpcException e) {
+            sLogger.log(Level.WARNING, "Unable to execute RPC add", e);
         }
         return body;
     }
 
-    @Override
     public CelestialBody update(CelestialBody body) {
         try {
             Object[] parameters = new Object[] { body };
             sLogger.log(Level.INFO, "Attempting to update body: " + body);
-            CelestialBody returnedBody =
-                    (CelestialBody) mXmlRpcClient.execute("RequestHandlerServer.update",
-                            parameters);
+            mXmlRpcClient.execute("RequestHandlerServer.update", parameters);
             sLogger.log(Level.INFO, "Body returned from update is: " + body);
-        } catch(XmlRpcException e) {
-            sLogger.log(Level.WARNING,
-                    "Unable to execute RPC update",
-                    e);
+        } catch (XmlRpcException e) {
+            sLogger.log(Level.WARNING, "Unable to execute RPC update", e);
         }
         return body;
     }

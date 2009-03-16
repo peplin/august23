@@ -17,7 +17,6 @@ import processing.core.PApplet;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import twoverse.object.applet.AppletBodyInterface;
-import twoverse.object.applet.AppletGalaxy;
 import twoverse.object.applet.AppletPlanet;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;

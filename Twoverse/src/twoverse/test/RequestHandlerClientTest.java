@@ -1,7 +1,5 @@
 package twoverse.test;
 
-import java.util.Vector;
-
 import junit.framework.Assert;
 
 import org.junit.After;
