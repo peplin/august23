@@ -1,5 +1,7 @@
 package twoverse.test;
 
+import java.util.Vector;
+
 import junit.framework.Assert;
 
 import org.junit.After;
@@ -32,13 +34,15 @@ public class RequestHandlerClientTest {
         server.run();
         client = new RequestHandlerClient();
         objectManagerClient = new ObjectManagerClient(client);
-        
+
         users = new User[4];
-        users[0] = new User(0, "xmlrpcfirst", "first@first.org", "1111111111",
-                100);
-        users[1] = new User(0, "second", "second@second.org", "2222222222", 100);
+        users[0] =
+                new User(0, "xmlrpcfirst", "first@first.org", "1111111111", 100);
+        users[1] =
+                new User(0, "second", "second@second.org", "2222222222", 100);
         users[2] = new User(0, "third", "third@third.org", "3333333333", 100);
-        users[3] = new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
+        users[3] =
+                new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
 
         users[0].setPlaintextPassword("firstpass");
         users[1].setPlaintextPassword("secondpass");
@@ -79,13 +83,18 @@ public class RequestHandlerClientTest {
     public void testAddGalaxy() {
         client.createAccount(users[0]);
         client.login("xmlrpcfirst", "firstpass");
-        
-        Galaxy galaxy = new Galaxy(0, -1, "theBody", null, null, -1, new Point(
-                42, 43, 44), new PhysicsVector3d(1, 2, 3, 4),
-                new PhysicsVector3d(5, 6, 7, 8), new GalaxyShape(1, "test",
-                        "test"), 1000.5, 2000.20);
+
+        Galaxy galaxy =
+                new Galaxy(0,
+                        "theBody",
+                        0,
+                        new Point(42, 43, 44),
+                        new PhysicsVector3d(1, 2, 3, 4),
+                        new PhysicsVector3d(5, 6, 7, 8),
+                        new GalaxyShape(1, "test", "test"),
+                        1000.5,
+                        2000.20);
         objectManagerClient.add(galaxy);
-        //TODO why don't we get hte ID here anymore? seems to hang?
         Assert.assertTrue(galaxy.getId() != 0);
         database.delete(galaxy);
         client.deleteAccount();

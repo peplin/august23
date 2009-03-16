@@ -39,6 +39,7 @@ public class SimulationRunner extends TimerTask {
 				// interact
 				// TODO check scale...maybe instead of doing all, do a nested
 				// once for each scale - n^2...ouch...but unavoidable
+			    // recursive simulate func?
 			}
 		}
 		mObjectManager.flushToDatabase();

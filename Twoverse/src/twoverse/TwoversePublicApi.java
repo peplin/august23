@@ -1,10 +1,8 @@
 package twoverse;
 
+import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.SessionManager.ExistingUserException;
-import twoverse.object.Galaxy;
-import twoverse.object.ManmadeBody;
-import twoverse.object.Planet;
-import twoverse.object.PlanetarySystem;
+import twoverse.object.CelestialBody;
 import twoverse.util.Session;
 import twoverse.util.User;
 import twoverse.util.User.UnsetPasswordException;
@@ -26,56 +24,16 @@ public interface TwoversePublicApi {
             UnsetPasswordException;
 
     /**
-     * Unregisters a currently active session. Confirm that session number
-     * belongs to requesting user.
-     * 
-     * @param username
-     * @param session
-     * @return value is meaningless, but XML-RPC doesn't support void functions
-     */
-    //public int logout(Session session);
-
-    /**
      * These functions modify galaxy, but over XML-RPC that doesn't really work.
      * Need to explicitly return the new object
      * 
-     * These must also have explicitly different names - we can't just rely on
-     * method overloading, as parameters from XML-RPC are received as Object.
-     * 
-     * @param galaxy
-     * @return ID for new object
-     */
-    public Galaxy addGalaxy(Galaxy galaxy);
-
-    /**
-     * 
-     * @param system
-     * @return ID for new object
-     */
-    public PlanetarySystem addPlanetarySystem(PlanetarySystem system);
-
-    public Planet addPlanet(Planet planet);
-
-    /**
-     * 
      * @param body
      * @return ID for new object
+     * @throws UnhandledCelestialBodyException 
      */
-    public ManmadeBody addManmadeBody(ManmadeBody body);
-
-    /**
-     * Methods for creating via Javascript web interface - can't use Serialized
-     * Java objects, so we give explicit constructor looking things
-     * 
-     */
-    /*
-     * public int addGalaxy(User owner, CelestialBody parent, PhysicsVector3d
-     * velocity, PhysicsVector3d acceleration, GalaxyShape shape); public int
-     * addPlanetarySystem(User owner, CelestialBody parent, PhysicsVector3d
-     * velocity, PhysicsVector3d acceleration, Star center); public int
-     * addManmadeBody(User owner, CelestialBody parent, PhysicsVector3d
-     * velocity, PhysicsVector3d acceleration);
-     */
+    public CelestialBody add(CelestialBody body) throws UnhandledCelestialBodyException;
+    
+    public CelestialBody update(CelestialBody body);
 
     /**
      * Change the name of an existing object. User must own the object.

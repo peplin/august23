@@ -77,7 +77,7 @@ public class SessionManagerTest {
             UnsetPasswordException {
         manager.createAccount(users[1]);
         Session session = manager.login(users[1]);
-        Assert.assertFalse(session.getId() == -1);
+        Assert.assertFalse(session.getId() == 0);
         database.deleteUser(users[1]);
     }
 

@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
+import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.object.CelestialBody;
 import twoverse.object.Galaxy;
 import twoverse.object.ManmadeBody;
@@ -35,10 +36,14 @@ public class ObjectManagerServer extends ObjectManager {
     }
 
     public void publishFeed() {
+        // TODO long term, or if performance is an issue, figure out if
+        // a feed for each scale is feasible. right now, that wouldn't be very
+        // simple as all objects are stored together, and we would have to
+        // recurse
+        // to figure out the number of feeds
         Element root = new Element(mConfigFile.getProperty("ROOT_TAG"));
-        Iterator<CelestialBody> it = mCelestialBodies.values().iterator();
-        while (it.hasNext()) {
-            root.appendChild(it.next().toXmlElement());
+        for(CelestialBody body : mCelestialBodies.values()) {
+            root.appendChild(body.toXmlElement());
         }
 
         Document doc = new Document(root);
@@ -52,7 +57,7 @@ public class ObjectManagerServer extends ObjectManager {
             serializer.setIndent(4);
             serializer.setMaxLength(64);
             serializer.write(doc);
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.WARNING, "Unable to write feed file", e);
         }
     }
@@ -62,7 +67,7 @@ public class ObjectManagerServer extends ObjectManager {
         mLock.writeLock().lock();
         // simulation calls this when done with a timestep
         ArrayList<CelestialBody> allBodies = getAllBodies();
-        for (CelestialBody body : allBodies) {
+        for(CelestialBody body : allBodies) {
             if(body.isDirty()) {
                 mDatabase.update(body);
                 body.setDirty(false);
@@ -76,24 +81,35 @@ public class ObjectManagerServer extends ObjectManager {
         sLogger.log(Level.INFO, "Initializing ObjectManager from Database");
         // All of these are marked clean explicitly
         try {
+            mCelestialBodies.put(1, CelestialBody.selectFromDatabase(1));
             mCelestialBodies.putAll(Galaxy.selectAllFromDatabase());
             mCelestialBodies.putAll(PlanetarySystem.selectAllFromDatabase());
             mCelestialBodies.putAll(ManmadeBody.selectAllFromDatabase());
             mCelestialBodies.putAll(Planet.selectAllFromDatabase());
-        } catch (SQLException e) {
-            // TODO log message
+
+            for(CelestialBody body : mCelestialBodies.values()) {
+                if(body.getParentId() != 0) {
+                    mCelestialBodies.get(body.getParentId())
+                            .addChild(body.getId());
+                }
+
+            }
+        } catch(SQLException e) {
+            sLogger.log(Level.WARNING, "Unable to initialize objects", e);
         }
     }
 
     /**
      * Modifies galaxy, sets ID and birth time
+     * 
+     * @throws UnhandledCelestialBodyException
      */
     @Override
-    public void add(CelestialBody body) {
+    public void add(CelestialBody body) throws UnhandledCelestialBodyException {
         sLogger.log(Level.INFO, "Adding body: " + body);
         mLock.writeLock().lock();
         // Make sure to add to DB first, since it sets the ID
-        mDatabase.add(body);
+        mDatabase.insert(body);
         super.add(body);
         mLock.writeLock().unlock();
         sLogger.log(Level.INFO, "Galaxy added is: " + body);

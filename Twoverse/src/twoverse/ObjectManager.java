@@ -25,7 +25,7 @@ public abstract class ObjectManager extends TimerTask {
             mConfigFile.load(this.getClass()
                     .getClassLoader()
                     .getResourceAsStream("twoverse/conf/ObjectManager.properties"));
-        } catch (IOException e) {
+        } catch(IOException e) {
 
         }
 
@@ -51,13 +51,15 @@ public abstract class ObjectManager extends TimerTask {
             throws UnhandledCelestialBodyException {
         CelestialBody result = null;
         mLock.readLock().lock();
-        if(mCelestialBodies.containsKey(objectId)) {
-            result = mCelestialBodies.get(objectId);
-        } else {
+        try {
+            if(mCelestialBodies.containsKey(objectId)) {
+                result = mCelestialBodies.get(objectId);
+            } else {
+                throw new UnhandledCelestialBodyException("No such object ID: " + objectId);
+            }
+        } finally {
             mLock.readLock().unlock();
-            throw new UnhandledCelestialBodyException("No such object ID");
         }
-        mLock.readLock().unlock();
         return result;
     }
 
@@ -70,15 +72,14 @@ public abstract class ObjectManager extends TimerTask {
 
     }
 
-    public CelestialBody getCelestialBodyBody(int id) {
-        mLock.readLock().lock();
-        CelestialBody result = mCelestialBodies.get(id);
-        mLock.readLock().unlock();
-        return result;
-    }
-
-    public void add(CelestialBody body) {
+    public void add(CelestialBody body) throws UnhandledCelestialBodyException {
+        if(body.getParentId() == 0) {
+            throw new UnhandledCelestialBodyException("Parent is required");
+        }
+        mLock.writeLock().lock();
         mCelestialBodies.put(body.getId(), body);
+        mCelestialBodies.get(body.getParentId()).addChild(body.getId());
+        mLock.writeLock().unlock();
     }
 
     /**
@@ -88,7 +89,13 @@ public abstract class ObjectManager extends TimerTask {
      * already have!
      */
     public void update(CelestialBody body) {
-        mCelestialBodies.put(body.getId(), body);
+        mLock.writeLock().lock();
+        if(mCelestialBodies.containsKey(body.getId())) {
+            mCelestialBodies.get(body.getId()).update(body);
+        } else {
+            mCelestialBodies.put(body.getId(), body);
+        }
+        mLock.writeLock().unlock();
     }
 
     public class UnhandledCelestialBodyException extends Exception {

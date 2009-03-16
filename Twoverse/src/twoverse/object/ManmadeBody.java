@@ -9,11 +9,18 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.logging.Level;
 
+import processing.core.PApplet;
+
 import nu.xom.Element;
+import twoverse.object.applet.AppletBodyInterface;
+import twoverse.object.applet.AppletGalaxy;
+import twoverse.object.applet.AppletManmadeBody;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
+import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
 public class ManmadeBody extends CelestialBody implements Serializable {
     private static final long serialVersionUID = -6112151366389080968L;
@@ -32,7 +39,8 @@ public class ManmadeBody extends CelestialBody implements Serializable {
     // is just orbiting
     public ManmadeBody(int id, int ownerId, String name, Timestamp birthTime,
             Timestamp deathTime, int parentId, Point position,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration) {
+            PhysicsVector3d velocity, PhysicsVector3d acceleration,
+            Vector<Integer> children) {
         super(id,
                 ownerId,
                 name,
@@ -41,7 +49,8 @@ public class ManmadeBody extends CelestialBody implements Serializable {
                 parentId,
                 position,
                 velocity,
-                acceleration);
+                acceleration,
+                children);
         loadConfig();
     }
 
@@ -53,6 +62,11 @@ public class ManmadeBody extends CelestialBody implements Serializable {
     public ManmadeBody(Element element) {
         super(element.getFirstChildElement(CelestialBody.XML_TAG));
         loadConfig();
+
+        if(!element.getLocalName()
+                .equals(sConfigFile.getProperty("MANMADE_BODY_TAG"))) {
+            throw new UnexpectedXmlElementException("Element is not a manmade body");
+        }
     }
 
     private synchronized void loadConfig() {
@@ -61,9 +75,14 @@ public class ManmadeBody extends CelestialBody implements Serializable {
         }
     }
 
+    public AppletBodyInterface getAsApplet(PApplet parent) {
+        return new AppletManmadeBody(parent, this);
+    }
+
     public static void prepareDatabaseStatements(Connection connection)
             throws SQLException {
         sConnection = connection;
+        // super.prepareDatabaseStatements(sConnection);
         sSelectAllManmadeBodiesStatement =
                 sConnection.prepareStatement("SELECT * FROM object "
                         + "NATURAL JOIN manmade " + "LEFT JOIN (user) "
@@ -80,9 +99,9 @@ public class ManmadeBody extends CelestialBody implements Serializable {
         try {
             ResultSet resultSet =
                     sSelectAllManmadeBodiesStatement.executeQuery();
-            ArrayList<CelestialBody> bodies = parse(resultSet);
+            ArrayList<CelestialBody> bodies = parseAll(resultSet);
             resultSet.beforeFirst();
-            for (CelestialBody body : bodies) {
+            for(CelestialBody body : bodies) {
                 if(!resultSet.next()) {
                     throw new SQLException("Mismatch between manmade and celestial bodies");
                 }
@@ -91,7 +110,7 @@ public class ManmadeBody extends CelestialBody implements Serializable {
                 manmadeBodies.put(manmadeBody.getId(), manmadeBody);
             }
             resultSet.close();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Unable to get manmade bodies", e);
         }
         return manmadeBodies;
@@ -105,7 +124,7 @@ public class ManmadeBody extends CelestialBody implements Serializable {
             sInsertManmadeBodyStatement.setInt(1, getId());
             sInsertManmadeBodyStatement.executeUpdate();
             setDirty(false);
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Could not add manmade body " + this, e);
         }
     }
@@ -115,7 +134,7 @@ public class ManmadeBody extends CelestialBody implements Serializable {
         try {
             super.updateInDatabase();
             setDirty(false);
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING,
                     "Could not update manmade body " + this,
                     e);

@@ -11,6 +11,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +28,6 @@ import twoverse.util.XmlExceptions.MissingXmlElementException;
 import twoverse.util.XmlExceptions.UnexpectedXmlAttributeException;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
-//TODO write getChildren function
 public class CelestialBody implements Serializable {
     private static Properties sCelestialBodyConfigFile;
     protected static Logger sLogger =
@@ -41,7 +41,7 @@ public class CelestialBody implements Serializable {
     private PhysicsVector3d mAcceleration;
     private Point mPosition;
     private String mName;
-    private ArrayList<CelestialBody> mChildren;
+    private Vector<Integer> mChildren;
     private static final long serialVersionUID = -6341175711814973441L;
     private boolean mDirty = true; // dirty if different than version in
     // database
@@ -65,7 +65,7 @@ public class CelestialBody implements Serializable {
             Point position, PhysicsVector3d velocity,
             PhysicsVector3d acceleration) {
         loadConfig();
-        initialize(-1,
+        initialize(0,
                 ownerId,
                 name,
                 null,
@@ -73,13 +73,15 @@ public class CelestialBody implements Serializable {
                 parentId,
                 position,
                 velocity,
-                acceleration);
+                acceleration,
+                new Vector<Integer>());
 
     }
 
     public CelestialBody(int id, int ownerId, String name, Timestamp birthTime,
             Timestamp deathTime, int parentId, Point position,
-            PhysicsVector3d velocity, PhysicsVector3d acceleration) {
+            PhysicsVector3d velocity, PhysicsVector3d acceleration,
+            Vector<Integer> children) {
         loadConfig();
         initialize(id,
                 ownerId,
@@ -89,20 +91,22 @@ public class CelestialBody implements Serializable {
                 parentId,
                 position,
                 velocity,
-                acceleration);
+                acceleration,
+                children);
     }
 
     public CelestialBody(CelestialBody body) {
         loadConfig();
-        initialize(getId(),
-                getOwnerId(),
-                getName(),
-                getBirthTime(),
-                getDeathTime(),
-                getParentId(),
-                getPosition(),
-                getVelocity(),
-                getAcceleration());
+        initialize(body.getId(),
+                body.getOwnerId(),
+                body.getName(),
+                body.getBirthTime(),
+                body.getDeathTime(),
+                body.getParentId(),
+                body.getPosition(),
+                body.getVelocity(),
+                body.getAcceleration(),
+                body.getChildren());
     }
 
     public CelestialBody(Element root) throws UnexpectedXmlElementException {
@@ -116,7 +120,7 @@ public class CelestialBody implements Serializable {
         Elements positionElements =
                 root.getChildElements(sCelestialBodyConfigFile.getProperty("POINT_TAG"));
         Point position = null;
-        for (int i = 0; i < positionElements.size() && position == null; i++) {
+        for(int i = 0; i < positionElements.size() && position == null; i++) {
             Element element = positionElements.get(i);
             if(element.getAttribute(sCelestialBodyConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                     .getValue()
@@ -136,7 +140,7 @@ public class CelestialBody implements Serializable {
                 root.getChildElements(sCelestialBodyConfigFile.getProperty("VECTOR_TAG"));
         PhysicsVector3d velocityVector = null;
         PhysicsVector3d accelerationVector = null;
-        for (int i = 0; i < vectorElements.size()
+        for(int i = 0; i < vectorElements.size()
                 && (velocityVector == null || accelerationVector == null); i++) {
             Element element = vectorElements.get(i);
             if(element.getAttribute(sCelestialBodyConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
@@ -160,6 +164,18 @@ public class CelestialBody implements Serializable {
                     new Timestamp(Long.valueOf(root.getAttribute(sCelestialBodyConfigFile.getProperty("DEATH_ATTRIBUTE_TAG"))
                             .getValue()));
         }
+
+        Vector<Integer> children = new Vector<Integer>();
+
+        Element childrenVectorElement =
+                root.getFirstChildElement(sCelestialBodyConfigFile.getProperty("CHILDREN_ELEMENT_TAG"));
+        Elements childValueElements =
+                childrenVectorElement.getChildElements(sCelestialBodyConfigFile.getProperty("CHILDREN_VALUE_ELEMENT_TAG"));
+        for(int i = 0; i < childValueElements.size(); i++) {
+            Element childElement = childValueElements.get(i);
+            children.add(Integer.valueOf(childElement.getValue()));
+        }
+
         initialize(Integer.valueOf(root.getAttribute(sCelestialBodyConfigFile.getProperty("ID_ATTRIBUTE_TAG"))
                 .getValue()),
                 Integer.valueOf(root.getAttribute(sCelestialBodyConfigFile.getProperty("OWNER_ATTRIBUTE_TAG"))
@@ -173,13 +189,14 @@ public class CelestialBody implements Serializable {
                         .getValue()),
                 position,
                 velocityVector,
-                accelerationVector);
+                accelerationVector,
+                children);
     }
 
     private void initialize(int id, int ownerId, String name,
             Timestamp birthTime, Timestamp deathTime, int parentId,
             Point position, PhysicsVector3d velocity,
-            PhysicsVector3d acceleration) {
+            PhysicsVector3d acceleration, Vector<Integer> children) {
         setId(id);
         setOwnerId(ownerId);
         setName(name);
@@ -189,8 +206,7 @@ public class CelestialBody implements Serializable {
         setPosition(position);
         setVelocity(velocity);
         setAcceleration(acceleration);
-
-        mChildren = new ArrayList<CelestialBody>();
+        mChildren = new Vector<Integer>(children);
     }
 
     private synchronized void loadConfig() {
@@ -207,7 +223,7 @@ public class CelestialBody implements Serializable {
                     .getClassLoader()
                     .getResourceAsStream("twoverse/conf/" + className
                             + ".properties"));
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.SEVERE, "Unable to load config: "
                     + e.getMessage(), e);
         }
@@ -240,35 +256,35 @@ public class CelestialBody implements Serializable {
                         + "velocity_vector_x = ?, velocity_vector_y = ?,"
                         + "velocity_vector_z = ?, accel_magnitude = ?,"
                         + "accel_vector_x = ?, accel_vector_y = ?, "
-                        + "accel_vector_z = ? WHERE id = ?)");
+                        + "accel_vector_z = ? WHERE id = ?");
     }
 
     public void deleteFromDatabase() throws SQLException {
-        if(sLogger == null) {
+        if(sConnection == null) {
             throw new SQLException("Unset database connection");
         }
         try {
             sDeleteStatement.setInt(1, getId());
             sDeleteStatement.executeUpdate();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Could not delete body " + this, e);
         }
     }
 
     public synchronized void insertInDatabase() throws SQLException {
-        if(sLogger == null) {
+        if(sConnection == null) {
             throw new SQLException("Unset database connection");
         }
         try {
             sInsertStatement.setString(1, getName());
 
-            if(getOwnerId() != -1) {
+            if(getOwnerId() != 0) {
                 sInsertStatement.setInt(2, getOwnerId());
             } else {
                 sInsertStatement.setNull(2, Types.INTEGER);
             }
 
-            if(getParentId() != -1) {
+            if(getParentId() != 0) {
                 sInsertStatement.setInt(3, getParentId());
             } else {
                 sInsertStatement.setNull(3, Types.INTEGER);
@@ -304,13 +320,13 @@ public class CelestialBody implements Serializable {
             }
             setBirthTime(resultSet.getTimestamp("birth"));
             resultSet.close();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING,
                     "Add celestial body query failed for body: " + this,
                     e);
             throw new SQLException("Add celestial body query failed for body: "
                     + this);
-        } catch (TwoDimensionalException e) {
+        } catch(TwoDimensionalException e) {
             sLogger.log(Level.WARNING,
                     "Expected 3D point but was 2D: " + this,
                     e);
@@ -322,25 +338,42 @@ public class CelestialBody implements Serializable {
         return null;
     }
 
-    public static synchronized CelestialBody selectFromDatabase()
+    public static synchronized CelestialBody selectFromDatabase(int id)
             throws SQLException {
-        return null;
+        CelestialBody body = null;
+        if(sConnection == null) {
+            throw new SQLException("Unset database connection");
+        }
+        try {
+            sSelectStatement.setInt(1, id);
+            ResultSet resultSet = sSelectStatement.executeQuery();
+            if(!resultSet.next()) {
+                throw new SQLException("Couldn't find object for id " + id);
+            }
+            body = parse(resultSet);
+            resultSet.close();
+        } catch(SQLException e) {
+            sLogger.log(Level.WARNING,
+                    "Select celestial body query failed for id: " + id,
+                    e);
+        }
+        return body;
     }
 
     public synchronized void updateInDatabase() throws SQLException {
-        if(sLogger == null) {
+        if(sConnection == null) {
             throw new SQLException("Unset database connection");
         }
         try {
             sUpdateStatement.setString(1, getName());
 
-            if(getOwnerId() != -1) {
+            if(getOwnerId() != 0) {
                 sUpdateStatement.setInt(2, getOwnerId());
             } else {
                 sUpdateStatement.setNull(2, Types.INTEGER);
             }
 
-            if(getParentId() != -1) {
+            if(getParentId() != 0) {
                 sUpdateStatement.setInt(3, getParentId());
             } else {
                 sUpdateStatement.setNull(3, Types.INTEGER);
@@ -365,50 +398,60 @@ public class CelestialBody implements Serializable {
                     .getZ());
             sUpdateStatement.setInt(15, getId());
             sUpdateStatement.executeUpdate();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING,
                     "Update celestial body query failed for body: " + this,
                     e);
-        } catch (TwoDimensionalException e) {
+        } catch(TwoDimensionalException e) {
             sLogger.log(Level.WARNING,
                     "Expected 3D point but was 2D: " + this,
                     e);
         }
     }
 
-    static protected ArrayList<CelestialBody> parse(ResultSet resultSet) {
+    static protected ArrayList<CelestialBody> parseAll(ResultSet resultSet) {
         ArrayList<CelestialBody> bodies = new ArrayList<CelestialBody>();
         try {
-            while (resultSet.next()) {
-                CelestialBody body;
-
-                body =
-                        new CelestialBody(resultSet.getInt("object.id"),
-                                resultSet.getInt("object.owner"),
-                                resultSet.getString("object.name"),
-                                resultSet.getTimestamp("birth"),
-                                resultSet.getTimestamp("death"),
-                                resultSet.getInt("parent"),
-                                new Point(resultSet.getInt("x"),
-                                        resultSet.getInt("y"),
-                                        resultSet.getInt("z")),
-                                new PhysicsVector3d(resultSet.getDouble("velocity_vector_x"),
-                                        resultSet.getDouble("velocity_vector_y"),
-                                        resultSet.getDouble("velocity_vector_z"),
-                                        resultSet.getDouble("velocity_magnitude")),
-                                new PhysicsVector3d(resultSet.getDouble("accel_vector_x"),
-                                        resultSet.getDouble("accel_vector_y"),
-                                        resultSet.getDouble("accel_vector_z"),
-                                        resultSet.getDouble("accel_magnitude")));
-                bodies.add(body);
+            while(resultSet.next()) {
+                bodies.add(parse(resultSet));
             }
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING,
                     "Unable to parse celestial bodies from set: " + resultSet,
                     e);
         }
 
         return bodies;
+    }
+
+    static protected CelestialBody parse(ResultSet resultSet) {
+        CelestialBody body = null;
+        try {
+            body =
+                    new CelestialBody(resultSet.getInt("object.id"),
+                            resultSet.getInt("object.owner"),
+                            resultSet.getString("object.name"),
+                            resultSet.getTimestamp("birth"),
+                            resultSet.getTimestamp("death"),
+                            resultSet.getInt("parent"),
+                            new Point(resultSet.getInt("x"),
+                                    resultSet.getInt("y"),
+                                    resultSet.getInt("z")),
+                            new PhysicsVector3d(resultSet.getDouble("velocity_vector_x"),
+                                    resultSet.getDouble("velocity_vector_y"),
+                                    resultSet.getDouble("velocity_vector_z"),
+                                    resultSet.getDouble("velocity_magnitude")),
+                            new PhysicsVector3d(resultSet.getDouble("accel_vector_x"),
+                                    resultSet.getDouble("accel_vector_y"),
+                                    resultSet.getDouble("accel_vector_z"),
+                                    resultSet.getDouble("accel_magnitude")),
+                            new Vector<Integer>());
+        } catch(SQLException e) {
+            sLogger.log(Level.WARNING,
+                    "Unable to parse celestial bodies from set: " + resultSet,
+                    e);
+        }
+        return body;
     }
 
     public Element toXmlElement() {
@@ -445,6 +488,16 @@ public class CelestialBody implements Serializable {
         positionElement.addAttribute(new Attribute(sCelestialBodyConfigFile.getProperty("NAME_ATTRIBUTE_TAG"),
                 sCelestialBodyConfigFile.getProperty("POSITION_ATTRIBUTE_VALUE")));
         element.appendChild(positionElement);
+
+        Element vectorElement =
+                new Element(sCelestialBodyConfigFile.getProperty("CHILDREN_ELEMENT_TAG"));
+        for(int i : mChildren) {
+            Element vectorValueElement =
+                    new Element(sCelestialBodyConfigFile.getProperty("CHILDREN_VALUE_ELEMENT_TAG"));
+            vectorValueElement.appendChild(String.valueOf(i));
+            vectorElement.appendChild(vectorValueElement);
+        }
+        element.appendChild(vectorElement);
         return element;
     }
 
@@ -534,11 +587,24 @@ public class CelestialBody implements Serializable {
                 + ", " + "death: " + getDeathTime() + ", " + "parent id: "
                 + getParentId() + ", " + "velocity: " + getVelocity() + ", "
                 + "acceleration: " + getAcceleration() + ", " + "position: "
-                + getPosition() + ", " + "dirty: " + isDirty() + "]";
+                + getPosition() + ", " + "dirty: " + isDirty() + ", "
+                + getChildren() + "]";
     }
 
-    public AppletBodyInterface getBodyAsApplet(PApplet parent) {
-        // TODO Auto-generated method stub
+    public AppletBodyInterface getAsApplet(PApplet parent) {
         return null;
+    }
+
+    public void addChild(int id) {
+        mChildren.add(id);
+    }
+
+    public Vector<Integer> getChildren() {
+        return mChildren;
+    }
+
+    public void update(CelestialBody body) {
+        // TODO Auto-generated method stub
+
     }
 }

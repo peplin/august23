@@ -9,10 +9,16 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.logging.Level;
+
+import processing.core.PApplet;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
+import twoverse.object.applet.AppletBodyInterface;
+import twoverse.object.applet.AppletGalaxy;
+import twoverse.object.applet.AppletPlanet;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
@@ -38,7 +44,7 @@ public class Planet extends CelestialBody implements Serializable {
     public Planet(int id, int ownerId, String name, Timestamp birthTime,
             Timestamp deathTime, int parentId, Point position,
             PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            double mass, double radius) {
+            Vector<Integer> children, double mass, double radius) {
         super(id,
                 ownerId,
                 name,
@@ -47,7 +53,8 @@ public class Planet extends CelestialBody implements Serializable {
                 parentId,
                 position,
                 velocity,
-                acceleration);
+                acceleration,
+                children);
         loadConfig();
         initialize(radius, mass);
     }
@@ -94,6 +101,10 @@ public class Planet extends CelestialBody implements Serializable {
         }
     }
 
+    public AppletBodyInterface getAsApplet(PApplet parent) {
+        return new AppletPlanet(parent, this);
+    }
+
     public static void prepareDatabaseStatements(Connection connection)
             throws SQLException {
         sConnection = connection;
@@ -115,9 +126,9 @@ public class Planet extends CelestialBody implements Serializable {
                 new HashMap<Integer, CelestialBody>();
         try {
             ResultSet resultSet = sSelectAllPlanetsStatement.executeQuery();
-            ArrayList<CelestialBody> bodies = parse(resultSet);
+            ArrayList<CelestialBody> bodies = parseAll(resultSet);
             resultSet.beforeFirst();
-            for (CelestialBody body : bodies) {
+            for(CelestialBody body : bodies) {
                 if(!resultSet.next()) {
                     throw new SQLException("Mismatch between planets and celestial bodies");
                 }
@@ -129,7 +140,7 @@ public class Planet extends CelestialBody implements Serializable {
                 planets.put(planet.getId(), planet);
             }
             resultSet.close();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Unable to get planets", e);
         }
         return planets;
@@ -145,7 +156,7 @@ public class Planet extends CelestialBody implements Serializable {
             sInsertPlanetStatement.setDouble(3, getRadius());
             sInsertPlanetStatement.executeUpdate();
             setDirty(false);
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Could not add system " + this, e);
         }
     }
@@ -160,7 +171,7 @@ public class Planet extends CelestialBody implements Serializable {
             sUpdatePlanetStatement.setDouble(3, getId());
             sUpdatePlanetStatement.executeUpdate();
             setDirty(false);
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Could not update planetary system "
                     + this, e);
         }
