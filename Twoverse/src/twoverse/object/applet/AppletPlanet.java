@@ -19,7 +19,8 @@ public class AppletPlanet extends Planet implements AppletBodyInterface {
         mParent.translate((float) getPosition().getX(),
                 (float) getPosition().getY(),
                 (float) getPosition().getZ());
-        mParent.sphere((float) getRadius());
+        //mParent.sphere((float) getRadius());
+        mParent.ellipse(0, 0, (float) getRadius(), (float) getRadius());
         mParent.popMatrix();
     }
 
