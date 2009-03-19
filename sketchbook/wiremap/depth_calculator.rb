@@ -34,11 +34,11 @@ This program compensates for projection distortion and redistributes the wires a
 
 # Layout Variables
 
-depth = 68.0
+depth = 62.0
 maplength = 32.0
 d_iterations = 80 # how many different depths there are, conventionally, d of 0 is mapline, 
 wire = 256
-map_unit = 0.25
+map_unit = 0.125
 d_unit = 0.25
 
 # Program Variables
