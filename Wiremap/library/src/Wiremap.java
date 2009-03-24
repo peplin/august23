@@ -55,9 +55,17 @@ public class Wiremap {
         mWireX = new int[mWireCount];
         mWireZ = new int[mWireCount];
         loadDepths(wireDepthsFile);
+        println(mWireX);
     }
 
-    public void sphere(int x, int y, int z, int radius) {
+    /**
+    ** y is flipping from processing - 0 to ? some lowish number
+    ** z >= 0, z <= mDepthThickness
+    */
+    public void sphere(float x, float y, float z, float radius) {
+        x = x / mParent.width * mMaplineLength  - (mMaplineLength / 2);
+        //y = mParent.height - y;  //TODO how to convert to globe fomrat?
+        z = mDepth - z;
         for(int i = 0; i < mWireCount; i++) {
             // if a wire's x coord is close enough to the globe's center
             if((mWireX[i] >= (x - radius)) && (mWireX[i] <= (x + radius))) {                  
@@ -82,24 +90,25 @@ public class Wiremap {
                     float left = i * mParent.width / mWireCount;
                     float top = (mParent.height / mPixelsPerInch 
                             - y_top_proj) * mPixelsPerInch + dot_height;    
-                    float width = mPixelsPerWire;
                     float height = y_height_proj * mPixelsPerInch -
                             (dot_height * 2);
-                    mParent.rect(left, top, width, height);
+                    mParent.rect(left, top, mPixelsPerWire, height);
 
                     /* Top Surface
                     ---------------------------------------------------------*/
-                    fill(255); //TODO probably don't want this
+                    mParent.pushMatrix();
+                    fill(255);
                     top = (mParent.height / mPixelsPerInch - y_top_proj)
                             * mPixelsPerInch;
                     height = dot_height;
-                    mParent.rect(left, top, width, height);
+                    mParent.rect(left, top, mPixelsPerWire, height);
+                    mParent.popMatrix();
 
                     /* Bottom Surface
                     ---------------------------------------------------------*/
                     top = (mParent.height / mPixelsPerInch - y_bot_proj)
                             * mPixelsPerInch - dot_height;
-                    mParent.rect(left, top, width, height);
+                    mParent.rect(left, top, mPixelsPerWire, height);
                 }
             }
         }

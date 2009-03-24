@@ -37,7 +37,6 @@ public class ObjectManagerClient extends ObjectManager {
         try {
             Document doc = mParser.build(mConfigFile.getProperty("FEED_URL"));
             // TODO how do we pick up deleted objects?
-            // TODO any way to not have to have a block for each?
 
             Element universe =
                     doc.getRootElement()
