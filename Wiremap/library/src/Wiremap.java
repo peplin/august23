@@ -13,6 +13,7 @@ public class Wiremap {
     private int mDepthThickness;
     private int mDepth;
     private int mMaplineLength;
+    private int mHeight;
     private double mDepthUnit;
     private double mMaplineUnit;
     private int mPixelsPerInch; //TODO can these be more easily calculated?
@@ -22,7 +23,7 @@ public class Wiremap {
     private int[] mWireX;
     private int[] mWireZ;
 
-    //TODO what is this?
+    //TODO
     int dot_height = 15; // height of surface pixels.
     int colorval_r = 0;                  // red
     int colorval_g = 0;                  // green
@@ -37,15 +38,19 @@ public class Wiremap {
             mWireZ[i] = (int)(mDepth - (mWireDepths[i] * mDepthUnit));
             mWireX[i] = (int)(base - (base * mWireDepths[i] / hyp * mDepthUnit));
         }
+        println(mWireZ);
+        println("");
+        println(mWireX);
     }
 
     public Wiremap(PApplet parent, int wireCount, int depth, int depthThickness,
-            int mapline, double depthUnit, double maplineUnit,
+            int height, int mapline, double depthUnit, double maplineUnit,
             int pixelsPerInch, int pixelsPerWire, String wireDepthsFile) {
         mParent = parent;
         mWireCount = wireCount;
         mDepthThickness = depthThickness;
         mDepth = depth;
+        mHeight = height;
         mMaplineLength = mapline;
         mDepthUnit = depthUnit;
         mMaplineUnit = maplineUnit;
@@ -55,7 +60,6 @@ public class Wiremap {
         mWireX = new int[mWireCount];
         mWireZ = new int[mWireCount];
         loadDepths(wireDepthsFile);
-        println(mWireX);
     }
 
     /**
@@ -65,6 +69,7 @@ public class Wiremap {
     public void sphere(float x, float y, float z, float radius) {
         x = x / mParent.width * mMaplineLength  - (mMaplineLength / 2);
         //y = mParent.height - y;  //TODO how to convert to globe fomrat?
+        y = y / mParent.width * mHeight;
         z = mDepth - z;
         for(int i = 0; i < mWireCount; i++) {
             // if a wire's x coord is close enough to the globe's center
