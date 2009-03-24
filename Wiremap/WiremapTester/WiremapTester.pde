@@ -12,6 +12,6 @@ void setup() {
 void draw() {
     background(0);
 
-    map.sphere(800, 700, 10, 10);
+    map.sphere(800, 300, 10, 10);
 
 }

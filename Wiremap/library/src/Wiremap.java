@@ -38,9 +38,6 @@ public class Wiremap {
             mWireZ[i] = (int)(mDepth - (mWireDepths[i] * mDepthUnit));
             mWireX[i] = (int)(base - (base * mWireDepths[i] / hyp * mDepthUnit));
         }
-        println(mWireZ);
-        println("");
-        println(mWireX);
     }
 
     public Wiremap(PApplet parent, int wireCount, int depth, int depthThickness,
@@ -63,13 +60,12 @@ public class Wiremap {
     }
 
     /**
-    ** y is flipping from processing - 0 to ? some lowish number
-    ** z >= 0, z <= mDepthThickness
-    */
+     * x and are in Processing coordinates - just like normal.
+     * z >= 0, z <= mDepthThickness
+     */
     public void sphere(float x, float y, float z, float radius) {
         x = x / mParent.width * mMaplineLength  - (mMaplineLength / 2);
-        //y = mParent.height - y;  //TODO how to convert to globe fomrat?
-        y = y / mParent.width * mHeight;
+        y = (mParent.width - y) / mParent.width * mHeight;
         z = mDepth - z;
         for(int i = 0; i < mWireCount; i++) {
             // if a wire's x coord is close enough to the globe's center
