@@ -3,15 +3,12 @@
 import processing.core.*;
 
 public class WiremapSphere {
-    private Wiremap mMap;
-    private int mX;
-    private int mY;
-    private int mZ;
-    private int mRadius;
-    private int mBaseColor;
-
-    //TODO
-    int dot_height = 15; // height of surface pixels.
+    protected Wiremap mMap;
+    protected int mX;
+    protected int mY;
+    protected int mZ;
+    protected int mRadius;
+    protected int mBaseColor;
 
     /**
      * z >= 0, z <= mDepthThickness
@@ -24,22 +21,27 @@ public class WiremapSphere {
         setBaseColor(baseColor);
     }
 
-    private int translateProcessingXToWiremapX(int x) {
+    protected int translateProcessingXToWiremapX(int x) {
         return (int)(x / (float)mMap.getParent().width * map.getMaplineLength() 
                 - (mMap.getMaplineLength() / 2));
     }
 
-    private int translateProcessingYToWiremapY(int y) {
+    protected int translateProcessingYToWiremapY(int y) {
         return (int)((mMap.getParent().height - y)
                 / (float)mMap.getParent().height * mMap.getHeight());
     }
 
-    private int translateProcessingZToWiremapZ(int z) {
+    protected int translateProcessingZToWiremapZ(int z) {
         return mMap.getDepth() - z;
     }
 
     public void display() {
         pushMatrix();
+        displayCenter();
+        popMatrix();
+    }
+
+    protected void displayCenter() {
         for(int i = 0; i < mMap.getWireCount(); i++) {
             // if a wire's x coord is close enough to the globe's center
             if((mMap.getWireX(i) >= (mX - mRadius))
@@ -66,34 +68,16 @@ public class WiremapSphere {
                             / mMap.getWireCount();
                     float top = (mMap.getParent().height
                             / mMap.getPixelsPerInch() - yMaxProjection)
-                            * mMap.getPixelsPerInch() + dot_height;    
+                            * mMap.getPixelsPerInch(); //  + dot_height;    
                     float height = (yMaxProjection - yMinProjection)
-                            * mMap.getPixelsPerInch() - (dot_height * 2);
+                            * mMap.getPixelsPerInch(); // - (dot_height * 2);
                     mMap.getParent().rect(left, top, mMap.getPixelsPerWire(),
                             height);
 
-                    /* Top Surface
-                    ---------------------------------------------------------*/
-                    mMap.getParent().pushMatrix();
-                    fill(255);
-                    top = (mMap.getParent().height / mMap.getPixelsPerInch()
-                            - yMaxProjection) * mMap.getPixelsPerInch();
-                    height = dot_height;
-                    mMap.getParent().rect(left, top, mMap.getPixelsPerWire(),
-                            height);
-                    mMap.getParent().popMatrix();
-
-                    /* Bottom Surface
-                    ---------------------------------------------------------*/
-                    top = (mMap.getParent().height / mMap.getPixelsPerInch()
-                            - yMinProjection) * mMap.getPixelsPerInch()
-                            - dot_height;
-                    mMap.getParent().rect(left, top, mMap.getPixelsPerWire(),
-                            height);
                 }
             }
         }
-        popMatrix();
+
     }
 
     public void setBaseColor(color baseColor) {
