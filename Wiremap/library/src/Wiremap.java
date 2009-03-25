@@ -23,12 +23,6 @@ public class Wiremap {
     private int[] mWireX;
     private int[] mWireZ;
 
-    //TODO
-    int dot_height = 15; // height of surface pixels.
-    int colorval_r = 0;                  // red
-    int colorval_g = 0;                  // green
-    int colorval_b = 255;                // blue
-
     private void loadDepths(String wireDepthsFile) {
         String lines[] = loadStrings(wireDepthsFile);
         for(int i = 0; i < mWireCount; i++) {
@@ -59,60 +53,40 @@ public class Wiremap {
         loadDepths(wireDepthsFile);
     }
 
-    /**
-     * x and are in Processing coordinates - just like normal.
-     * z >= 0, z <= mDepthThickness
-     */
-    public void sphere(float x, float y, float z, float radius) {
-        x = x / mParent.width * mMaplineLength  - (mMaplineLength / 2);
-        y = (mParent.width - y) / mParent.width * mHeight;
-        z = mDepth - z;
-        for(int i = 0; i < mWireCount; i++) {
-            // if a wire's x coord is close enough to the globe's center
-            if((mWireX[i] >= (x - radius)) && (mWireX[i] <= (x + radius))) {                  
-                // find the distance from the wire to the globe's center
-                float local_hyp = sqrt(sq(mWireX[i] - x) + sq(mWireZ[i] - z));           
-                // if the wire's xz coord is close enough to the globe's center
-                if(local_hyp <= radius) {                                                        
-                    // find the height of the globe at that point
-                    float y_abs = sqrt(sq(radius) - sq(local_hyp));                      
-                    // find the top & bottom coords
-                    float y_top_coord = y + y_abs;                                          
-                    float y_bot_coord = y - y_abs;                                          
-                    // compensate for projection morphing
-                    float y_top_proj = y_top_coord * mDepth / mWireZ[i];                  
-                    float y_bot_proj = y_bot_coord * mDepth / mWireZ[i];
-                    float y_height_proj = y_top_proj - y_bot_proj;
+    public PApplet getParent() {
+        return mParent;
+    }
 
-                    /* Top dot
-                    ---------------------------------------------------------*/
-                    // Fill the globe pixels this color
-                    fill(colorval_r, colorval_g, colorval_b);                                   
-                    float left = i * mParent.width / mWireCount;
-                    float top = (mParent.height / mPixelsPerInch 
-                            - y_top_proj) * mPixelsPerInch + dot_height;    
-                    float height = y_height_proj * mPixelsPerInch -
-                            (dot_height * 2);
-                    mParent.rect(left, top, mPixelsPerWire, height);
+    public int getPixelsPerInch() {
+        return mPixelsPerInch;
+    }
 
-                    /* Top Surface
-                    ---------------------------------------------------------*/
-                    mParent.pushMatrix();
-                    fill(255);
-                    top = (mParent.height / mPixelsPerInch - y_top_proj)
-                            * mPixelsPerInch;
-                    height = dot_height;
-                    mParent.rect(left, top, mPixelsPerWire, height);
-                    mParent.popMatrix();
+    public int getPixelsPerWire() {
+        return mPixelsPerWire;
+    }
 
-                    /* Bottom Surface
-                    ---------------------------------------------------------*/
-                    top = (mParent.height / mPixelsPerInch - y_bot_proj)
-                            * mPixelsPerInch - dot_height;
-                    mParent.rect(left, top, mPixelsPerWire, height);
-                }
-            }
-        }
+    public int getMaplineLength() {
+        return mMaplineLength;
+    }
+
+    public int getHeight() {
+        return mHeight;
+    }
+
+    public int getDepth() {
+        return mDepth;
+    }
+
+    public int getWireCount() {
+        return mWireCount;
+    }
+
+    public int getWireX(int wire) {
+        return mWireX[wire];
+    }
+
+    public int getWireZ(int wire) {
+        return mWireZ[wire];
     }
 
     public void rect(int x, int y, int z, int width, int height, int depth) {
@@ -122,5 +96,4 @@ public class Wiremap {
     public void line(int x1, int y1, int z1, int x2, int y2, int z2) {
 
     }
-
 }

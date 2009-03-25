@@ -12,6 +12,7 @@ void setup() {
 void draw() {
     background(0);
 
-    map.sphere(800, 300, 10, 10);
-
+    WiremapSphere sphere = new WiremapSphere(
+                    map, 800, 300, 10, 10, color(267, 120, 45));
+    sphere.display();
 }
