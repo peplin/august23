@@ -2,7 +2,7 @@
 
 import processing.core.*;
 
-public class WiremapRectangle extends WiremapShape {
+public class WiremapRectangle extends WiremapPositionedShape {
     protected int mWidth;
     protected int mHeight;
     protected int mDepth;
@@ -391,8 +391,8 @@ public class WiremapRectangle extends WiremapShape {
         topY = topY * mMap.getDepth()
                 / mMap.getWireZ(wire);
 
-        WiremapSliver sliver = new WiremapSliver(mMap, mMap.getWireX(wire),
-            (int)topY, 0, mBaseColor, (int)(topY - bottomY),
+        WiremapSliver sliver = new WiremapSliver(mMap, wire, (int)topY,
+            mBaseColor, (int)(topY - bottomY),
             mBorderHeight, mBorderColor);
         sliver.display();
     }

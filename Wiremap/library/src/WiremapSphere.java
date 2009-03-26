@@ -2,7 +2,7 @@
 
 import processing.core.*;
 
-public class WiremapSphere extends WiremapShape {
+public class WiremapSphere extends WiremapPositionedShape {
     protected int mRadius;
 
     /**
@@ -26,29 +26,25 @@ public class WiremapSphere extends WiremapShape {
             if((mMap.getWireX(i) >= (mX - mRadius))
                     && (mMap.getWireX(i) <= (mX + mRadius))) {  
                 // find the distance from the wire to the globe's center
+                // TODO this uses two coordinate systems...BAD
                 float local_hyp = sqrt(sq(mMap.getWireX(i) - mX)
                         + sq(mMap.getWireZ(i) - mZ));           
                 // if the wire's xz coord is close enough to the globe's center
                 if(local_hyp <= mRadius) {                                                        
                     // find the height of the globe at that point
                     float centerY = sqrt(sq(mRadius) - sq(local_hyp));                      
-                    float yMax = mY + centerY;                                          
-                    float yMin = mY - centerY;                                          
-                    float yMaxProjection = yMax * mMap.getDepth()
+                    float yMinProjection = (mY + centerY) * mMap.getDepth()
                             / mMap.getWireZ(i);                  
-                    float yMinProjection = yMin * mMap.getDepth()
+                    float yMaxProjection = (mY - centerY) * mMap.getDepth()
                             / mMap.getWireZ(i);
 
-                    fill(mBaseColor);                                   
-                    float left = i * mMap.getParent().width
-                            / mMap.getWireCount();
-                    float top = (mMap.getParent().height
-                            / mMap.getPixelsPerInch() - yMaxProjection)
-                            * mMap.getPixelsPerInch(); //  + dot_height;    
-                    float height = (yMaxProjection - yMinProjection)
-                            * mMap.getPixelsPerInch(); // - (dot_height * 2);
-                    mMap.getParent().rect(left, top, mMap.getPixelsPerWire(),
-                            height);
+                    WiremapSliver sliver = new WiremapSliver(
+                            mMap, i, (int)(yMaxProjection
+                                * mMap.getPixelsPerInch()),
+                            mBaseColor, (int)(yMinProjection - yMaxProjection)
+                                * mMap.getPixelsPerInch(),
+                            0, 0);
+                    sliver.display();
                 }
             }
         }

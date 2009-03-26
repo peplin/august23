@@ -3,13 +3,17 @@
 import processing.core.*;
 
 public class WiremapSliver extends WiremapShape {
+    private int mWire;
+    private int mStartingHeight;
     private int mHeight;
     private int mCapHeight;
     private color mCapColor;
 
-    public WiremapSliver(Wiremap map, int x, int y, int z, color baseColor, 
-            int height, int capHeight, color capColor) {
-        super(map, x, y, z, baseColor);
+    public WiremapSliver(Wiremap map, int wire, int startingHeight,
+            color baseColor, int height, int capHeight, color capColor) {
+        super(map, baseColor);
+        setWire(wire);
+        setStartingHeight(startingHeight);
         setHeight(height);
         setCapHeight(capHeight);
         setCapColor(capColor);
@@ -17,37 +21,21 @@ public class WiremapSliver extends WiremapShape {
 
     public void display() {
         pushMatrix();
-        println("in display");
-        for(int i = 0; i < mMap.getWireCount(); i++) {
-            // if a wire's x coord is close enough to the globe's center
-            if((mMap.getWireX(i) >= (mX - mMap.getPixelsPerWire()))
-                    && (mMap.getWireX(i) <= (mX + mMap.getPixelsPerWire()))) {  
-                fill(mCapColor);
-                noStroke();
-                // top dot for sliver
-                // TODO what is this y coord exactly? seems to work okay
-                float y = (mMap.getParent().height / mMap.getPixelsPerInch()
-                        - mY) * mMap.getPixelsPerInch();
-                float left = i * mMap.getParent().width
-                        / mMap.getWireCount();
-                float top = y;
-                float wide = 2;
-                float tall = mCapHeight;
-                rect(left, top, wide, tall);
+        noStroke();
 
-                // bottom dot for sliver
-                top += mHeight;
-                rect(left, top, wide, tall);
+        fill(mCapColor);
+        // top dot for sliver
+        float left = mWire * mMap.getParent().width / mMap.getWireCount();
+        rect(left, mStartingHeight, mMap.getPixelsPerWire(), mCapHeight);
 
-                // filler for sliver
-                fill(mBaseColor);
-                top = y + mCapHeight;
-                tall = mHeight - mCapHeight;
-                rect(left, top, wide, tall);
-                break; // only draws the first found
-            }
-        }
+        // bottom dot for sliver
+        rect(left, mStartingHeight + mHeight, mMap.getPixelsPerWire(),
+                mCapHeight);
 
+        // filler for sliver
+        fill(mBaseColor);
+        rect(left, mStartingHeight + mCapHeight, mMap.getPixelsPerWire(),
+                mHeight - mCapHeight);
         popMatrix();
     }
 
@@ -61,5 +49,13 @@ public class WiremapSliver extends WiremapShape {
 
     public void setHeight(int height) {
         mHeight = height;
+    }
+
+    public void setWire(int wire) {
+        mWire = wire;
+    }
+
+    public void setStartingHeight(int height) {
+        mStartingHeight = height;
     }
 }

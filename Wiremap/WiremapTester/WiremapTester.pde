@@ -6,7 +6,7 @@ WiremapSliver sliver;
 void setup() {
     size(1024, 768);
 
-    map = new Wiremap(this, 128, 70, 20, 24, 32, .25, .25, 3,
+    map = new Wiremap(this, 128, 70, 20, 24, 32, .25, .25, 7,
             "depth128.txt");
 
     sphere = new WiremapSphere(
@@ -21,25 +21,27 @@ void setup() {
     rectangle = new WiremapRectangle(map, 200, 300, 10, color(265, 120, 45),
             42, 34, 12, 5, color(255, 255, 255));
 
-    sliver = new WiremapSliver(map, 400, 300, 10, color(265, 120, 45),
+    sliver = new WiremapSliver(map, 0, 200, color(265, 120, 45),
             150, 5, color(255, 255, 255));
 }
 
 void draw() {
     background(0);
 
-/*    sphere.setPosition(mouseY, 300, (int)map(mouseX, 0, 1024, 0, 20));
-    sphere.display();
-
-    outlinedSphere.setPosition(width-mouseX, 300, (int)map(mouseY, 0, 768, 0, 20));
-    outlinedSphere.display();
+    //sphere.setPosition(300, mouseY, (int)map(mouseX, 0, 1024, 0, 20));
+    //sphere.display();
+    //outlinedSphere.setPosition(mouseX, 300, (int)map(mouseY, 0, 768, 0, 20));
+    //outlinedSphere.display();
     
     glowingSphere.setPosition(mouseX, 300, (int)map(mouseY, 0, 768, 0, 20));
     glowingSphere.display();
+/*
+    for(int i = 0; i < map.getWireCount(); i++) {
+        sliver.display();
+        sliver.setWire(i);
+
+    }
     */
-    rectangle.display();
-    rectangle.yaw(1);
-    //sliver.display();
 
 }
 

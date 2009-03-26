@@ -33,31 +33,20 @@ public class WiremapOutlinedSphere extends WiremapSphere {
                 if(local_hyp <= mRadius) {                                                        
                     // find the height of the globe at that point
                     float centerY = sqrt(sq(mRadius) - sq(local_hyp));                      
-                    float yMax = mY + centerY;                                          
-                    float yMin = mY - centerY;                                          
-                    float yMaxProjection = yMax * mMap.getDepth()
+                    float yMinProjection = (mY + centerY) * mMap.getDepth()
                             / mMap.getWireZ(i);                  
-                    float yMinProjection = yMin * mMap.getDepth()
+                    float yMaxProjection = (mY - centerY) * mMap.getDepth()
                             / mMap.getWireZ(i);
-                    float left = i * mMap.getParent().width
-                            / mMap.getWireCount();
-                    /* Top Surface
-                    ---------------------------------------------------------*/
-                    mMap.getParent().pushMatrix();
-                    fill(255);
-                    float top = (mMap.getParent().height / mMap.getPixelsPerInch()
-                            - yMaxProjection) * mMap.getPixelsPerInch();
-                    mMap.getParent().rect(left, top, mMap.getPixelsPerWire(),
-                            mOutlineThickness);
-                    mMap.getParent().popMatrix();
 
-                    /* Bottom Surface
-                    ---------------------------------------------------------*/
-                    top = (mMap.getParent().height / mMap.getPixelsPerInch()
-                            - yMinProjection) * mMap.getPixelsPerInch()
-                            - mOutlineThickness;
-                    mMap.getParent().rect(left, top, mMap.getPixelsPerWire(),
-                            mOutlineThickness);
+                    WiremapSliver sliver = new WiremapSliver(
+                            mMap, i, (int)(yMaxProjection 
+                                    * mMap.getPixelsPerInch()),
+                            mOutlineColor, mOutlineThickness, 0, 0);
+                    sliver.display();
+
+                    sliver.setStartingHeight((int)(yMinProjection
+                            * mMap.getPixelsPerInch()));
+                    sliver.display();
                 }
             }
         }
