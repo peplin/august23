@@ -1,1 +1,0 @@
-../library/src/WiremapShape.java

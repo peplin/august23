@@ -1,1 +1,0 @@
-../library/src/WiremapPositionedShape.java
