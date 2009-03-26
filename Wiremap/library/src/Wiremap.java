@@ -16,8 +16,8 @@ public class Wiremap {
     private int mHeight;
     private double mDepthUnit;
     private double mMaplineUnit;
-    private int mPixelsPerInch; //TODO can these be more easily calculated?
     private int mPixelsPerWire;
+    private int mPixelsPerInch;
 
     private int[] mWireDepths;
     private int[] mWireX;
@@ -36,7 +36,7 @@ public class Wiremap {
 
     public Wiremap(PApplet parent, int wireCount, int depth, int depthThickness,
             int height, int mapline, double depthUnit, double maplineUnit,
-            int pixelsPerInch, int pixelsPerWire, String wireDepthsFile) {
+            int pixelsPerWire, String wireDepthsFile) {
         mParent = parent;
         mWireCount = wireCount;
         mDepthThickness = depthThickness;
@@ -45,8 +45,8 @@ public class Wiremap {
         mMaplineLength = mapline;
         mDepthUnit = depthUnit;
         mMaplineUnit = maplineUnit;
-        mPixelsPerInch = pixelsPerInch;
         mPixelsPerWire = pixelsPerWire;
+        mPixelsPerInch = mParent.width / mMaplineLength;
         mWireDepths = new int[mWireCount];
         mWireX = new int[mWireCount];
         mWireZ = new int[mWireCount];

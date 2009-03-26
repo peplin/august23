@@ -2,37 +2,16 @@
 
 import processing.core.*;
 
-public class WiremapSphere {
-    protected Wiremap mMap;
-    protected int mX;
-    protected int mY;
-    protected int mZ;
+public class WiremapSphere extends WiremapShape {
     protected int mRadius;
-    protected int mBaseColor;
 
     /**
      * z >= 0, z <= mDepthThickness
      */
-    public WiremapSphere(Wiremap map, int x, int y, int z, int radius,
-            int baseColor) {
-        mMap = map;
-        setPosition(x, y, z);
+    public WiremapSphere(Wiremap map, int x, int y, int z, color baseColor, 
+            int radius) {
+        super(map, x, y, z, baseColor);
         setRadius(radius);
-        setBaseColor(baseColor);
-    }
-
-    protected int translateProcessingXToWiremapX(int x) {
-        return (int)(x / (float)mMap.getParent().width * map.getMaplineLength() 
-                - (mMap.getMaplineLength() / 2));
-    }
-
-    protected int translateProcessingYToWiremapY(int y) {
-        return (int)((mMap.getParent().height - y)
-                / (float)mMap.getParent().height * mMap.getHeight());
-    }
-
-    protected int translateProcessingZToWiremapZ(int z) {
-        return mMap.getDepth() - z;
     }
 
     public void display() {
@@ -60,9 +39,6 @@ public class WiremapSphere {
                     float yMinProjection = yMin * mMap.getDepth()
                             / mMap.getWireZ(i);
 
-                    /* Top dot
-                    ---------------------------------------------------------*/
-                    // Fill the globe pixels this color
                     fill(mBaseColor);                                   
                     float left = i * mMap.getParent().width
                             / mMap.getWireCount();
@@ -73,21 +49,10 @@ public class WiremapSphere {
                             * mMap.getPixelsPerInch(); // - (dot_height * 2);
                     mMap.getParent().rect(left, top, mMap.getPixelsPerWire(),
                             height);
-
                 }
             }
         }
 
-    }
-
-    public void setBaseColor(color baseColor) {
-        mBaseColor = baseColor;
-    }
-
-    public void setPosition(int x, int y, int z) {
-        mX = translateProcessingXToWiremapX(x);
-        mY = translateProcessingYToWiremapY(y);
-        mZ = translateProcessingZToWiremapZ(z);
     }
 
     public void setRadius(int radius) {
