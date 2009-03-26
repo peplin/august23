@@ -26,13 +26,12 @@ public class WiremapSphere extends WiremapPositionedShape {
             if((mMap.getWireX(i) >= (mX - mRadius))
                     && (mMap.getWireX(i) <= (mX + mRadius))) {  
                 // find the distance from the wire to the globe's center
-                // TODO this uses two coordinate systems...BAD
-                float local_hyp = sqrt(sq(mMap.getWireX(i) - mX)
+                float distanceToCenter = sqrt(sq(mMap.getWireX(i) - mX)
                         + sq(mMap.getWireZ(i) - mZ));           
                 // if the wire's xz coord is close enough to the globe's center
-                if(local_hyp <= mRadius) {                                                        
+                if(distanceToCenter <= mRadius) {                                                        
                     // find the height of the globe at that point
-                    float centerY = sqrt(sq(mRadius) - sq(local_hyp));                      
+                    float centerY = sqrt(sq(mRadius) - sq(distanceToCenter));                      
                     float yMinProjection = (mY + centerY) * mMap.getDepth()
                             / mMap.getWireZ(i);                  
                     float yMaxProjection = (mY - centerY) * mMap.getDepth()
@@ -48,7 +47,6 @@ public class WiremapSphere extends WiremapPositionedShape {
                 }
             }
         }
-
     }
 
     public void setRadius(int radius) {
