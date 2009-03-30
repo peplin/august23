@@ -19,9 +19,8 @@ import twoverse.util.Point.TwoDimensionalException;
 
 /** Constants for Configuration **/
 private static final boolean DEBUG = true;
-private static final boolean USE_TUIO = true;
-private static final int WINDOW_WIDTH = 800;
-private static final int WINDOW_HEIGHT = 600;
+private static final int WINDOW_WIDTH = 1024;
+private static final int WINDOW_HEIGHT = 768;
 private static final int FRAME_RATE = 30;
 
 /** TUIO & Control Members **/
@@ -53,12 +52,10 @@ void setup() {
     mRequestHandler = new RequestHandlerClient();
     mTuioClient = new TuioClient(this);
 
-    // temporary stuff to test client/server connection
     User user =
-            new User(0, "xmlrpcfirst", "first@first.org", "1111111111", 100);
-    user.setPlaintextPassword("foobar");
+            new User(0, "multitouch", "august23@umich.edu", NULL, 100);
     mRequestHandler.createAccount(user);
-    mRequestHandler.login(user.getUsername(), "foobar");
+    mRequestHandler.login(user.getUsername(), "txy1k2");
 
     mObjectManager = new ObjectManagerClient(mRequestHandler);
 
@@ -73,7 +70,7 @@ void draw() {
     mCamera.setCamera();
     updateUniverse();
 
-    if(DEBUG && USE_TUIO) {
+    if(DEBUG) {
         // Draw each cursor to the screen for debugging
         TuioCursor[] tuioCursorList = mTuioClient.getTuioCursors();
         for(int i = 0; i < tuioCursorList.length; i++) {
@@ -113,12 +110,12 @@ void addTuioCursor(TuioCursor tcur) {
 
 void mousePressed() {
     if(mouseButton == LEFT) {
-        mObjectManager.add(new Planet(0,
-                "Earth",
+        mObjectManager.add(new Star(0,
+                "Your Star",
                 mParentId,
-                new Point(modelX(mouseX, mouseY, 0), modelY(mouseX,
-                        mouseY,
-                        0), 0),
+                new Point(modelX(mouseX, mouseY, 0),
+                        modelY(mouseX, mouseY, 0),
+                        0),
                 new PhysicsVector3d(1, 2, 3, 4),
                 new PhysicsVector3d(5, 6, 7, 8),
                 10,
