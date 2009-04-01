@@ -36,10 +36,10 @@ This program compensates for projection distortion and redistributes the wires a
 
 depth = 62.0
 maplength = 32.0
-d_iterations = 80 # how many different depths there are, conventionally, d of 0 is mapline, 
+d_iterations = 192 # how many different depths there are, conventionally, d of 0 is mapline, 
 wire = 256
 map_unit = 0.125
-d_unit = 0.25
+d_unit = 0.125
 
 # Program Variables
 
