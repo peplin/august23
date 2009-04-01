@@ -12,10 +12,7 @@ import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
 import twoverse.object.CelestialBody;
-import twoverse.object.Galaxy;
-import twoverse.object.ManmadeBody;
-import twoverse.object.Planet;
-import twoverse.object.PlanetarySystem;
+import twoverse.object.Star;
 
 public class ObjectManagerServer extends ObjectManager {
     private Database mDatabase;
@@ -80,10 +77,7 @@ public class ObjectManagerServer extends ObjectManager {
         // All of these are marked clean explicitly
         try {
             mCelestialBodies.put(1, CelestialBody.selectFromDatabase(1));
-            mCelestialBodies.putAll(Galaxy.selectAllFromDatabase());
-            mCelestialBodies.putAll(PlanetarySystem.selectAllFromDatabase());
-            mCelestialBodies.putAll(ManmadeBody.selectAllFromDatabase());
-            mCelestialBodies.putAll(Planet.selectAllFromDatabase());
+            mCelestialBodies.putAll(Star.selectAllFromDatabase());
 
             for(CelestialBody body : mCelestialBodies.values()) {
                 if(body.getParentId() != 0) {
@@ -110,7 +104,7 @@ public class ObjectManagerServer extends ObjectManager {
         mDatabase.insert(body);
         super.add(body);
         mLock.writeLock().unlock();
-        sLogger.log(Level.INFO, "Galaxy added is: " + body);
+        sLogger.log(Level.INFO, "Body added is: " + body);
     }
 
     @Override
