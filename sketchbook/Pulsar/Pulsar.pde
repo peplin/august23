@@ -1,3 +1,5 @@
+import processing.opengl.*;
+
 /** Configuration Parameters **/
 float beatsPerSecond = 1;
 float beatDurationMs = 100;
@@ -17,15 +19,22 @@ boolean contracting = false;
 float rotationRad = 0;
 
 void setup() {
-    size(640, 480, P3D);
+    size(640, 480, OPENGL);
     frameRate(30);
+    
+    noStroke();
+    fill(255);
 
     lastBeatMs = millis();
 }
 
 void draw() {
     background(0);
-    lights();
+
+    directionalLight(51, 102, 126, -1, 0, 0);
+    lightSpecular(255, 255, 255);
+    pointLight(50, 120, 50, 200, height/2, 200);
+    
 
     float now = millis();
     float scaleStep = contractDistance / beatDurationMs
@@ -48,6 +57,7 @@ void draw() {
 
     translate(width/2, height/2);
     rotateY(rotationRad);
+
     sphere(radius * radiusScale);
     
     if(targetBeatsPerSecond > beatsPerSecond) {
