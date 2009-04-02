@@ -1,8 +1,9 @@
 import codeanticode.gsvideo.*;
+import java.awt.event.KeyEvent;
 
 public class ActiveColorGrabber {
     private final int MINIMUM_DIFFERENCE_THRESHOLD = 100;
-    private final float AVERAGE_PERCENTAGE_CHANGE = .05;
+    private final float AVERAGE_PERCENTAGE_CHANGE = .1;
     private final int AVERAGE_THRESHOLD = 10;
     private GSCapture mVideo;
     private int[] mPreviousFrame;
@@ -12,9 +13,12 @@ public class ActiveColorGrabber {
     private float mTargetAverageR;
     private float mTargetAverageG;
     private float mTargetAverageB;
+    private int mBackgroundActivePixels = 650000;
+    private int mLastBackgroundActivePixels = 650000;
 
     public ActiveColorGrabber(PApplet parent) {
         parent.registerDraw(this);
+        parent.registerKeyEvent(this);
         mVideo = new GSCapture(parent, width, height, 24);
         mPreviousFrame = new int[width * height];
     }
@@ -31,6 +35,14 @@ public class ActiveColorGrabber {
         return (color)averageColor;
     }
 
+    public void keyEvent(KeyEvent event) {
+        if(event.getKeyCode() == KeyEvent.VK_B) {
+            mBackgroundActivePixels = mLastBackgroundActivePixels; 
+            println("Active pixel threshold is now " + mBackgroundActivePixels);
+        }
+
+    }
+
     public void draw() {
         float newTargetR = 0;
         float newTargetG = 0;
@@ -40,7 +52,7 @@ public class ActiveColorGrabber {
             mVideo.read(); 
             mVideo.loadPixels();
 
-            int changedPixelCount = 0;
+            int changedPixelTotal = 0;
             for (int i = 0; i < width * height; i++) { 
                 color currentColor = mVideo.pixels[i];
                 color prevColor = mPreviousFrame[i];
@@ -59,7 +71,7 @@ public class ActiveColorGrabber {
                 if(diffR < MINIMUM_DIFFERENCE_THRESHOLD
                         && diffR < MINIMUM_DIFFERENCE_THRESHOLD
                         && diffB < MINIMUM_DIFFERENCE_THRESHOLD) {
-                    changedPixelCount++;
+                    changedPixelTotal += diffR + diffG + diffB;
                 }
                 newTargetR += currR;
                 newTargetG += currG;
@@ -67,10 +79,11 @@ public class ActiveColorGrabber {
                 mPreviousFrame[i] = currentColor;
             }
 
-            if(changedPixelCount > width * height / 5) {
-                newTargetR /= changedPixelCount;
-                newTargetG /= changedPixelCount;
-                newTargetB /= changedPixelCount;
+            mLastBackgroundActivePixels = changedPixelTotal;
+            if(changedPixelTotal > mBackgroundActivePixels) {
+                newTargetR /= width * height;
+                newTargetG /= width * height;
+                newTargetB /= width * height;
                 mTargetAverageR = constrain(
                         (3 * mTargetAverageR + newTargetR) / 4, 0, 255);
                 mTargetAverageG = constrain(
@@ -78,9 +91,9 @@ public class ActiveColorGrabber {
                 mTargetAverageB = constrain(
                         (3 * mTargetAverageB + newTargetB) / 4, 0, 255);
             } else {
-                mTargetAverageR = min(0, mTargetAverageR - 1);
-                mTargetAverageG = min(0, mTargetAverageG - 1);
-                mTargetAverageB = min(0, mTargetAverageB - 1);
+                mTargetAverageR = min(0, mTargetAverageR * .99);
+                mTargetAverageG = min(0, mTargetAverageG  * .99);
+                mTargetAverageB = min(0, mTargetAverageB * .99);
             }
 
             if(mTargetAverageR > mAverageColorR + AVERAGE_THRESHOLD) {
