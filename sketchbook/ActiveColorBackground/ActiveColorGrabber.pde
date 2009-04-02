@@ -21,17 +21,16 @@ public class ActiveColorGrabber {
 
     public color getActiveColor() {
         color averageColor = color(mAverageColorR, mAverageColorG, mAverageColorB);
-        /*float hue = hue(averageColor);
-        float saturation = constrain(saturation(averageColor), 150, 255);
-        float brightness = constrain(brightness(averageColor), 200, 255);;
+        float hue = hue(averageColor);
+        // optionally, brightens up colors a little because webcam is dark
+        float saturation = constrain(saturation(averageColor) * 1.25, 0, 255);
+        float brightness = constrain(brightness(averageColor) * 1.25, 0, 255);;
         colorMode(HSB, 255);
         averageColor = color(hue, saturation, brightness);
         colorMode(RGB, 255);
-        */
         return (color)averageColor;
     }
 
-    //TODO consider going to black if there is no change
     public void draw() {
         float newTargetR = 0;
         float newTargetG = 0;
@@ -60,11 +59,11 @@ public class ActiveColorGrabber {
                 if(diffR < MINIMUM_DIFFERENCE_THRESHOLD
                         && diffR < MINIMUM_DIFFERENCE_THRESHOLD
                         && diffB < MINIMUM_DIFFERENCE_THRESHOLD) {
-                    newTargetR += currR;
-                    newTargetG += currG;
-                    newTargetB += currB;
                     changedPixelCount++;
                 }
+                newTargetR += currR;
+                newTargetG += currG;
+                newTargetB += currB;
                 mPreviousFrame[i] = currentColor;
             }
 
@@ -72,9 +71,16 @@ public class ActiveColorGrabber {
                 newTargetR /= changedPixelCount;
                 newTargetG /= changedPixelCount;
                 newTargetB /= changedPixelCount;
-                mTargetAverageR = (mTargetAverageR + newTargetR) / 2;
-                mTargetAverageG = (mTargetAverageG + newTargetG) / 2;
-                mTargetAverageB = (mTargetAverageB + newTargetB) / 2;
+                mTargetAverageR = constrain(
+                        (3 * mTargetAverageR + newTargetR) / 4, 0, 255);
+                mTargetAverageG = constrain(
+                        (3 * mTargetAverageG + newTargetG) / 4, 0, 255);
+                mTargetAverageB = constrain(
+                        (3 * mTargetAverageB + newTargetB) / 4, 0, 255);
+            } else {
+                mTargetAverageR = min(0, mTargetAverageR - 1);
+                mTargetAverageG = min(0, mTargetAverageG - 1);
+                mTargetAverageB = min(0, mTargetAverageB - 1);
             }
 
             if(mTargetAverageR > mAverageColorR + AVERAGE_THRESHOLD) {
