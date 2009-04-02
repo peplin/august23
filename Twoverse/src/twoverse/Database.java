@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
-import twoverse.objet.Star;
+import twoverse.object.Star;
 import twoverse.util.User;
 import twoverse.util.Point.TwoDimensionalException;
 
