@@ -53,9 +53,9 @@ void setup() {
     mTuioClient = new TuioClient(this);
 
     User user =
-            new User(0, "multitouch", "august23@umich.edu", NULL, 100);
-    mRequestHandler.createAccount(user);
-    mRequestHandler.login(user.getUsername(), "txy1k2");
+            new User(0, "august_mt", "", NULL, 100);
+    //TODO before releasing code, figure out how to hide this
+    mRequestHandler.login(user.getUsername(), "grocs1966");
 
     mObjectManager = new ObjectManagerClient(mRequestHandler);
 

@@ -1,6 +1,6 @@
 <?php
 $stars = mysql_query("SELECT * FROM object "
-                    + "NATURAL JOIN planet " + "LEFT JOIN (user) "
+                    + "NATURAL JOIN star " + "LEFT JOIN (user) "
                     + "ON (object.owner = user.id)");
 echo "<div><ul>";
 while ($star = mysql_fetch_row($stars)) {

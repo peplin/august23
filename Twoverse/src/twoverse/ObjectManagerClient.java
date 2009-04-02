@@ -12,10 +12,7 @@ import nu.xom.Element;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
 import twoverse.object.CelestialBody;
-import twoverse.object.Galaxy;
-import twoverse.object.ManmadeBody;
-import twoverse.object.Planet;
-import twoverse.object.PlanetarySystem;
+import twoverse.object.Star;
 import twoverse.object.applet.AppletBodyInterface;
 
 public class ObjectManagerClient extends ObjectManager {
@@ -43,37 +40,12 @@ public class ObjectManagerClient extends ObjectManager {
                             .getFirstChildElement(mConfigFile.getProperty("CELESTIAL_BODY_TAG"));
             update(new CelestialBody(universe));
 
-            Elements galaxies =
-                    doc.getRootElement()
-                            .getChildElements(mConfigFile.getProperty("GALAXY_TAG"));
-            for (int i = 0; i < galaxies.size(); i++) {
-                Galaxy g = new Galaxy(galaxies.get(i));
-                update(g);
-            }
-
-            Elements planetarySystems =
-                    doc.getRootElement()
-                            .getChildElements(mConfigFile.getProperty("PLANETARY_SYSTEM_TAG"));
-            for (int i = 0; i < planetarySystems.size(); i++) {
-                PlanetarySystem system =
-                        new PlanetarySystem(planetarySystems.get(i));
-                update(system);
-            }
-
             Elements planets =
                     doc.getRootElement()
-                            .getChildElements(mConfigFile.getProperty("PLANET_TAG"));
+                            .getChildElements(mConfigFile.getProperty("STAR_TAG"));
             for (int i = 0; i < planets.size(); i++) {
-                Planet planet = new Planet(planets.get(i));
+                Star planet = new Star(planets.get(i));
                 update(planet);
-            }
-
-            Elements manmadeBodies =
-                    doc.getRootElement()
-                            .getChildElements(mConfigFile.getProperty("MANMADE_BODY_TAG"));
-            for (int i = 0; i < manmadeBodies.size(); i++) {
-                ManmadeBody manmadeBody = new ManmadeBody(manmadeBodies.get(i));
-                update(manmadeBody);
             }
         } catch (ParsingException e) {
             sLogger.log(Level.WARNING, "Feed may be malformed", e);
