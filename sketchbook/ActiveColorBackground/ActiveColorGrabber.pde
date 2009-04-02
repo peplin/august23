@@ -67,7 +67,7 @@ public class ActiveColorGrabber {
                 mPreviousFrame[i] = currentColor;
             }
 
-            if(changedPixelCount > 0) {
+            if(changedPixelCount > width * height / 5) {
                 newTargetR /= changedPixelCount;
                 newTargetG /= changedPixelCount;
                 newTargetB /= changedPixelCount;
