@@ -53,8 +53,9 @@ void setup() {
     mTuioClient = new TuioClient(this);
 
     User user =
-            new User(0, "august_mt", "grocs1966", null, 100);
+            new User(0, "august_mt", null, null, 100);
     //TODO before releasing code, figure out how to hide this
+    user.setPlaintextPassword("grocs1966");
     mRequestHandler.createAccount(user);
     mRequestHandler.login(user.getUsername(), "grocs1966");
 

@@ -40,12 +40,12 @@ public class ObjectManagerClient extends ObjectManager {
                             .getFirstChildElement(mConfigFile.getProperty("CELESTIAL_BODY_TAG"));
             update(new CelestialBody(universe));
 
-            Elements planets =
+            Elements stars =
                     doc.getRootElement()
                             .getChildElements(mConfigFile.getProperty("STAR_TAG"));
-            for (int i = 0; i < planets.size(); i++) {
-                Star planet = new Star(planets.get(i));
-                update(planet);
+            for (int i = 0; i < stars.size(); i++) {
+                Star star = new Star(stars.get(i));
+                update(star);
             }
         } catch (ParsingException e) {
             sLogger.log(Level.WARNING, "Feed may be malformed", e);
