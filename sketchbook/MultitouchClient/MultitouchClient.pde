@@ -10,7 +10,7 @@ import twoverse.ObjectManagerClient;
 import twoverse.RequestHandlerClient;
 import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.object.CelestialBody;
-import twoverse.object.Planet;
+import twoverse.object.Star;
 import twoverse.util.Camera;
 import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
@@ -53,8 +53,9 @@ void setup() {
     mTuioClient = new TuioClient(this);
 
     User user =
-            new User(0, "august_mt", "", NULL, 100);
+            new User(0, "august_mt", "grocs1966", null, 100);
     //TODO before releasing code, figure out how to hide this
+    mRequestHandler.createAccount(user);
     mRequestHandler.login(user.getUsername(), "grocs1966");
 
     mObjectManager = new ObjectManagerClient(mRequestHandler);
