@@ -29,16 +29,16 @@
 // Variables for Physical Wiremap
 // units in MILLIMETERS
 
-  float depth = 2870.00;                     // distance from projector Mapline
-  float map_length = 1280.00;                // mapline length
-  float depth_unit = 5.00;                   // units, in inches, along hyp
-  float map_unit = 5.00;                     // units, in inches, along mapline
+  float depth = 2286.00;                     // distance from projector Mapline
+  float map_length = 1219.00;                // mapline length
+  float depth_unit = 4.7;                   // units, in inches, along hyp
+  float map_unit = 4.7;               // units, in inches, along mapline
   int wire = 256;                            // number of wires in contraption
 
 // Variables for the Projector
 
   int wires_hit = 256;                       // how many wires the projector hits
-  float ppmm = 0.80;                         // pixels per mm
+  float ppmm = .84;                         // pixels per mm
 
 // Variables for to build the Map
 
@@ -98,6 +98,7 @@ void draw() {
   } else {
     fill(0,0,255);
   }
+  //fill(255);
   rect(i*4, 0, 2, height);
   //rect(i*4, height - 40, 2, 40);
   }
