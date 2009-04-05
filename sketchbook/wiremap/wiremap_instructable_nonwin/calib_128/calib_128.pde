@@ -56,7 +56,6 @@ static public void main(String args[]) {
   float[] map = new float[wire];             // distance from mapline to point of intersection along hypot
   float[] x_by_ind = new float[wire];        // x coordinate for each wire
   float[] z_by_ind = new float[wire];        // z coordinate for each wire
-
 // Variables for the Shape to be rendered (a globe)
 
   float[] globe = new float[3];              // globe x,y,z coords
@@ -260,74 +259,4 @@ map[127] = 40;
     z_by_ind[j] = depth - map[j]*5;
     x_by_ind[j] = xmap - xmap*map[j]/hyp*depth_unit;
   }
-}
-
-void gen_circle(int i)
-{
-  if((x_by_ind[i] >= (globe[0] - radius)) && (x_by_ind[i] <= (globe[0] + radius))) {          // if a wire's x is +/- radius inches of globe's
-    float local_hyp = sqrt(sq(x_by_ind[i] - globe[0]) + sq(z_by_ind[i] - globe[2]));    // find the distance
-    if(local_hyp <= radius) {                                                              // if the distance from globe to wire's x/y is <radius
-      float y_abs = sqrt(sq(radius) - sq(local_hyp));
-      float y_top_coord = globe[1] + y_abs;
-      float y_bot_coord = globe[1] - y_abs;                                             // calculate y's intersect
-      float y_top_proj = y_top_coord * depth / z_by_ind[i];                      // compensate for projection morphing IN INCHES
-      float y_bot_proj = y_bot_coord * depth / z_by_ind[i];
-      float y_height_proj = y_top_proj - y_bot_proj;
-      fill(255);                                                                    // draw a rectangle at that intersect
-
-      // rect 1 is top dot for sliver
-      float left1 = (i-round((wire-wires_hit)/2)) * (width) / wires_hit;
-      float top1 = (height/ppi - y_top_proj) * ppi;
-      float wide1 = width / wires_hit;
-      float tall1 = dot_height;
-      rect(left1, top1, 3, tall1);                                                        // draw a rectangle at that intersect
-
-      // rect 2 is bottom dot for sliver
-      float left2 = (i-round((wire-wires_hit)/2)) * (width) / wires_hit;
-      float top2 = (height/ppi - y_bot_proj) * ppi - dot_height;
-      float wide2 = width / wires_hit;
-      float tall2 = dot_height;
-      rect(left2, top2, 3, tall2);                                                        // draw a rectangle at that intersect
-
-      // rect 3 is filler for sliver
-      fill(0,0,255);
-      float left3 = (i-round((wire-wires_hit)/2)) * (width) / wires_hit;
-      float top3 = (height/ppi - y_top_proj) * ppi + dot_height;
-      float wide3 = width / wires_hit;
-      float tall3 = y_height_proj * ppi - (dot_height * 2);
-      rect(left3, top3, 3, tall3);                                                        // draw a rectangle at that intersect
-    }
-  }
-}
-
-
-void keyPressed() {                                           // adjust globe[] accordingly
-    if (globe_a == true) {
-      if (key == 'w') {
-        globe[1] = globe[1] + step;
-      } else if (key == 's') {
-        globe[1] = globe[1] - step;
-      } else if (key == 'e') {
-        radius = radius + .1;
-      } else if (key == 'd') {
-        radius = radius - .1;
-      }
-    } else {
-      if (key == 'w') {
-        globe_b[1] = globe_b[1] + step;
-      } else if (key == 's') {
-        globe_b[1] = globe_b[1] - step;
-      } else if (key == 'e') {
-        radius_b = radius_b + .1;
-      } else if (key == 'd') {
-        radius_b = radius_b - .1;
-      }
-    }
-      
-      
-      if (key == 'b') {
-        threshold = threshold +5;
-      } else if (key == 'n') {
-        threshold = threshold -5;
-      }
 }
