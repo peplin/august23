@@ -17,7 +17,7 @@ int section = 0;
 void setup() {
     size(1024, 768, P3D);
 
-    map = new Wiremap(this, 12, 90, 36, 48, 36.0/12.0, .1875, 2,
+    map = new Wiremap(this, 256, 90, 36, 48, .1875, .1875, 2,
             "emptydepths.txt");
 
     previousDepths = new int[map.getWireCount()];

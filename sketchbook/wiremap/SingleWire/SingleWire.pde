@@ -11,7 +11,7 @@ int newDepths[];
 void setup() {
     size(1024, 768, P3D);
 
-    map = new Wiremap(this, 256, 90, 36, 48, .1875, .1875, 2,
+    map = new Wiremap(this, 256, 90, 36, 48, .1875, .1875, 4,
             "/home/peplin/programming/august/sketchbook/wiremap/depth256.txt");
 
     newDepths = new int[map.getWireCount()];
