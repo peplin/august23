@@ -195,7 +195,7 @@ public class Star extends CelestialBody implements Serializable {
     @Override
     public Element toXmlElement() {
         loadConfig();
-        Element root = new Element(sConfigFile.getProperty("PLANET_TAG"));
+        Element root = new Element(sConfigFile.getProperty("STAR_TAG"));
         root.appendChild(super.toXmlElement());
         root.addAttribute(new Attribute(sConfigFile.getProperty("RADIUS_ATTRIBUTE_TAG"),
                 String.valueOf(getRadius())));
