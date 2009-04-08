@@ -64,7 +64,6 @@ void setup() {
     for(int i = 0; i < handlers.length; i++) {
         handlers[i].setLevel(Level.WARNING);
     }
-
 }
 
 void draw() {
@@ -100,18 +99,57 @@ void updateUniverse() {
     popMatrix();
 }
 
+void checkButtons(int x, int y) {
+    if(mZoomInButton.isUnder(x, y)) {
+        println("clicked zoom in");
+
+    } else if(mZoomOutButton.isUnder(x, y)) {
+        println("clicked zoom out");
+    } else if(mCreateButton.isUnder(x, y)) {
+        println("clicked create");
+    } else if(mConnectButton.isUnder(x, y)) {
+        println("clicked connect");
+    }
+}
+
+void checkStarHover(int x, int y) {
+    for(int i = 0; i < parent.getChildren().size(); i++) {
+        CelestialBody body =
+                (CelestialBody) (mObjectManager.getCelestialBody(
+                            parent.getChildren().get(i)));
+        Point bodyPosition = new Point(
+                screenX(body.getX(), body.getY(), body.getZ()),
+                screenY(body.getX(), body.getY(), body.getZ()),
+                0);
+        if(x >= bodyPosition.getX() + bodyPosition.getRadius() 
+                && x <= bodyPosition.getX() - bodyPosition.getRadius()
+                && y >= bodyPosition.getY() + bodyPosition.getRadius() 
+                && y <= bodyPosition.getY() - bodyPosition.getRadius()) {
+            println("clicked on star: " + body.getId());
+            return true;
+        }
+    }
+    return false;
+}
+
 
 void mousePressed() {
     if(mouseButton == LEFT) {
-        mObjectManager.add(new Star(0,
-                "Your Star",
-                mParentId,
-                new Point(width / 2 - mCamera.getCenterX() + mouseX,
-                    height/2 - mCamera.getCenterY() + mouseY, 0),
-                new PhysicsVector3d(1, 2, 3, 4),
-                new PhysicsVector3d(5, 6, 7, 8),
-                10,
-                10));
+        if(checkStarHover(mouseX, mouseY)) {
+            println("switching to star info mode");
+        } else if(checkButtons(x, y)) {
+
+        } else if(mMode == CREATE) {
+            mObjectManager.add(new Star(0,
+                    "Your Star",
+                    mParentId,
+                    new Point(width / 2 - mCamera.getCenterX() + mouseX,
+                        height/2 - mCamera.getCenterY() + mouseY, 0),
+                    new PhysicsVector3d(1, 2, 3, 4),
+                    new PhysicsVector3d(5, 6, 7, 8),
+                    10,
+                    10));
+        }
     }
 }
 
@@ -123,6 +161,9 @@ void mouseDragged() {
     }
 }
 
+void cursorPressed(float cursorX, cursorYJ:q
+
+
 /**
     * TUIO Callbacks: Unfortunately, these must be implemented in the PApplet
     * class itself, so we can't pull it out to a MultitouchHandler class
@@ -132,7 +173,7 @@ void addTuioCursor(TuioCursor tcur) {
 }
 
 // called when a cursor is moved
-void updateTuioCursor (TuioCursor tcur) {
+void updateTuioCursor(TuioCursor tcur) {
     mTuioController.updateTuioCursor(tcur);
 }
 
