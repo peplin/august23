@@ -11,6 +11,10 @@ public class Camera {
     private float mCenterZ;
     private float mScale;
     private PApplet mParent;
+    
+    private float mCenterXVelocity;
+    private float mCenterYVelocity;
+    private float mScaleTarget;
 
     public Camera(PApplet parent, float eyeX, float eyeY, float eyeZ,
             float centerX, float centerY, int centerZ, float scale) {
@@ -35,12 +39,17 @@ public class Camera {
                 1,
                 0);
 
-        mParent.translate(mParent.width / 2,
-                mParent.height / 2);
+        mCenterX += mCenterXVelocity;
+        mCenterY += mCenterYVelocity;
+        
+        mParent.translate(mParent.width / 2, mParent.height / 2);
         mParent.scale(mScale);
         mParent.translate(-mParent.width / 2, -mParent.height / 2);
         mParent.translate(mCenterX, mCenterY);
         
+        mCenterXVelocity *= .75;
+        mCenterYVelocity *= .75;
+        mScaleTarget = mParent.lerp(mScale, mScaleTarget, (float) .02);
     }
 
     public void moveEye(float differenceX, float differenceY, float differenceZ) {
@@ -48,16 +57,21 @@ public class Camera {
         mEyeY += differenceY;
         mEyeZ += differenceZ;
     }
-
+    
     public void zoom(float difference) {
-        mScale += difference;
+        mScaleTarget += difference;
     }
-
-    public void moveCenter(float differenceX, float differenceY,
-            float differenceZ) {
-        mCenterX += differenceX;
-        mCenterY += differenceY;
-        mCenterZ += differenceZ;
-        mCenterZ = PApplet.constrain(mCenterZ, 0, (float) 1.0);
+    
+    public void changeTranslateVelocity(float differenceX, float differenceY) {
+        mCenterXVelocity += differenceX * .1;
+        mCenterYVelocity += differenceY * .1;
+    }
+    
+    public float getCenterX() {
+        return mCenterX;
+    }
+    
+    public float getCenterY() {
+        return mCenterY;
     }
 }

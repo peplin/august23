@@ -24,7 +24,7 @@ private static final int WINDOW_HEIGHT = 768;
 private static final int FRAME_RATE = 30;
 
 /** TUIO & Control Members **/
-private TuioClient mTuioClient;
+private TuioController mTuioController;
 
 /** Object & Server Members **/
 private ObjectManagerClient mObjectManager;
@@ -38,19 +38,18 @@ private int mParentId = 1;
 void setup() {
     frameRate(FRAME_RATE);
     size(WINDOW_WIDTH, WINDOW_HEIGHT, P3D);
-    smooth();
 
     mCamera =
             new Camera(this,
                     (float) (width / 2.0),
-                    (float) (height),
+                    (float) (height / 2.0),
                     (float) ((height / 2.0) / tan((float) (PI * 60.0 / 360.0))),
-                    0,
-                    0,
+                    (float) (width / 2.0),
+                    (float) (height / 2.0),
                     0, 1);
 
     mRequestHandler = new RequestHandlerClient();
-    mTuioClient = new TuioClient(this);
+    mTuioController = new TuioController(this);
 
     User user =
             new User(0, "august_mt", null, null, 100);
@@ -65,27 +64,24 @@ void setup() {
     for(int i = 0; i < handlers.length; i++) {
         handlers[i].setLevel(Level.WARNING);
     }
+
 }
 
 void draw() {
     background(0);
     mCamera.setCamera();
     updateUniverse();
+    updateInterface();
 
-    if(DEBUG) {
-        // Draw each cursor to the screen for debugging
-        TuioCursor[] tuioCursorList = mTuioClient.getTuioCursors();
-        for(int i = 0; i < tuioCursorList.length; i++) {
-            rect(tuioCursorList[i].getScreenX(width),
-                    tuioCursorList[i].getScreenY(height),
-                    10,
-                    10);
-        }
-    }
+}
+
+void updateInterface() {
+
 }
 
 void updateUniverse() {
-    lights();
+    pushMatrix();
+    translate(-width/2, -height/2);
     try {
         CelestialBody parent = mObjectManager.getCelestialBody(mParentId);
         for(int i = 0; i < parent.getChildren().size(); i++) {
@@ -99,25 +95,19 @@ void updateUniverse() {
             }
         }
     } catch(UnhandledCelestialBodyException e) {
-        println("Caught exception when updating universe: " + e);
+        //println("Caught exception when updating universe: " + e);
     }
+    popMatrix();
 }
 
-/**
-    * TUIO Callbacks: Unfortunately, these must be implemented in the PApplet
-    * class itself, so we can't pull it out to a MultitouchHandler class
-    */
-void addTuioCursor(TuioCursor tcur) {
-}
 
 void mousePressed() {
     if(mouseButton == LEFT) {
         mObjectManager.add(new Star(0,
                 "Your Star",
                 mParentId,
-                new Point(modelX(mouseX, mouseY, 0),
-                        modelY(mouseX, mouseY, 0),
-                        0),
+                new Point(width / 2 - mCamera.getCenterX() + mouseX,
+                    height/2 - mCamera.getCenterY() + mouseY, 0),
                 new PhysicsVector3d(1, 2, 3, 4),
                 new PhysicsVector3d(5, 6, 7, 8),
                 10,
@@ -127,8 +117,26 @@ void mousePressed() {
 
 void mouseDragged() {
     if(mouseButton == RIGHT) {
-        mCamera.moveCenter(mouseX - pmouseX, mouseY - pmouseY, 0);
+        mCamera.changeTranslateVelocity(mouseX - pmouseX, mouseY - pmouseY);
     } else if(mouseButton == CENTER) {
         mCamera.zoom((float) (-.01 * (mouseY - pmouseY)));
     }
+}
+
+/**
+    * TUIO Callbacks: Unfortunately, these must be implemented in the PApplet
+    * class itself, so we can't pull it out to a MultitouchHandler class
+    */
+void addTuioCursor(TuioCursor tcur) {
+    mTuioController.addTuioCursor(tcur);
+}
+
+// called when a cursor is moved
+void updateTuioCursor (TuioCursor tcur) {
+    mTuioController.updateTuioCursor(tcur);
+}
+
+// called when a cursor is removed from the scene
+void removeTuioCursor(TuioCursor tcur) {
+    mTuioController.removeTuioCursor(tcur);
 }
