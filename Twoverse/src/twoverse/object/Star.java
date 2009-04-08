@@ -69,7 +69,7 @@ public class Star extends CelestialBody implements Serializable {
         loadConfig();
 
         if(!element.getLocalName()
-                .equals(sConfigFile.getProperty("PLANET_TAG"))) {
+                .equals(sConfigFile.getProperty("STAR_TAG"))) {
             throw new UnexpectedXmlElementException("Element is not a star");
         }
 
