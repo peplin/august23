@@ -34,10 +34,14 @@ public class GalaxyMode implements MultitouchModeInterface {
 
 
     public void cursorPressed(Point cursor) {
-        checkStars(cursor);
+        Star star = checkStars(cursor);
+        if(star != null) {
+            setMode(1);
+            ((InfoMode)getMode()).setSelectedStar(star);
+        }
     }
 
-    boolean checkStars(Point cursor) {
+    Star checkStars(Point cursor) {
         pushMatrix();
         translate(-width/2, -height/2);
         try {
@@ -60,9 +64,8 @@ public class GalaxyMode implements MultitouchModeInterface {
                             && cursor.getX() >= bodyPosition.getX() - body.getRadius()
                             && cursor.getY() <= bodyPosition.getY() + body.getRadius() 
                             && cursor.getY() >= bodyPosition.getY() - body.getRadius()) {
-                        println("clicked on star: " + body.getId());
                         popMatrix();
-                        return true;
+                        return body;
                     }
                 } catch(TwoDimensionalException e) {
                     println(e);
@@ -72,7 +75,7 @@ public class GalaxyMode implements MultitouchModeInterface {
             println("Caught exception when updating universe: " + e);
         }
         popMatrix();
-        return false;
+        return null;
     }
 
     void cursorDragged(Point cursor) {

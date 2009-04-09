@@ -5,6 +5,7 @@ public class MultitouchInterface {
     private final int BUTTON_WIDTH = 100;
     private final int BUTTON_HEIGHT = 75;
     private final int BUTTON_PADDING = 25;
+    private final float ZOOM_STEP = .1;
     private RectButton mZoomInButton;
     private RectButton mZoomOutButton;
     private RectButton mCreateButton;
@@ -16,6 +17,10 @@ public class MultitouchInterface {
     public MultitouchInterface(PApplet parent) {
         mParent = parent;
         mParent.registerMouseEvent(this);
+        addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) { 
+            mouseWheel(evt.getWheelRotation());
+        }}); 
 
         PFont font = loadFont("buttonFont.vlw");
 
@@ -72,6 +77,10 @@ public class MultitouchInterface {
         mGalaxyButton.setLocked(true);
     }
 
+    void mouseWheel(int delta) {
+        mCamera.zoom(-.05 * delta);
+    }
+
     public void mouseEvent(MouseEvent e) {
         Point cursor = new Point(e.getX(), e.getY(), 0);
 
@@ -92,9 +101,9 @@ public class MultitouchInterface {
     /** returns true if a button was pressed and this event was handled */
     private boolean checkButtons(Point cursor) {
         if(mZoomInButton.isPressed(cursor)) {
-            zoom(true);
+            mCamera.zoom(ZOOM_STEP);
         } else if(mZoomOutButton.isPressed(cursor)) {
-            zoom(false);
+            mCamera.zoom(ZOOM_STEP);
         } else if(mCreateButton.isPressed(cursor)) {
             if(mCreateButton.isLocked()) {
                 mCreateButton.setLocked(false);
