@@ -34,6 +34,7 @@ public abstract class ObjectManager extends TimerTask {
         mLock = new ReentrantReadWriteLock();
 
         mCelestialBodies = new HashMap<Integer, CelestialBody>();
+        mLinks = new HashMap<Integer, Link>();
 
         Timer feedPushTimer = new Timer();
         feedPushTimer.scheduleAtFixedRate(this,

@@ -90,6 +90,8 @@ public class Link implements Serializable {
         sInsertStatement =
                 sConnection.prepareStatement("INSERT INTO link (first, second) "
                         + "VALUES (?, ?)");
+        sSelectAllLinksStatement =
+            sConnection.prepareStatement("SELECT * FROM link");
     }
 
     public Link(Star first) {

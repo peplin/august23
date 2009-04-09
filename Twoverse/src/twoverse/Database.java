@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
+import twoverse.object.Link;
 import twoverse.object.Star;
 import twoverse.util.User;
 import twoverse.util.Point.TwoDimensionalException;
@@ -96,7 +97,9 @@ public class Database {
             Star.prepareDatabaseStatements(DriverManager.getConnection(mConfigFile.getProperty("CONNECTION"),
                     mConfigFile.getProperty("DB_USER"),
                     mConfigFile.getProperty("DB_PASSWORD")));
-        } catch (SQLException e) {
+            Link.prepareDatabaseStatements(DriverManager.getConnection(mConfigFile.getProperty("CONNECTION"),
+                    mConfigFile.getProperty("DB_USER"),
+                    mConfigFile.getProperty("DB_PASSWORD")));        } catch (SQLException e) {
             throw new DatabaseException("Couldn't prepare statements: "
                     + e.getMessage());
         }

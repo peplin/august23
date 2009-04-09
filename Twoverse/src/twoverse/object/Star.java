@@ -153,7 +153,7 @@ public class Star extends CelestialBody implements Serializable {
                 sConnection.prepareStatement("SELECT * FROM object "
                         + "NATURAL JOIN star " + "LEFT JOIN (user) "
                         + "ON (object.owner = user.id)" + " LEFT JOIN (state) "
-                        + "ON (object.state = state.id)");
+                        + "ON (star.state = state.id)");
         sInsertStarStatement =
                 sConnection.prepareStatement("INSERT INTO star (id, mass, radius, colorR, colorB, colorG, luminosity, frequency, state) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
