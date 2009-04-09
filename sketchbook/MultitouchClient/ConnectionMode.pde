@@ -1,6 +1,8 @@
+import twoverse.object.Link;
+
 public class ConnectionMode extends GalaxyMode {
     private ArrayList mStarLinks;
-    private StarLink mOpenLink = null;
+    private Link mOpenLink = null;
     public ConnectionMode(PApplet parent, ObjectManagerClient objectManager,
             Camera camera) {
         super(parent, objectManager, camera);
@@ -14,7 +16,7 @@ public class ConnectionMode extends GalaxyMode {
         noFill();
         translate(-width/2, -height/2);
         for(int i = 0; i < mStarLinks.size(); i++) {
-            StarLink link = (StarLink) mStarLinks.get(i);
+            Link link = (Link) mStarLinks.get(i);
             beginShape(LINES);
             vertex((float)link.getFirst().getPosition().getX(),
                     (float)link.getFirst().getPosition().getY());
@@ -34,7 +36,7 @@ public class ConnectionMode extends GalaxyMode {
                 mStarLinks.add(mOpenLink);
                 mOpenLink = null;
             } else {
-                mOpenLink = new StarLink(selectedStar);
+                mOpenLink = new Link(selectedStar);
             }
         }
     }

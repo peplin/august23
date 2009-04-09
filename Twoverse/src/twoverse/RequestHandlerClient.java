@@ -14,6 +14,7 @@ import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 import twoverse.object.CelestialBody;
+import twoverse.object.Link;
 import twoverse.util.Session;
 import twoverse.util.User;
 
@@ -207,5 +208,21 @@ public class RequestHandlerClient implements TwoversePublicApi {
             sLogger.log(Level.WARNING, "Unable to execute RPC update", e);
         }
         return body;
+    }
+
+    @Override
+    public Link add(Link link) {
+        try {
+            Object[] parameters = new Object[] { link };
+            sLogger.log(Level.INFO, "Attempting to add link: " + link);
+            Link returnedLink =
+                    (Link) mXmlRpcClient.execute("RequestHandlerServer.add",
+                            parameters);
+            link.setId(returnedLink.getId());
+            sLogger.log(Level.INFO, "Link returned from add is: " + link);
+        } catch (XmlRpcException e) {
+            sLogger.log(Level.WARNING, "Unable to execute RPC add", e);
+        }
+        return link;
     }
 }

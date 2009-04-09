@@ -16,6 +16,7 @@ import twoverse.ObjectManager.UnhandledCelestialBodyException;
 import twoverse.SessionManager.ExistingUserException;
 import twoverse.SessionManager.UnknownUserException;
 import twoverse.object.CelestialBody;
+import twoverse.object.Link;
 import twoverse.util.Session;
 import twoverse.util.User;
 import twoverse.util.User.UnsetPasswordException;
@@ -95,7 +96,8 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         }
     }
 
-    public CelestialBody add(CelestialBody body) throws UnhandledCelestialBodyException {
+    public CelestialBody add(CelestialBody body)
+            throws UnhandledCelestialBodyException {
         sLogger.log(Level.INFO, "Attempting to add body: " + body);
         sObjectManager.add(body);
         return body;
@@ -150,5 +152,12 @@ public class RequestHandlerServer extends XmlRpcServlet implements
                 };
         mapping.setAuthenticationHandler(handler);
         return mapping;
+    }
+
+    @Override
+    public Link add(Link link) {
+        sLogger.log(Level.INFO, "Attempting to add link: " + link);
+        sObjectManager.add(link);
+        return link;
     }
 }

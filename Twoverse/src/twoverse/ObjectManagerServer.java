@@ -12,6 +12,7 @@ import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
 import twoverse.object.CelestialBody;
+import twoverse.object.Link;
 import twoverse.object.Star;
 
 public class ObjectManagerServer extends ObjectManager {
@@ -39,6 +40,10 @@ public class ObjectManagerServer extends ObjectManager {
         Element root = new Element(mConfigFile.getProperty("ROOT_TAG"));
         for(CelestialBody body : mCelestialBodies.values()) {
             root.appendChild(body.toXmlElement());
+        }
+        
+        for(Link link : mLinks.values()) {
+            root.appendChild(link.toXmlElement());
         }
 
         Document doc = new Document(root);
@@ -70,6 +75,7 @@ public class ObjectManagerServer extends ObjectManager {
         }
         mLock.writeLock().unlock();
         sLogger.log(Level.INFO, "Flush to database completed");
+        //TODO do we need to flush links? never modified, so probably not
     }
 
     private void initialize() {
@@ -84,8 +90,9 @@ public class ObjectManagerServer extends ObjectManager {
                     mCelestialBodies.get(body.getParentId())
                             .addChild(body.getId());
                 }
-
             }
+            
+            mLinks.putAll(Link.selectAllFromDatabase());
         } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Unable to initialize objects", e);
         }

@@ -14,6 +14,9 @@ int newDepths[];
 int round = 0;
 int section = 0;
 
+boolean sectionMode = false;
+int sectionModeCounter = 0;
+
 void setup() {
     size(1024, 768, P3D);
 
@@ -32,38 +35,46 @@ void setup() {
 void draw() {
     background(0);
 
-    if(currentWire == -1) {
-        section++;
-        println("advancing to section " + section + " in round " + round);
-        if(section == pow(3, round)) {
-            outputFile();
-            round++;
-            println("advancing to round " + round);
-            section = 0;
+    if(sectionMode) {
+    for(int i = 0; i < map.getWireCount(); i++) {
+        if(newDepths[i] == sectionModeCounter) {
+            sliver.setWire(i);
+            sliver.display();
         }
-        while(currentWire == -1) {
-            currentWire = findNextWire(section);
-            if(currentWire != -1) {
-                break;
-            }
-            section++;
-            if(section == pow(3, round)) {
-                println("no more precision possible");
-                exit();
-            }
-        }
-        println("next current wire is " + currentWire);
     }
 
-    sliver.setWire(currentWire);
-    sliver.display();
+    } else {
+        if(currentWire == -1) {
+            section++;
+            println("advancing to section " + section + " in round " + round);
+            if(section == pow(3, round)) {
+                outputFile();
+                round++;
+                println("advancing to round " + round);
+                section = 0;
+            }
+            while(currentWire == -1) {
+                currentWire = findNextWire(section);
+                if(currentWire != -1) {
+                    break;
+                }
+                section++;
+                if(section == pow(3, round)) {
+                    println("no more precision possible");
+                    exit();
+                }
+            }
+            println("next current wire is " + currentWire);
+        }
 
+        sliver.setWire(currentWire);
+        sliver.display();
+    }
     noLoop();
 }
 
 void outputFile() {
     outfile = createWriter("calibration-round" + round + ".txt");
-    println(newDepths);
     for(int i = 0; i < map.getWireCount(); i++) {
         outfile.println(newDepths[i]);
         previousDepths[i] = newDepths[i];
@@ -89,6 +100,19 @@ void keyPressed() {
             newDepths[currentWire] = -1;
         }
         currentWire = findNextWire(section);
+        redraw();
+    }
+
+    if(key == 'v') {
+        if(sectionModeCounter == 0 && !sectionMode) {
+            sectionMode = true;
+        } else {
+            sectionModeCounter++;
+        }
+        if(sectionModeCounter == pow(3, round)) {
+            sectionModeCounter = 0;
+            sectionMode = false;
+        }
         redraw();
     }
 }

@@ -12,6 +12,7 @@ import nu.xom.Element;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
 import twoverse.object.CelestialBody;
+import twoverse.object.Link;
 import twoverse.object.Star;
 import twoverse.object.applet.AppletBodyInterface;
 
@@ -43,13 +44,21 @@ public class ObjectManagerClient extends ObjectManager {
             Elements stars =
                     doc.getRootElement()
                             .getChildElements(mConfigFile.getProperty("STAR_TAG"));
-            for (int i = 0; i < stars.size(); i++) {
+            for(int i = 0; i < stars.size(); i++) {
                 Star star = new Star(stars.get(i));
                 update(star);
             }
-        } catch (ParsingException e) {
+
+            Elements links =
+                    doc.getRootElement()
+                            .getChildElements(mConfigFile.getProperty("LINK_TAG"));
+            for(int i = 0; i < links.size(); i++) {
+                Link link = new Link(links.get(i));
+                update(link);
+            }
+        } catch(ParsingException e) {
             sLogger.log(Level.WARNING, "Feed may be malformed", e);
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.WARNING, "Unable to connect to feed", e);
         }
     }
@@ -59,7 +68,7 @@ public class ObjectManagerClient extends ObjectManager {
         ArrayList<AppletBodyInterface> allBodies =
                 new ArrayList<AppletBodyInterface>();
         Collection<CelestialBody> bodies = mCelestialBodies.values();
-        for (CelestialBody body : bodies) {
+        for(CelestialBody body : bodies) {
             allBodies.add(body.getAsApplet(parent));
         }
         mLock.readLock().unlock();
@@ -78,7 +87,7 @@ public class ObjectManagerClient extends ObjectManager {
         mRequestHandler.add(body);
         try {
             super.add(body);
-        } catch (UnhandledCelestialBodyException e) {
+        } catch(UnhandledCelestialBodyException e) {
             sLogger.log(Level.WARNING, "Unable to add", e);
         }
         mLock.writeLock().unlock();
@@ -90,6 +99,15 @@ public class ObjectManagerClient extends ObjectManager {
         mLock.writeLock().lock();
         mRequestHandler.update(body);
         super.update(body);
+        mLock.writeLock().unlock();
+    }
+
+    @Override
+    public void add(Link link) {
+        sLogger.log(Level.INFO, "Attemping to update link: " + link);
+        mLock.writeLock().lock();
+        mRequestHandler.add(link);
+        super.update(link);
         mLock.writeLock().unlock();
     }
 }

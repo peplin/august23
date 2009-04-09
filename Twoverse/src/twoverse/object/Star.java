@@ -27,6 +27,12 @@ public class Star extends CelestialBody implements Serializable {
     private static Properties sConfigFile;
     private double mRadius;
     private double mMass;
+    private int mColorR;
+    private int mColorG;
+    private int mColorB;
+    private double mLuminosity;
+    private double mFrequency;
+    private int mState = 5;
     private static PreparedStatement sSelectAllStarsStatement;
     private static PreparedStatement sInsertStarStatement;
     private static PreparedStatement sUpdateStarStatement;
@@ -34,16 +40,18 @@ public class Star extends CelestialBody implements Serializable {
 
     public Star(int ownerId, String name, int parentId, Point position,
             PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            double mass, double radius) {
+            double mass, double radius, int colorR, int colorB, int colorG,
+            double luminosity, double frequency) {
         super(ownerId, name, parentId, position, velocity, acceleration);
         loadConfig();
-        initialize(radius, mass);
+        initialize(radius, mass, colorR, colorG, colorB, luminosity, frequency);
     }
 
     public Star(int id, int ownerId, String name, Timestamp birthTime,
             Timestamp deathTime, int parentId, Point position,
             PhysicsVector3d velocity, PhysicsVector3d acceleration,
-            Vector<Integer> children, double mass, double radius) {
+            Vector<Integer> children, double mass, double radius, int colorR,
+            int colorB, int colorG, double luminosity, double frequency) {
         super(id,
                 ownerId,
                 name,
@@ -55,21 +63,21 @@ public class Star extends CelestialBody implements Serializable {
                 acceleration,
                 children);
         loadConfig();
-        initialize(radius, mass);
+        initialize(radius, mass, colorR, colorG, colorB, luminosity, frequency);
     }
 
-    public Star(CelestialBody body, double mass, double radius) {
+    public Star(CelestialBody body, double mass, double radius, int colorR,
+            int colorB, int colorG, double luminosity, double frequency) {
         super(body);
         loadConfig();
-        initialize(radius, mass);
+        initialize(radius, mass, colorR, colorG, colorB, luminosity, frequency);
     }
 
     public Star(Element element) {
         super(element.getFirstChildElement(CelestialBody.XML_TAG));
         loadConfig();
 
-        if(!element.getLocalName()
-                .equals(sConfigFile.getProperty("STAR_TAG"))) {
+        if(!element.getLocalName().equals(sConfigFile.getProperty("STAR_TAG"))) {
             throw new UnexpectedXmlElementException("Element is not a star");
         }
 
@@ -81,17 +89,51 @@ public class Star extends CelestialBody implements Serializable {
                 Double.valueOf(element.getAttribute(sConfigFile.getProperty("MASS_ATTRIBUTE_TAG"))
                         .getValue());
 
-        initialize(radius, mass);
+        int colorR =
+                Integer.valueOf(element.getAttribute(sConfigFile.getProperty("COLOR_R_ATTRIBUTE_TAG"))
+                        .getValue());
+        int colorG =
+                Integer.valueOf(element.getAttribute(sConfigFile.getProperty("COLOR_G_ATTRIBUTE_TAG"))
+                        .getValue());
+        int colorB =
+                Integer.valueOf(element.getAttribute(sConfigFile.getProperty("COLOR_B_ATTRIBUTE_TAG"))
+                        .getValue());
+
+        double luminosity =
+                Double.valueOf(element.getAttribute(sConfigFile.getProperty("LUMINOSITY_ATTRIBUTE_TAG"))
+                        .getValue());
+
+        double frequency =
+                Double.valueOf(element.getAttribute(sConfigFile.getProperty("FREQUENCY_ATTRIBUTE_TAG"))
+                        .getValue());
+
+        setState(Integer.valueOf(element.getAttribute(sConfigFile.getProperty("STATE_ATTRIBUTE_TAG"))
+                .getValue()));
+
+        initialize(radius, mass, colorR, colorG, colorB, luminosity, frequency);
     }
 
     public Star(Star star) {
         super(star);
-        initialize(star.getRadius(), star.getMass());
+        mState = star.getState();
+        initialize(star.getRadius(),
+                star.getMass(),
+                star.getColorR(),
+                star.getColorG(),
+                star.getColorB(),
+                star.getLuminosity(),
+                star.getFrequency());
     }
 
-    private void initialize(double radius, double mass) {
+    private void initialize(double radius, double mass, int colorR, int colorB,
+            int colorG, double luminosity, double frequency) {
         setRadius(radius);
         setMass(mass);
+        setColorR(colorR);
+        setColorG(colorG);
+        setColorB(colorB);
+        setLuminosity(luminosity);
+        setFrequency(frequency);
     }
 
     private synchronized void loadConfig() {
@@ -110,13 +152,16 @@ public class Star extends CelestialBody implements Serializable {
         sSelectAllStarsStatement =
                 sConnection.prepareStatement("SELECT * FROM object "
                         + "NATURAL JOIN star " + "LEFT JOIN (user) "
-                        + "ON (object.owner = user.id)");
+                        + "ON (object.owner = user.id)" + " LEFT JOIN (state) "
+                        + "ON (object.state = state.id)");
         sInsertStarStatement =
-                sConnection.prepareStatement("INSERT INTO star (id, mass, radius) "
-                        + "VALUES (?, ?, ?)");
+                sConnection.prepareStatement("INSERT INTO star (id, mass, radius, colorR, colorB, colorG, luminosity, frequency, state) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         sUpdateStarStatement =
-                sConnection.prepareStatement("UPDATE star " + "SET mass = ?,"
-                        + " radius = ? " + "WHERE id = ?");
+                sConnection.prepareStatement("UPDATE star "
+                        + "SET mass = ?,"
+                        + " radius = ?, colorR = ?, colorG = ?, colorB = ?, luminosity = ?, frequency = ?, state = ? "
+                        + "WHERE id = ?");
     }
 
     public static synchronized HashMap<Integer, CelestialBody> selectAllFromDatabase()
@@ -134,7 +179,13 @@ public class Star extends CelestialBody implements Serializable {
                 Star star =
                         new Star(body,
                                 resultSet.getDouble("mass"),
-                                resultSet.getDouble("radius"));
+                                resultSet.getDouble("radius"),
+                                resultSet.getInt("colorR"),
+                                resultSet.getInt("colorG"),
+                                resultSet.getInt("colorB"),
+                                resultSet.getDouble("luminosity"),
+                                resultSet.getDouble("frequency"));
+                star.setState(resultSet.getInt("state"));
                 star.setDirty(false);
                 stars.put(star.getId(), star);
             }
@@ -153,6 +204,13 @@ public class Star extends CelestialBody implements Serializable {
             sInsertStarStatement.setInt(1, getId());
             sInsertStarStatement.setDouble(2, getMass());
             sInsertStarStatement.setDouble(3, getRadius());
+            sInsertStarStatement.setInt(4, getColorR());
+            sInsertStarStatement.setInt(5, getColorG());
+            sInsertStarStatement.setInt(6, getColorB());
+            sInsertStarStatement.setDouble(7, getLuminosity());
+            sInsertStarStatement.setDouble(8, getFrequency());
+            sInsertStarStatement.setInt(9, getState());
+
             sInsertStarStatement.executeUpdate();
             setDirty(false);
         } catch(SQLException e) {
@@ -167,7 +225,13 @@ public class Star extends CelestialBody implements Serializable {
 
             sUpdateStarStatement.setDouble(1, getMass());
             sUpdateStarStatement.setDouble(2, getRadius());
-            sUpdateStarStatement.setDouble(3, getId());
+            sInsertStarStatement.setInt(3, getColorR());
+            sInsertStarStatement.setInt(4, getColorG());
+            sInsertStarStatement.setInt(5, getColorB());
+            sInsertStarStatement.setDouble(6, getLuminosity());
+            sInsertStarStatement.setDouble(7, getFrequency());
+            sInsertStarStatement.setInt(8, getState());
+            sUpdateStarStatement.setDouble(9, getId());
             sUpdateStarStatement.executeUpdate();
             setDirty(false);
         } catch(SQLException e) {
@@ -192,6 +256,54 @@ public class Star extends CelestialBody implements Serializable {
         return mRadius;
     }
 
+    public void setColorR(int colorR) {
+        mColorR = colorR;
+    }
+
+    public void setColorG(int colorG) {
+        mColorG = colorG;
+    }
+
+    public void setColorB(int colorB) {
+        mColorB = colorB;
+    }
+
+    public int getColorR() {
+        return mColorR;
+    }
+
+    public int getColorG() {
+        return mColorG;
+    }
+
+    public int getColorB() {
+        return mColorB;
+    }
+
+    public void setLuminosity(double luminosity) {
+        mLuminosity = luminosity;
+    }
+
+    public double getLuminosity() {
+        return mLuminosity;
+    }
+
+    public void setFrequency(double frequency) {
+        mFrequency = frequency;
+    }
+
+    public double getFrequency() {
+        return mFrequency;
+    }
+
+    public void setState(int state) {
+        mState = state;
+    }
+
+    public int getState() {
+        return mState;
+    }
+
     @Override
     public Element toXmlElement() {
         loadConfig();
@@ -201,6 +313,18 @@ public class Star extends CelestialBody implements Serializable {
                 String.valueOf(getRadius())));
         root.addAttribute(new Attribute(sConfigFile.getProperty("MASS_ATTRIBUTE_TAG"),
                 String.valueOf(getMass())));
+        root.addAttribute(new Attribute(sConfigFile.getProperty("COLOR_R_ATTRIBUTE_TAG"),
+                String.valueOf(getColorR())));
+        root.addAttribute(new Attribute(sConfigFile.getProperty("COLOR_G_ATTRIBUTE_TAG"),
+                String.valueOf(getColorG())));
+        root.addAttribute(new Attribute(sConfigFile.getProperty("COLOR_B_ATTRIBUTE_TAG"),
+                String.valueOf(getColorB())));
+        root.addAttribute(new Attribute(sConfigFile.getProperty("LUMINOSITY_ATTRIBUTE_TAG"),
+                String.valueOf(getLuminosity())));
+        root.addAttribute(new Attribute(sConfigFile.getProperty("FREQUENCY_ATTRIBUTE_TAG"),
+                String.valueOf(getFrequency())));
+        root.addAttribute(new Attribute(sConfigFile.getProperty("STATE_ATTRIBUTE_TAG"),
+                String.valueOf(getState())));
         return root;
     }
 }

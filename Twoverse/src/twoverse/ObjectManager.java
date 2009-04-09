@@ -10,10 +10,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
+import twoverse.object.Link;
 import twoverse.util.User;
 
 public abstract class ObjectManager extends TimerTask {
     protected HashMap<Integer, CelestialBody> mCelestialBodies;
+    protected HashMap<Integer, Link> mLinks;
     protected ReentrantReadWriteLock mLock;
     protected Properties mConfigFile;
     protected static Logger sLogger =
@@ -47,6 +49,14 @@ public abstract class ObjectManager extends TimerTask {
         return allBodies;
     }
 
+    public ArrayList<Link> getAllLinks() {
+        mLock.readLock().lock();
+        ArrayList<Link> allLinks = new ArrayList<Link>();
+        allLinks.addAll(mLinks.values());
+        mLock.readLock().unlock();
+        return allLinks;
+    }
+
     public CelestialBody getCelestialBody(int objectId)
             throws UnhandledCelestialBodyException {
         CelestialBody result = null;
@@ -55,7 +65,8 @@ public abstract class ObjectManager extends TimerTask {
             if(mCelestialBodies.containsKey(objectId)) {
                 result = mCelestialBodies.get(objectId);
             } else {
-                throw new UnhandledCelestialBodyException("No such object ID: " + objectId);
+                throw new UnhandledCelestialBodyException("No such object ID: "
+                        + objectId);
             }
         } finally {
             mLock.readLock().unlock();
@@ -69,7 +80,6 @@ public abstract class ObjectManager extends TimerTask {
         ArrayList<CelestialBody> result = new ArrayList<CelestialBody>();
         mLock.readLock().unlock();
         return result;
-
     }
 
     public void add(CelestialBody body) throws UnhandledCelestialBodyException {
@@ -79,6 +89,12 @@ public abstract class ObjectManager extends TimerTask {
         mLock.writeLock().lock();
         mCelestialBodies.put(body.getId(), body);
         mCelestialBodies.get(body.getParentId()).addChild(body.getId());
+        mLock.writeLock().unlock();
+    }
+
+    public void add(Link link) {
+        mLock.writeLock().lock();
+        mLinks.put(link.getId(), link);
         mLock.writeLock().unlock();
     }
 
@@ -94,6 +110,14 @@ public abstract class ObjectManager extends TimerTask {
             mCelestialBodies.get(body.getId()).update(body);
         } else {
             mCelestialBodies.put(body.getId(), body);
+        }
+        mLock.writeLock().unlock();
+    }
+
+    public void update(Link link) {
+        mLock.writeLock().lock();
+        if(!mLinks.containsKey(link.getId())) {
+            mLinks.put(link.getId(), link);
         }
         mLock.writeLock().unlock();
     }
