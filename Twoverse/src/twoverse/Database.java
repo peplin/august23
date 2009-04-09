@@ -224,6 +224,14 @@ public class Database {
 
         }
     }
+    
+    public synchronized void insert(Link link) {
+        try {
+            link.insertInDatabase();
+        } catch(SQLException e) {
+            
+        }
+    }
 
     public synchronized void delete(CelestialBody body) {
         try {

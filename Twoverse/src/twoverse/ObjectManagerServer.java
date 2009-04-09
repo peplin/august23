@@ -115,6 +115,17 @@ public class ObjectManagerServer extends ObjectManager {
     }
 
     @Override
+    public void add(Link link) {
+        sLogger.log(Level.INFO, "Adding link: " + link);
+        mLock.writeLock().lock();
+        // Make sure to add to DB first, since it sets the ID
+        mDatabase.insert(link);
+        super.add(link);
+        mLock.writeLock().unlock();
+        sLogger.log(Level.INFO, "Link added is: " + link);
+    }
+    
+    @Override
     public void update(CelestialBody body) {
         sLogger.log(Level.INFO, "Updating with body: " + body);
         mLock.writeLock().lock();

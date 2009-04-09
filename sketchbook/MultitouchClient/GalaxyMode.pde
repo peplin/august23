@@ -47,6 +47,8 @@ public class GalaxyMode implements MultitouchModeInterface {
         try {
             CelestialBody parent =
                 mObjectManager.getCelestialBody(MASTER_PARENT_ID);
+            cursor.setX(width/2 - mCamera.getCenterX() + cursor.getX());
+            cursor.setY(height/2 - mCamera.getCenterY() + cursor.getY());
             for(int i = 0; i < parent.getChildren().size(); i++) {
                 Star body =
                         (Star) (mObjectManager.getCelestialBody(

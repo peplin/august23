@@ -1,39 +1,47 @@
 import twoverse.object.Link;
 
 public class ConnectionMode extends GalaxyMode {
-    private ArrayList mStarLinks;
     private Link mOpenLink = null;
     public ConnectionMode(PApplet parent, ObjectManagerClient objectManager,
             Camera camera) {
         super(parent, objectManager, camera);
-        mStarLinks = new ArrayList();
     }
 
     public void display() {
         super.display();
+        mCamera.resetScale();
         pushMatrix();
         stroke(255);
         noFill();
         translate(-width/2, -height/2);
-        for(int i = 0; i < mStarLinks.size(); i++) {
-            Link link = (Link) mStarLinks.get(i);
-            beginShape(LINES);
-            vertex((float)link.getFirst().getPosition().getX(),
-                    (float)link.getFirst().getPosition().getY());
-            vertex((float)link.getSecond().getPosition().getX(),
-                    (float)link.getSecond().getPosition().getY());
-            endShape();
+        ArrayList starLinks = mObjectManager.getAllLinks();
+        for(int i = 0; i < starLinks.size(); i++) {
+            Link link = (Link) starLinks.get(i);
+            try {
+                Star first
+                    = (Star)mObjectManager.getCelestialBody(link.getFirstId());
+                Star second
+                    = (Star)mObjectManager.getCelestialBody(link.getSecondId());
+                beginShape(LINES);
+                vertex((float) first.getPosition().getX(),
+                        (float) first.getPosition().getY());
+                vertex((float) second.getPosition().getX(),
+                        (float) second.getPosition().getY());
+                endShape();
+            } catch(UnhandledCelestialBodyException e) {
+                println(e);
+            }
         }
         popMatrix();
     }
 
     public void cursorPressed(Point cursor) {
-        //TODO figure out where to store these in DB - mod obj manager
         Star selectedStar = checkStars(cursor);
         if(selectedStar != null) {
-            if(mOpenLink != null && selectedStar != mOpenLink.getFirst()) {
+            if(mOpenLink != null && selectedStar.getId()
+                    != mOpenLink.getFirstId()) {
                 mOpenLink.setSecond(selectedStar);
-                mStarLinks.add(mOpenLink);
+                mObjectManager.add(mOpenLink);
                 mOpenLink = null;
             } else {
                 mOpenLink = new Link(selectedStar);

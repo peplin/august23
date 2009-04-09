@@ -225,17 +225,17 @@ public class Star extends CelestialBody implements Serializable {
 
             sUpdateStarStatement.setDouble(1, getMass());
             sUpdateStarStatement.setDouble(2, getRadius());
-            sInsertStarStatement.setInt(3, getColorR());
-            sInsertStarStatement.setInt(4, getColorG());
-            sInsertStarStatement.setInt(5, getColorB());
-            sInsertStarStatement.setDouble(6, getLuminosity());
-            sInsertStarStatement.setDouble(7, getFrequency());
-            sInsertStarStatement.setInt(8, getState());
+            sUpdateStarStatement.setInt(3, getColorR());
+            sUpdateStarStatement.setInt(4, getColorG());
+            sUpdateStarStatement.setInt(5, getColorB());
+            sUpdateStarStatement.setDouble(6, getLuminosity());
+            sUpdateStarStatement.setDouble(7, getFrequency());
+            sUpdateStarStatement.setInt(8, getState());
             sUpdateStarStatement.setDouble(9, getId());
             sUpdateStarStatement.executeUpdate();
             setDirty(false);
         } catch(SQLException e) {
-            sLogger.log(Level.WARNING, "Could not update starary system "
+            sLogger.log(Level.WARNING, "Could not update star "
                     + this, e);
         }
     }

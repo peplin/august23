@@ -101,7 +101,6 @@ MultitouchModeInterface getMode() {
 void setMode(int mode) {
     getMode().disable();
     mCurrentMode = mode;
-    println("DEBUG: Switching to mode " + mode);
 }
 
 void mouseDragged() {

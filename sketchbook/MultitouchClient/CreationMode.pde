@@ -30,7 +30,7 @@ public class CreationMode extends GalaxyMode {
     }
 
     public void disconnectEvent() {
-        int endState = mClient.read();
+        //int endState = mClient.read();
         //TODO update star w/ end state
         saveStar();
         mNewStar = null;
@@ -58,17 +58,26 @@ public class CreationMode extends GalaxyMode {
     }
 
     public void cursorPressed(Point cursor) {
+        pushMatrix();
         mNewStar = new Star(0,
                 "Your Star",
                 MASTER_PARENT_ID,
                 new Point(
-                    width / 2 - mCamera.getCenterX() + mouseX,
-                    height/2 - mCamera.getCenterY() + mouseY, 0),
+                    modelX(mouseX - mCamera.getCenterX(), 
+                        mouseY - mCamera.getCenterY(), 0),
+                    modelY(mouseX - mCamera.getCenterX(),
+                        mouseY - mCamera.getCenterY(), 0), 0),
                 new PhysicsVector3d(1, 2, 3, 4),
                 new PhysicsVector3d(5, 6, 7, 8),
                 10,
-                10);
-        mClient = new Client(mParent, "141.213.30.171", 1966);
+                10,
+                255, 255, 255,
+                255,
+                1);
+        //TODO just for testing
+        disconnectEvent();
+        //mClient = new Client(mParent, "141.213.30.171", 1966);
+        popMatrix();
     }
 
     public void disable() {
