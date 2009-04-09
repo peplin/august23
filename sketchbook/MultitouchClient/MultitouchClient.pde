@@ -25,6 +25,7 @@ private static final int FRAME_RATE = 30;
 
 /** TUIO & Control Members **/
 private TuioController mTuioController;
+private MultitouchInterface mInterface;
 
 /** Object & Server Members **/
 private ObjectManagerClient mObjectManager;
@@ -33,14 +34,14 @@ private RequestHandlerClient mRequestHandler;
 /** Camera Properties **/
 private Camera mCamera;
 
-private int mParentId = 1;
-
-
 /** View Modes - nasty numbers becase there is no enum in 1.4 
 ** 0 - galaxy view
 ** 1 - star info view
 ** 2 - create star view (same as galaxy but different click function) 
+** 3 - connect mode
 */
+private MultitouchModeInterface mModes[];
+private int mCurrentMode = 0;
 
 void setup() {
     frameRate(FRAME_RATE);
@@ -57,6 +58,7 @@ void setup() {
 
     mRequestHandler = new RequestHandlerClient();
     mTuioController = new TuioController(this);
+    mInterface = new MultitouchInterface(this);
 
     User user =
             new User(0, "august_mt", null, null, 100);
@@ -67,134 +69,45 @@ void setup() {
 
     mObjectManager = new ObjectManagerClient(mRequestHandler);
 
+    mModes = new MultitouchModeInterface[4];
+    mModes[0] = new GalaxyMode(this, mObjectManager, mCamera);
+    mModes[1] = new InfoMode(this);
+    mModes[2] = new CreationMode(this, mObjectManager, mCamera);
+    mModes[3] = new ConnectionMode(this, mObjectManager, mCamera);
+
     Handler[] handlers = Logger.getLogger("").getHandlers();
     for(int i = 0; i < handlers.length; i++) {
         handlers[i].setLevel(Level.WARNING);
     }
+
+    textMode(SCREEN);
+    textAlign(LEFT);
 }
 
 void draw() {
     background(0);
+    pushMatrix();
     mCamera.setCamera();
-    updateUniverse();
-    updateInterface();
-
-}
-
-void updateInterface() {
-
-}
-
-void updateUniverse() {
-    pushMatrix();
-    translate(-width/2, -height/2);
-    try {
-        CelestialBody parent = mObjectManager.getCelestialBody(mParentId);
-        for(int i = 0; i < parent.getChildren().size(); i++) {
-            Star body =
-                    (Star) (mObjectManager.getCelestialBody(
-                                parent.getChildren().get(i)));
-            try {
-                body.getAsApplet(this).display();
-            } catch(TwoDimensionalException e) {
-                println(e);
-            }
-        }
-    } catch(UnhandledCelestialBodyException e) {
-        println("Caught exception when updating universe: " + e);
-    }
+    getMode().display();
     popMatrix();
+    translate(width/2, height/2);
+    mInterface.display();
 }
 
-boolean checkButtons(int x, int y) {
-    /*if(mZoomInButton.isUnder(x, y)) {
-        println("clicked zoom in");
-
-    } else if(mZoomOutButton.isUnder(x, y)) {
-        println("clicked zoom out");
-    } else if(mCreateButton.isUnder(x, y)) {
-        println("clicked create");
-    } else if(mConnectButton.isUnder(x, y)) {
-        println("clicked connect");
-    }*/
-    return false;
+MultitouchModeInterface getMode() {
+    return mModes[mCurrentMode];
 }
 
-boolean checkStarHover(int x, int y) {
-    pushMatrix();
-    translate(-width/2, -height/2);
-    try {
-        CelestialBody parent = mObjectManager.getCelestialBody(mParentId);
-        for(int i = 0; i < parent.getChildren().size(); i++) {
-            Star body =
-                    (Star) (mObjectManager.getCelestialBody(
-                                parent.getChildren().get(i)));
-            try {
-                Point bodyPosition = new Point(
-                        screenX((float)body.getPosition().getX(), 
-                            (float)body.getPosition().getY(), 
-                            (float)body.getPosition().getZ()),
-                        screenY((float)body.getPosition().getX(), 
-                            (float)body.getPosition().getY(),
-                            (float)body.getPosition().getZ()),
-                        0);
-                println(bodyPosition);
-                println("Mousex: " + x);
-                println("Mousey: " + y);
-                if(x <= bodyPosition.getX() + body.getRadius() 
-                        && x >= bodyPosition.getX() - body.getRadius()
-                        && y <= bodyPosition.getY() + body.getRadius() 
-                        && y >= bodyPosition.getY() - body.getRadius()) {
-                    println("clicked on star: " + body.getId());
-                    popMatrix();
-                    return true;
-                }
-            } catch(TwoDimensionalException e) {
-                println(e);
-            }
-        }
-    } catch(UnhandledCelestialBodyException e) {
-        println("Caught exception when updating universe: " + e);
-    }
-    popMatrix();
-    return false;
-}
-
-
-void mousePressed() {
-    if(mouseButton == LEFT) {
-        if(checkStarHover(mouseX, mouseY)) {
-            println("switching to star info mode");
-        } else if(checkButtons(mouseX, mouseY)) {
-
-        } else { // if(mMode == CREATE) {
-            mObjectManager.add(new Star(0,
-                    "Your Star",
-                    mParentId,
-                    new Point(width / 2 - mCamera.getCenterX() + mouseX,
-                        height/2 - mCamera.getCenterY() + mouseY, 0),
-                    new PhysicsVector3d(1, 2, 3, 4),
-                    new PhysicsVector3d(5, 6, 7, 8),
-                    10,
-                    10));
-        }
-    }
+void setMode(int mode) {
+    getMode().disable();
+    mCurrentMode = mode;
+    println("DEBUG: Switching to mode " + mode);
 }
 
 void mouseDragged() {
-    if(mouseButton == RIGHT) {
-        mCamera.changeTranslateVelocity(mouseX - pmouseX, mouseY - pmouseY);
-    } else if(mouseButton == CENTER) {
-        mCamera.zoom((float) (-.01 * (mouseY - pmouseY)));
-    }
+    mCamera.changeTranslateVelocity(mouseX - pmouseX, mouseY - pmouseY);
 }
 
-
-
-/**
-    * TUIO Callbacks: Unfortunately, these must be implemented in the PApplet
-    * class itself, so we can't pull it out to a MultitouchHandler class
-    */
 void addTuioCursor(TuioCursor tcur) {
     mTuioController.addTuioCursor(tcur);
 }

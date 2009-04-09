@@ -1,52 +1,38 @@
 package twoverse.gui;
 
-import java.util.ArrayList;
-
 import processing.core.PApplet;
 import twoverse.util.Point;
 
 public abstract class Button {
-    private Point mCenter;
+    private Point mCorner;
     private int mBaseColor;
     private int mHighlightColor;
     private boolean mVisible = false;
     private boolean mLocked = false;
     private String mName;
-    private ArrayList<Button> mChildren;
     protected PApplet mParentApplet;
     
     public Button(PApplet parentApplet, Point center, int baseColor,
             int highlightColor, String name) {
-        setCenter(center);
+        setCorner(center);
         setParentApplet(parentApplet);
         setBaseColor(baseColor);
         setHighlightColor(highlightColor);
         setName(name);
         setVisible(true);
-        mChildren = new ArrayList<Button>();
     }
 
     private void setParentApplet(PApplet parentApplet) {
         mParentApplet = parentApplet;
     }
 
-    public void update(Point cursor) {
-        if (isPressed(cursor)) {
-            if (isLocked()) {
-                setLocked(false);
-            } else {
-                setLocked(true);
-            }
-        }
-    }
-
     public abstract boolean isPressed(Point cursor);
 
-    boolean overRect(Point cursor, Point center, int width, int height) {
-        if (cursor.getX() >= center.getX()
-                && cursor.getX() <= center.getX() + width
-                && cursor.getY() >= center.getY()
-                && cursor.getY() <= center.getY() + height) {
+    boolean overRect(Point cursor, Point corner, int width, int height) {
+        if (cursor.getX() >= corner.getX()
+                && cursor.getX() <= corner.getX() + width
+                && cursor.getY() >= corner.getY()
+                && cursor.getY() <= corner.getY() + height) {
             return true;
         } else {
             return false;
@@ -72,12 +58,12 @@ public abstract class Button {
         return mVisible;
     }
 
-    public void setCenter(Point center) {
-        mCenter = center;
+    public void setCorner(Point corner) {
+        mCorner = corner;
     }
 
-    public Point getCenter() {
-        return mCenter;
+    public Point getCorner() {
+        return mCorner;
     }
 
     public void setBaseColor(int baseColor) {
@@ -103,17 +89,12 @@ public abstract class Button {
     public boolean isLocked() {
         return mLocked;
     }
-
+    
     public void setName(String name) {
         mName = name;
     }
 
     public String getName() {
         return mName;
-    }
-
-    public void addChild(Button child) {
-        child.setVisible(false);
-        mChildren.add(child);
     }
 }

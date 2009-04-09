@@ -25,7 +25,9 @@ public class Camera {
         mCenterY = centerY;
         mCenterZ = centerZ;
         mScale = scale;
+        mScaleTarget = scale;
         mParent = parent;
+        //mParent.pushMatrix();
     }
 
     public void setCamera() {
@@ -42,14 +44,12 @@ public class Camera {
         mCenterX += mCenterXVelocity;
         mCenterY += mCenterYVelocity;
         
-        mParent.translate(mParent.width / 2, mParent.height / 2);
-        mParent.scale(mScale);
-        mParent.translate(-mParent.width / 2, -mParent.height / 2);
         mParent.translate(mCenterX, mCenterY);
+        mParent.scale(mScale);
         
         mCenterXVelocity *= .75;
         mCenterYVelocity *= .75;
-        mScaleTarget = mParent.lerp(mScale, mScaleTarget, (float) .02);
+        mScale = mParent.lerp(mScale, mScaleTarget, (float) .02);
     }
 
     public void moveEye(float differenceX, float differenceY, float differenceZ) {
@@ -60,6 +60,10 @@ public class Camera {
     
     public void zoom(float difference) {
         mScaleTarget += difference;
+    }
+    
+    public void resetScale() {
+        mScaleTarget = 1;
     }
     
     public void changeTranslateVelocity(float differenceX, float differenceY) {
@@ -73,5 +77,9 @@ public class Camera {
     
     public float getCenterY() {
         return mCenterY;
+    }
+    
+    public float getScale() {
+        return mScale;
     }
 }
