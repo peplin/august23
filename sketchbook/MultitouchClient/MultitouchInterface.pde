@@ -15,4 +15,8 @@ public class MultitouchInterface {
 
     }
 
+    protected void draw() {
+
+    }
+
 }

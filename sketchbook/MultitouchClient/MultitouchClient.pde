@@ -35,6 +35,13 @@ private Camera mCamera;
 
 private int mParentId = 1;
 
+
+/** View Modes - nasty numbers becase there is no enum in 1.4 
+** 0 - galaxy view
+** 1 - star info view
+** 2 - create star view (same as galaxy but different click function) 
+*/
+
 void setup() {
     frameRate(FRAME_RATE);
     size(WINDOW_WIDTH, WINDOW_HEIGHT, P3D);
@@ -84,8 +91,8 @@ void updateUniverse() {
     try {
         CelestialBody parent = mObjectManager.getCelestialBody(mParentId);
         for(int i = 0; i < parent.getChildren().size(); i++) {
-            CelestialBody body =
-                    (CelestialBody) (mObjectManager.getCelestialBody(
+            Star body =
+                    (Star) (mObjectManager.getCelestialBody(
                                 parent.getChildren().get(i)));
             try {
                 body.getAsApplet(this).display();
@@ -114,6 +121,8 @@ boolean checkButtons(int x, int y) {
 }
 
 boolean checkStarHover(int x, int y) {
+    pushMatrix();
+    translate(-width/2, -height/2);
     try {
         CelestialBody parent = mObjectManager.getCelestialBody(mParentId);
         for(int i = 0; i < parent.getChildren().size(); i++) {
@@ -129,11 +138,15 @@ boolean checkStarHover(int x, int y) {
                             (float)body.getPosition().getY(),
                             (float)body.getPosition().getZ()),
                         0);
-                if(x >= bodyPosition.getX() + body.getRadius() 
-                        && x <= bodyPosition.getX() - body.getRadius()
-                        && y >= bodyPosition.getY() + body.getRadius() 
-                        && y <= bodyPosition.getY() - body.getRadius()) {
+                println(bodyPosition);
+                println("Mousex: " + x);
+                println("Mousey: " + y);
+                if(x <= bodyPosition.getX() + body.getRadius() 
+                        && x >= bodyPosition.getX() - body.getRadius()
+                        && y <= bodyPosition.getY() + body.getRadius() 
+                        && y >= bodyPosition.getY() - body.getRadius()) {
                     println("clicked on star: " + body.getId());
+                    popMatrix();
                     return true;
                 }
             } catch(TwoDimensionalException e) {
@@ -143,6 +156,7 @@ boolean checkStarHover(int x, int y) {
     } catch(UnhandledCelestialBodyException e) {
         println("Caught exception when updating universe: " + e);
     }
+    popMatrix();
     return false;
 }
 
