@@ -121,3 +121,15 @@ void updateTuioCursor(TuioCursor tcur) {
 void removeTuioCursor(TuioCursor tcur) {
     mTuioController.removeTuioCursor(tcur);
 }
+
+void clientEvent(Client client) {
+    if(mCurrentMode == 2) {
+        ((CreationMode)getMode()).clientEvent(); 
+    }
+}
+
+void disconnectEvent(Client client) {
+    if(mCurrentMode == 2) {
+        ((CreationMode)getMode()).disconnectEvent(); 
+    }
+}
