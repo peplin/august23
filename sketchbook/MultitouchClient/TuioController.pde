@@ -38,7 +38,7 @@ public class TuioController {
             fingerDown = true;
             fingerX = previousFingerX = tcur.getX() * screen.width;
             fingerY = previousFingerY = tcur.getY() * screen.width;
-            mParent.cursorPressed(fingerX, fingerY);
+            //mParent.cursorPressed(fingerX, fingerY);
         }
     }
 
@@ -50,7 +50,7 @@ public class TuioController {
             previousFingerY = fingerY;
             fingerX = tcur.getX() * screen.width;
             fingerY = tcur.getY() * screen.height;
-            mParent.cursorDragged(fingerX, fingerY);
+            //mParent.cursorDragged(fingerX, fingerY);
         }
     }
 

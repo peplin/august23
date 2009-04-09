@@ -94,13 +94,13 @@ void updateUniverse() {
             }
         }
     } catch(UnhandledCelestialBodyException e) {
-        //println("Caught exception when updating universe: " + e);
+        println("Caught exception when updating universe: " + e);
     }
     popMatrix();
 }
 
-void checkButtons(int x, int y) {
-    if(mZoomInButton.isUnder(x, y)) {
+boolean checkButtons(int x, int y) {
+    /*if(mZoomInButton.isUnder(x, y)) {
         println("clicked zoom in");
 
     } else if(mZoomOutButton.isUnder(x, y)) {
@@ -109,25 +109,39 @@ void checkButtons(int x, int y) {
         println("clicked create");
     } else if(mConnectButton.isUnder(x, y)) {
         println("clicked connect");
-    }
+    }*/
+    return false;
 }
 
-void checkStarHover(int x, int y) {
-    for(int i = 0; i < parent.getChildren().size(); i++) {
-        CelestialBody body =
-                (CelestialBody) (mObjectManager.getCelestialBody(
-                            parent.getChildren().get(i)));
-        Point bodyPosition = new Point(
-                screenX(body.getX(), body.getY(), body.getZ()),
-                screenY(body.getX(), body.getY(), body.getZ()),
-                0);
-        if(x >= bodyPosition.getX() + bodyPosition.getRadius() 
-                && x <= bodyPosition.getX() - bodyPosition.getRadius()
-                && y >= bodyPosition.getY() + bodyPosition.getRadius() 
-                && y <= bodyPosition.getY() - bodyPosition.getRadius()) {
-            println("clicked on star: " + body.getId());
-            return true;
+boolean checkStarHover(int x, int y) {
+    try {
+        CelestialBody parent = mObjectManager.getCelestialBody(mParentId);
+        for(int i = 0; i < parent.getChildren().size(); i++) {
+            Star body =
+                    (Star) (mObjectManager.getCelestialBody(
+                                parent.getChildren().get(i)));
+            try {
+                Point bodyPosition = new Point(
+                        screenX((float)body.getPosition().getX(), 
+                            (float)body.getPosition().getY(), 
+                            (float)body.getPosition().getZ()),
+                        screenY((float)body.getPosition().getX(), 
+                            (float)body.getPosition().getY(),
+                            (float)body.getPosition().getZ()),
+                        0);
+                if(x >= bodyPosition.getX() + body.getRadius() 
+                        && x <= bodyPosition.getX() - body.getRadius()
+                        && y >= bodyPosition.getY() + body.getRadius() 
+                        && y <= bodyPosition.getY() - body.getRadius()) {
+                    println("clicked on star: " + body.getId());
+                    return true;
+                }
+            } catch(TwoDimensionalException e) {
+                println(e);
+            }
         }
+    } catch(UnhandledCelestialBodyException e) {
+        println("Caught exception when updating universe: " + e);
     }
     return false;
 }
@@ -137,9 +151,9 @@ void mousePressed() {
     if(mouseButton == LEFT) {
         if(checkStarHover(mouseX, mouseY)) {
             println("switching to star info mode");
-        } else if(checkButtons(x, y)) {
+        } else if(checkButtons(mouseX, mouseY)) {
 
-        } else if(mMode == CREATE) {
+        } else { // if(mMode == CREATE) {
             mObjectManager.add(new Star(0,
                     "Your Star",
                     mParentId,
@@ -161,7 +175,6 @@ void mouseDragged() {
     }
 }
 
-void cursorPressed(float cursorX, cursorYJ:q
 
 
 /**

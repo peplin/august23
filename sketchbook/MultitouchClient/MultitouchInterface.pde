@@ -1,4 +1,5 @@
-
+import processing.core.*;
+import twoverse.gui.RectButton;
 
 public class MultitouchInterface {
     private RectButton mZoomInButton;
