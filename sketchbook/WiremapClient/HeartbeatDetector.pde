@@ -22,7 +22,7 @@ public class HeartbeatDetector {
         mParent = parent;
         mParent.registerDraw(this);
         mGraph = new float[width];
-        mPort = new Serial(this, Serial.list()[0], 9600); 
+        mPort = new Serial(mParent, Serial.list()[0], 9600); 
     }
 
     public void draw() {
@@ -47,7 +47,7 @@ public class HeartbeatDetector {
                                 mMinimumValue = mGraph[mCurrentIndex] / (float)AVERAGE_COUNT;
                             }
                             float valueAverage = mGraph[mCurrentIndex] / AVERAGE_COUNT;
-                            if(mCurrentIndex >= 10 && valueAverage < mGraph[(currentIndex - 10) % width] 
+                            if(mCurrentIndex >= 10 && valueAverage < mGraph[(mCurrentIndex - 10) % width] 
                                     / (float)AVERAGE_COUNT && !mUpbeat) {
                                 if(!mUpbeat) {
                                     beat();
@@ -58,7 +58,7 @@ public class HeartbeatDetector {
                                     / (float)AVERAGE_COUNT) {
                                 mUpbeat = false; 
                             }
-                            mCurrentIndex = (currentIndex + 1) % (width - 1);
+                            mCurrentIndex = (mCurrentIndex + 1) % (width - 1);
                             mGraph[mCurrentIndex] = 0;
                             mCurrentAverageIndex = 0;
                         }
@@ -82,7 +82,7 @@ public class HeartbeatDetector {
         mLastBeatTime = now;
     }
 
-    public void getCurrentRate() {
+    public float getCurrentRate() {
         return mCurrentRate;
     }
 

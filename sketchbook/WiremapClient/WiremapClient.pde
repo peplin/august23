@@ -33,8 +33,8 @@ void draw() {
     background(0);
     if(mActivated) {
         if(!mHeartbeatSet) {
-            float currentRate = mHeartbeatSet.getCurrentRate();
-            if(currentRate > .5 && < 3) {
+            float currentRate = mHeartbeatDetector.getCurrentRate();
+            if(currentRate > .5 && currentRate< 3) {
                 mHeartbeatSet = true;
                 //TODO send heartbeat, also store it
                 //play lifeline connceted audio
@@ -70,7 +70,7 @@ void serverEvent(Server server, Client client) {
     mCurrentClient = client;
     mHeartbeatSet = false;
     mSimulationRunning = false;
-    mHeartbeatSet.resetAverages();
+    mHeartbeatDetector.resetAverages();
 }
 
 void initializeAudio() {
@@ -87,10 +87,23 @@ void initializeAudio() {
     mCurrentAmbientPlayer = mAmbientPlayers[0];
 
     mSequenceVoiceOverPlayers = new AudioPlayer[8];
-    for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
+       mSequenceVoiceOverPlayers[1]
+            = mMinim.loadFile("sequenceVo2.wav");
+    mSequenceVoiceOverPlayers[2]
+            = mMinim.loadFile("sequenceVo3.wav");
+    mSequenceVoiceOverPlayers[4]
+            = mMinim.loadFile("sequenceVo5.wav");
+    mSequenceVoiceOverPlayers[5]
+            = mMinim.loadFile("sequenceVo6.wav");
+    mSequenceVoiceOverPlayers[6]
+            = mMinim.loadFile("sequenceVo7.wav");
+    
+    
+    
+    /*for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
         mSequenceVoiceOverPlayers[i]
             = mMinim.loadFile("sequenceVo" + i + ".wav");
-    }
+    }*/
 }
 
 void stop() {
