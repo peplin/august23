@@ -10,21 +10,40 @@ boolean mSimulationRunning = false;
 boolean mHeartbeatSet = false;
 
 float mHeartbeatFrequency;
-color mColor; //TODO set to some default
+color mColor; 
 
 Minim mMinim;
 AudioPlayer mAmbientPlayers[];
 AudioPlayer mSequenceVoiceOverPlayers[];
 AudioPlayer mCurrentAmbientPlayer;
+StarSimulation mStarSimulation;
 SineWave mSineWave;
+Wiremap mWiremap;
 AudioOutput mAudioOutput;
 HeartbeatDetector mHeartbeatDetector;
+WiremapGlowingSphere mGlowingSphere;
+boolean mStarted = false;
+
+boolean goingUp = false;
+boolean goingLeft = false;
+boolean goingBack = false;
+
+float x = 0;
+float y = 0;
+float z = 10;
 
 void setup() {
     size(1024, 768, P3D);
     mServer = new Server(this, 1966);
     mMinim = new Minim(this);
-//    mHeartbeatDetector = new HeartbeatDetector(this);
+    mWiremap = new Wiremap(this, 256, 90, 36, 48, 36.0/9.0, .1875, 2, 
+            "depths.txt");
+    mStarSimulation = new StarSimulation(mWiremap, this);  
+    mHeartbeatDetector = new HeartbeatDetector(this);
+    
+    mGlowingSphere = new WiremapGlowingSphere(
+    mWiremap, 500, 300, 20, color(255, 255, 0), 8, 
+    color(255, 0, 0)); 
 
     initializeAudio();
 }
@@ -33,18 +52,83 @@ void draw() {
     background(0);
     if(mActivated) {
         if(!mHeartbeatSet) {
-            float currentRate = 1; //mHeartbeatDetector.getCurrentRate();
+            float currentRate = mHeartbeatDetector.getCurrentRate();
             if(currentRate > .5 && currentRate< 3) {
                 mHeartbeatSet = true;
-                //TODO send heartbeat, also store it
-                //play lifeline connceted audio
+                mStarSimulation.setFrequency(currentRate);
+                mCurrentClient.write("beat " + currentRate);
             }
         } else {
-            //TODO star formation
+            if(mStarted) {
+                mSequenceVoiceOverPlayers[0].pause();
+                mSequenceVoiceOverPlayers[1].play();
+                mCurrentClient.write("play seq 2");
+                delay(3000);
+                mSequenceVoiceOverPlayers[2].play();
+                mCurrentClient.write("play seq 3");
+                delay(3000);
+                mSequenceVoiceOverPlayers[3].play();
+                mCurrentClient.write("play seq 4");
+                delay(2000);
+                mSequenceVoiceOverPlayers[4].play();
+                mCurrentClient.write("play seq 5");
+                mStarted = true;
+            } else {
+                pushMatrix();
+                mStarSimulation.display();
+                popMatrix();
+            }
         }
-        //disconnect from client when finished with message of final state
+
+        if(mStarSimulation.isEnded()) {
+            client.write("done");
+            mActivated = false;
+            mHeartbeatSet = false;
+            mStarted = false;
+        }
     } else {
         // do interesting light show stuff, or stay silent
+        background(0);
+        if(goingBack) {
+            z += 1;
+            if(z >= 35) {
+            goingBack = false; 
+            }
+        } 
+        else {
+            z -= 1;
+            if(z <= 1) {
+            goingBack = true; 
+            }
+        }
+
+        if(goingUp) {
+            y -= 10;
+            if(y <= 20) {
+            goingUp = false; 
+            }
+        } 
+        else {
+            y += 10;
+            if(y >= height - 40) {
+            goingUp = true; 
+            }
+        }
+
+        if(goingLeft) {
+            x -= 10;
+            if(x <= 20) {
+            goingLeft = false; 
+            }
+        } 
+        else {
+            x += 10;
+            if(x >= width - 60) {
+                goingLeft = true;
+            }
+        }    
+        glowingSphere.setPosition((int)x, (int)y, (int)z);
+        glowingSphere.display();
     }
 
     listen();
@@ -71,8 +155,9 @@ void serverEvent(Server server, Client client) {
     mHeartbeatSet = false;
     mSimulationRunning = false;
     client.write("start");
-//    client.write("done");
-    //mHeartbeatDetector.resetAverages();
+    mSequenceVoiceOverPlayers[0].loop(2);
+    mStarSimulation.initialie();
+    mHeartbeatDetector.resetAverages();
 }
 
 void initializeAudio() {
@@ -88,24 +173,11 @@ void initializeAudio() {
     }
     mCurrentAmbientPlayer = mAmbientPlayers[0];
 
-    mSequenceVoiceOverPlayers = new AudioPlayer[8];
-       mSequenceVoiceOverPlayers[1]
-            = mMinim.loadFile("sequenceVo2.mp3");
-    mSequenceVoiceOverPlayers[2]
-            = mMinim.loadFile("sequenceVo3.mp3");
-    mSequenceVoiceOverPlayers[4]
-            = mMinim.loadFile("sequenceVo5.mp3");
-    mSequenceVoiceOverPlayers[5]
-            = mMinim.loadFile("sequenceVo6.mp3");
-    mSequenceVoiceOverPlayers[6]
-            = mMinim.loadFile("sequenceVo7.mp3");
-    
-    
-    
-    /*for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
+    mSequenceVoiceOverPlayers = new AudioPlayer[5];
+    for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
         mSequenceVoiceOverPlayers[i]
-            = mMinim.loadFile("sequenceVo" + i + ".wav");
-    }*/
+            = mMinim.loadFile("sequence" + (i + 1) + ".mp3");
+    }
 }
 
 void stop() {
