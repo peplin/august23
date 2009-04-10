@@ -24,7 +24,7 @@ void setup() {
     size(1024, 768, P3D);
     mServer = new Server(this, 1966);
     mMinim = new Minim(this);
-    mHeartbeatDetector = new HeartbeatDetector(this);
+//    mHeartbeatDetector = new HeartbeatDetector(this);
 
     initializeAudio();
 }
@@ -33,7 +33,7 @@ void draw() {
     background(0);
     if(mActivated) {
         if(!mHeartbeatSet) {
-            float currentRate = mHeartbeatDetector.getCurrentRate();
+            float currentRate = 1; //mHeartbeatDetector.getCurrentRate();
             if(currentRate > .5 && currentRate< 3) {
                 mHeartbeatSet = true;
                 //TODO send heartbeat, also store it
@@ -70,7 +70,9 @@ void serverEvent(Server server, Client client) {
     mCurrentClient = client;
     mHeartbeatSet = false;
     mSimulationRunning = false;
-    mHeartbeatDetector.resetAverages();
+    client.write("start");
+//    client.write("done");
+    //mHeartbeatDetector.resetAverages();
 }
 
 void initializeAudio() {
@@ -82,21 +84,21 @@ void initializeAudio() {
 
     mAmbientPlayers = new AudioPlayer[7];
     for(int i = 0; i < 7; i++) {
-        mAmbientPlayers[i] = mMinim.loadFile("ambient" + (i + 1) + ".wav");
+        mAmbientPlayers[i] = mMinim.loadFile("ambient" + (i + 1) + ".mp3");
     }
     mCurrentAmbientPlayer = mAmbientPlayers[0];
 
     mSequenceVoiceOverPlayers = new AudioPlayer[8];
        mSequenceVoiceOverPlayers[1]
-            = mMinim.loadFile("sequenceVo2.wav");
+            = mMinim.loadFile("sequenceVo2.mp3");
     mSequenceVoiceOverPlayers[2]
-            = mMinim.loadFile("sequenceVo3.wav");
+            = mMinim.loadFile("sequenceVo3.mp3");
     mSequenceVoiceOverPlayers[4]
-            = mMinim.loadFile("sequenceVo5.wav");
+            = mMinim.loadFile("sequenceVo5.mp3");
     mSequenceVoiceOverPlayers[5]
-            = mMinim.loadFile("sequenceVo6.wav");
+            = mMinim.loadFile("sequenceVo6.mp3");
     mSequenceVoiceOverPlayers[6]
-            = mMinim.loadFile("sequenceVo7.wav");
+            = mMinim.loadFile("sequenceVo7.mp3");
     
     
     
