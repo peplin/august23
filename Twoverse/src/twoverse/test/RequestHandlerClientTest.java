@@ -27,11 +27,11 @@ public class RequestHandlerClientTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        database = new Database();
+   /*     database = new Database();
         server = new TwoverseServer();
         server.run();
         client = new RequestHandlerClient();
-        objectManagerClient = new ObjectManagerClient(client);
+        objectManagerClient = new ObjectManagerClient(client, "");
 
         users = new User[4];
         users[0] =
@@ -46,6 +46,7 @@ public class RequestHandlerClientTest {
         users[1].setPlaintextPassword("secondpass");
         users[2].setPlaintextPassword("thirdpass");
         users[3].setPlaintextPassword("fourthpass");
+        */
     }
 
     @AfterClass
