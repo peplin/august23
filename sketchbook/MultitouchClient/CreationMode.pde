@@ -1,4 +1,6 @@
 import processing.net.*;
+import ddf.minim.*;
+import ddf.minim.signals.SineWave;
 
 public class CreationMode extends GalaxyMode {
     private final String WIREMAP_SERVER_IP = "127.0.0.1";
@@ -8,9 +10,17 @@ public class CreationMode extends GalaxyMode {
     private Client mClient;
     private PFont mFont;
 
+    private Minim mMinim;
+    private AudioPlayer mSequenceVoiceOverPlayers[];
+    private AudioPlayer mGrabBagVoiceOverPlayers[];
+    private AudioPlayer mNarrationVoiceOverPlayers[];
+    private AudioPlayer mCurrentPlayer;
+    private float mNextPlayTime;
+
     public CreationMode(PApplet parent, ObjectManagerClient objectManager,
             Camera camera) {
         super(parent, objectManager, camera);
+        mMinim = new Minim(this);
         mColorGrabber = new ActiveColorGrabber(mParent);
         mFont = loadFont("promptFont.vlw");
         textFont(mFont, 48);
@@ -23,6 +33,13 @@ public class CreationMode extends GalaxyMode {
         } else {
             if(mSimulationRunning) {
                 //TODO display simulation
+                //TODO also select randomly from narrations
+                if(!mCurrentPlayer.isPlaying() && mNextPlayTime <= millis()) {
+                    mCurrentPlayer
+                        = mGrabBagVoiceOverPlayers[
+                            (int)random(mGrabBagVoiceOverPlayers.length)];
+                    mCurrentPlayer.play();
+                }
             } else {
                 text("Please enter the airlock", 0, 0);
                 //TODO display static particle field
@@ -46,7 +63,7 @@ public class CreationMode extends GalaxyMode {
         String data[] = mClient.readString().split(" ");
         //TODO confirm these packets aren't split up very often if ever
         if(data.length > 1 && data[0].equals("beat")) {
-            mNewStar.setHeartbeat(Integer.parseInt(data[1]));
+            mNewStar.setFrequency(Integer.parseInt(data[1]));
         }
         if(data[0].equals("start")) {
             mSimulationRunning = true;
@@ -72,7 +89,9 @@ public class CreationMode extends GalaxyMode {
                 new PhysicsVector3d(5, 6, 7, 8),
                 10,
                 10,
-                red(activeColor), green(activeColor) blue(activeColor),
+                (int)red(activeColor),
+                (int)green(activeColor),
+                (int)blue(activeColor),
                 255,
                 1);
         mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
@@ -83,5 +102,48 @@ public class CreationMode extends GalaxyMode {
     public void disable() {
         //TODO block disabling while client is connected
         mNewStar = null;
+    }
+
+    private void initializeAudio() {
+        mSequenceVoiceOverPlayers = new AudioPlayer[1];
+        mGrabBagVoiceOverPlayers = new AudioPlayer[1];
+        mNarrationVoiceOverPlayers = new AudioPlayer[1];
+
+        for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
+            mSequenceVoiceOverPlayers[i]
+                = mMinim.loadFile("sequenceVo" + i + ".wav");
+        }
+
+        for(int i = 0; i < mGrabBagVoiceOverPlayers.length; i++) {
+            mGrabBagVoiceOverPlayers[i]
+                = mMinim.loadFile("grabbagVo" + i + ".wav");
+        }
+
+        for(int i = 0; i < mNarrationVoiceOverPlayers.length; i++) {
+            mNarrationVoiceOverPlayers[i]
+                = mMinim.loadFile("narrationVo" + i + ".wav");
+        }
+    }
+
+    public void finalize() {
+        for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
+            if(mSequenceVoiceOverPlayers[i] != null) {
+                mSequenceVoiceOverPlayers[i].close();
+            }
+        }
+
+        for(int i = 0; i < mGrabBagVoiceOverPlayers.length; i++) {
+            if(mGrabBagVoiceOverPlayers[i] != null) {
+                mGrabBagVoiceOverPlayers[i].close();
+            }
+        }
+
+        for(int i = 0; i < mNarrationVoiceOverPlayers.length; i++) {
+            if(mNarrationVoiceOverPlayers[i] != null) {
+                mNarrationVoiceOverPlayers[i].close();
+            }
+        }
+        mMinim.stop();
+        super.finalize();
     }
 }

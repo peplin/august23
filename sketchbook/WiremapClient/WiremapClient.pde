@@ -18,24 +18,33 @@ AudioPlayer mSequenceVoiceOverPlayers[];
 AudioPlayer mCurrentAmbientPlayer;
 SineWave mSineWave;
 AudioOutput mAudioOutput;
+HeartbeatDetector mHeartbeatDetector;
 
 void setup() {
     size(1024, 768, P3D);
     mServer = new Server(this, 1966);
     mMinim = new Minim(this);
+    mHeartbeatDetector = new HeartbeatDetector(this);
 
     initializeAudio();
 }
 
 void draw() {
+    background(0);
     if(mActivated) {
         if(!mHeartbeatSet) {
+            float currentRate = mHeartbeatSet.getCurrentRate();
+            if(currentRate > .5 && < 3) {
+                mHeartbeatSet = true;
+                //TODO send heartbeat, also store it
+                //play lifeline connceted audio
+            }
         } else {
             //TODO star formation
         }
+        //disconnect from client when finished with message of final state
     } else {
         // do interesting light show stuff, or stay silent
-        //disconnect from client when finished with message of final state
     }
 
     listen();
@@ -52,7 +61,6 @@ void listen() {
         String data = client.readString();
         if(data != null) {
             println("client sent: " + data);
-            //TODO if we get heartbeat, play lifelineconnected
         }
     }
 }
@@ -62,6 +70,7 @@ void serverEvent(Server server, Client client) {
     mCurrentClient = client;
     mHeartbeatSet = false;
     mSimulationRunning = false;
+    mHeartbeatSet.resetAverages();
 }
 
 void initializeAudio() {
@@ -72,23 +81,16 @@ void initializeAudio() {
     mAudioOutput.disableSignal(mSineWave);
 
     mAmbientPlayers = new AudioPlayer[7];
-    for(int i = 0; i < 1; i++) {
-        mAmbientPlayers[i] = mMinim.loadFile("ambient" + (i + 1) + ".wav", 2048);
+    for(int i = 0; i < 7; i++) {
+        mAmbientPlayers[i] = mMinim.loadFile("ambient" + (i + 1) + ".wav");
     }
     mCurrentAmbientPlayer = mAmbientPlayers[0];
 
-    //TODO this number goes up when we record the rest tomorrow
     mSequenceVoiceOverPlayers = new AudioPlayer[8];
-    /*for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
+    for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
         mSequenceVoiceOverPlayers[i]
-            = mMinim.loadFile("sequenceVo" + i + ".mp3", 2048);
+            = mMinim.loadFile("sequenceVo" + i + ".wav");
     }
-    mSequenceVoiceOverPlayers[2] = mMinim.loadFile("sequenceVo3.wav", 2048);
-    mSequenceVoiceOverPlayers[3] = mMinim.loadFile("sequenceVo4.wav", 2048);
-    mSequenceVoiceOverPlayers[5] = mMinim.loadFile("sequenceVo6.wav", 2048);
-    mSequenceVoiceOverPlayers[6] = mMinim.loadFile("sequenceVo7.wav", 2048);
-    mSequenceVoiceOverPlayers[7] = mMinim.loadFile("sequenceVo8.wav", 2048);
-    */
 }
 
 void stop() {
