@@ -79,6 +79,8 @@ void setup() {
     for(int i = 0; i < handlers.length; i++) {
         handlers[i].setLevel(Level.WARNING);
     }
+    
+    //TODO set log level to info
 
     textMode(SCREEN);
     textAlign(LEFT);
@@ -124,11 +126,5 @@ void removeTuioCursor(TuioCursor tcur) {
 void clientEvent(Client client) {
     if(mCurrentMode == 2) {
         ((CreationMode)getMode()).clientEvent(); 
-    }
-}
-
-void disconnectEvent(Client client) {
-    if(mCurrentMode == 2) {
-        ((CreationMode)getMode()).disconnectEvent(); 
     }
 }

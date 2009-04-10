@@ -103,7 +103,7 @@ public class MultitouchInterface {
         if(mZoomInButton.isPressed(cursor)) {
             mCamera.zoom(ZOOM_STEP);
         } else if(mZoomOutButton.isPressed(cursor)) {
-            mCamera.zoom(ZOOM_STEP);
+            mCamera.zoom(-ZOOM_STEP);
         } else if(mCreateButton.isPressed(cursor)) {
             if(mCreateButton.isLocked()) {
                 mCreateButton.setLocked(false);
@@ -136,14 +136,6 @@ public class MultitouchInterface {
             return false;
         }
         return true;
-    }
-
-    void zoom(boolean closer) {
-        if(closer) {
-            mCamera.zoom((float) (.1));
-        } else {
-            mCamera.zoom((float) (-.1));
-        }
     }
 
     public void display() {
