@@ -85,9 +85,9 @@ public class StarSimulation {
 
         initialize();
 
-        float a0 = 10;
+        float a0 = 40;
         rbkg = 2.e2;
-        rsph0 = 4.e2;
+        rsph0 = 12.e2;
         float u1,u2;
         for(int i=0; i<nsph; i++) {
             u1 = random(0,1);
@@ -327,7 +327,8 @@ public class StarSimulation {
             for (int j=0;j<n;j++){
                 r2 = x[j]*x[j]+y[j]*y[j]+z[j]*z[j];
                 if (r2 > rmin*rmin && r2 < rmax*rmax){
-                point(x[j],y[j],z[j]);
+                    translate(x[j],y[j],z[j]);
+                    box(5);
                 }
             } 
         }

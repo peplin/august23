@@ -75,6 +75,7 @@ void draw() {
                 mStarted = true;
             } else {
                 pushMatrix();
+                scale(1.5);
                 mStarSimulation.display();
                 popMatrix();
             }
