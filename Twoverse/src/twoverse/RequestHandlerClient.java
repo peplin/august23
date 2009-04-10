@@ -1,9 +1,7 @@
 package twoverse;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,29 +18,21 @@ import twoverse.util.User;
 
 public class RequestHandlerClient implements TwoversePublicApi {
     private Session mSession;
-    private Properties mConfigFile;
     private XmlRpcClient mXmlRpcClient;
+    private String mServerIp;
     XmlRpcClientConfigImpl mXmlRpcConfig;
     private static Logger sLogger =
             Logger.getLogger(RequestHandlerClient.class.getName());
 
-    public RequestHandlerClient() {
-        try {
-            mConfigFile = new Properties();
-            mConfigFile.load(this.getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("twoverse/conf/RequestHandlerClient.properties"));
-        } catch (IOException e) {
+    public RequestHandlerClient(String serverIp) {
 
-        }
-
+        mServerIp = serverIp;
         mXmlRpcConfig = new XmlRpcClientConfigImpl();
         try {
-            mXmlRpcConfig.setServerURL(new URL(mConfigFile.getProperty("XMLRPCSERVER")));
+            mXmlRpcConfig.setServerURL(new URL(mServerIp));
         } catch (MalformedURLException e) {
             sLogger.log(Level.SEVERE,
-                    "Unable to parse URL for XML-RPC server: "
-                            + mConfigFile.getProperty("XMLRPCSERVER"),
+                    "Unable to parse URL for XML-RPC server: " + mServerIp,
                     e);
         }
 

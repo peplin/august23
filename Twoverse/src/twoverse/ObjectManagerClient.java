@@ -19,11 +19,13 @@ import twoverse.object.applet.AppletBodyInterface;
 public class ObjectManagerClient extends ObjectManager {
     private Builder mParser;
     private RequestHandlerClient mRequestHandler;
+    private String mFeedUrl;
 
-    public ObjectManagerClient(RequestHandlerClient requestHandler) {
+    public ObjectManagerClient(RequestHandlerClient requestHandler, String feedUrl) {
         super();
         mParser = new Builder();
         mRequestHandler = requestHandler;
+        mFeedUrl = feedUrl;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class ObjectManagerClient extends ObjectManager {
 
     private void pullFeed() {
         try {
-            Document doc = mParser.build(mConfigFile.getProperty("FEED_URL"));
+            Document doc = mParser.build(mFeedUrl);
             // TODO how do we pick up deleted objects?
 
             Element universe =

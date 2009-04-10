@@ -32,4 +32,7 @@ while ($star = mysql_fetch_row($stars)) {
     echo "</tr>";
 }
 echo "</tbody></table>";
+
+echo "<div><ul>";
+echo "<li>
 ?>
