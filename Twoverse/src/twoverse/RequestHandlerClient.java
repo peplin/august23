@@ -210,7 +210,6 @@ public class RequestHandlerClient implements TwoversePublicApi {
         return body;
     }
 
-    @Override
     public Link add(Link link) {
         try {
             Object[] parameters = new Object[] { link };

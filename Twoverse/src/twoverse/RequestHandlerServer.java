@@ -154,7 +154,6 @@ public class RequestHandlerServer extends XmlRpcServlet implements
         return mapping;
     }
 
-    @Override
     public Link add(Link link) {
         sLogger.log(Level.INFO, "Attempting to add link: " + link);
         sObjectManager.add(link);
