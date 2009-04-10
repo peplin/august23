@@ -70,7 +70,8 @@ void serverEvent(Server server, Client client) {
     mCurrentClient = client;
     mHeartbeatSet = false;
     mSimulationRunning = false;
-    client.write("done");
+    client.write("start");
+//    client.write("done");
     //mHeartbeatDetector.resetAverages();
 }
 
