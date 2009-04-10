@@ -1,11 +1,12 @@
-import codeanticode.gsvideo.*;
+//import codeanticode.gsvideo.*;
 import java.awt.event.KeyEvent;
+import processing.video.*;
 
 public class ActiveColorGrabber {
     private final int MINIMUM_DIFFERENCE_THRESHOLD = 100;
     private final float AVERAGE_PERCENTAGE_CHANGE = .1;
     private final int AVERAGE_THRESHOLD = 10;
-    private GSCapture mVideo;
+    private Capture mVideo;
     private int[] mPreviousFrame;
     private float mAverageColorR = 255;
     private float mAverageColorG = 255;
@@ -19,7 +20,7 @@ public class ActiveColorGrabber {
     public ActiveColorGrabber(PApplet parent) {
         parent.registerDraw(this);
         parent.registerKeyEvent(this);
-        mVideo = new GSCapture(parent, width, height, 24);
+        mVideo = new Capture(parent, width, height, 24);
         mPreviousFrame = new int[width * height];
     }
 

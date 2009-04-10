@@ -56,7 +56,7 @@ void setup() {
                     (float) (height / 2.0),
                     0, 1);
 
-    mRequestHandler = new RequestHandlerClient();
+    mRequestHandler = new RequestHandlerClient("http://141.213.30.171:8080");
     mTuioController = new TuioController(this);
     mInterface = new MultitouchInterface(this);
 
@@ -67,7 +67,7 @@ void setup() {
     mRequestHandler.createAccount(user);
     mRequestHandler.login(user.getUsername(), "grocs1966");
 
-    mObjectManager = new ObjectManagerClient(mRequestHandler);
+    mObjectManager = new ObjectManagerClient(mRequestHandler, "http://141.213.30.171/gallery/feed.xml");
 
     mModes = new MultitouchModeInterface[4];
     mModes[0] = new GalaxyMode(this, mObjectManager, mCamera);

@@ -20,7 +20,7 @@ public class CreationMode extends GalaxyMode {
     public CreationMode(PApplet parent, ObjectManagerClient objectManager,
             Camera camera) {
         super(parent, objectManager, camera);
-        mMinim = new Minim(this);
+        mMinim = new Minim(mParent);
         mColorGrabber = new ActiveColorGrabber(mParent);
         mFont = loadFont("promptFont.vlw");
         textFont(mFont, 48);
@@ -144,6 +144,5 @@ public class CreationMode extends GalaxyMode {
             }
         }
         mMinim.stop();
-        super.finalize();
     }
 }
