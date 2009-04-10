@@ -1,14 +1,19 @@
 import processing.net.*;
 
 public class CreationMode extends GalaxyMode {
+    private final String WIREMAP_SERVER_IP = "127.0.0.1";
     private Star mNewStar = null;
-    private boolean mReceivedAllData = false;
+    private boolean mSimulationRunning = false;
+    private ActiveColorGrabber mColorGrabber;
     private Client mClient;
+    private PFont mFont;
 
     public CreationMode(PApplet parent, ObjectManagerClient objectManager,
             Camera camera) {
         super(parent, objectManager, camera);
-        //TODO replace this IP with that of the MT computer
+        mColorGrabber = new ActiveColorGrabber(mParent);
+        mFont = loadFont("promptFont.vlw");
+        textFont(mFont, 48);
     }
 
     public void display() {
@@ -16,49 +21,45 @@ public class CreationMode extends GalaxyMode {
             mCamera.resetScale();
             super.display();
         } else {
-            if(mReceivedAllData) {
+            if(mSimulationRunning) {
                 //TODO display simulation
             } else {
+                text("Please enter the airlock", 0, 0);
                 //TODO display static particle field
-                // share gauge cluster with InfoMode
             }
+            //TODO display gauge cluster
         }
     } 
 
     private void saveStar() {
         mObjectManager.add(mNewStar);
+        mNewStar = null;
     }
 
     public void disconnectEvent() {
-        //int endState = mClient.read();
-        //TODO update star w/ end state
         saveStar();
-        mNewStar = null;
+        mSimulationRunning = false;
         setMode(0);
     }
 
     public void clientEvent() {
-        String data[] = mClient.readString().split("/");
+        String data[] = mClient.readString().split(" ");
         //TODO confirm these packets aren't split up very often if ever
-        if(data[0].equals("color")) {
-            /*mNewStar.setColor(color(Integer.parseInt(data[1]),
-                        Integer.parseInt(data[2]),
-                        Integer.parseInt(data[3])));
-                        */
-            if(data.length == 6) {
-                if(data[4].equals("beat")) {
-                    //mNewStar.setHeartbeat(Integer.parseInt(data[5]));
-                }
-            }
-        } else if(data[0].equals("beat")) {
-            //mNewStar.setHeartbeat(Integer.parseInt(data[1]));
+        if(data.length > 1 && data[0].equals("beat")) {
+            mNewStar.setHeartbeat(Integer.parseInt(data[1]));
         }
-        //TODO if recv all, set flag to true - or can we check the star
-        //directly?
+        if(data[0].equals("start")) {
+            mSimulationRunning = true;
+        }
+        if(data.length > 1 && data[0].equals("state")) {
+            mNewStar.setState(Integer.parseInt(data[1]));
+        }
     }
 
     public void cursorPressed(Point cursor) {
         pushMatrix();
+        //TODO this may be too dark - perhaps just grab average
+        color activeColor = mColorGrabber.getActiveColor();
         mNewStar = new Star(0,
                 "Your Star",
                 MASTER_PARENT_ID,
@@ -71,12 +72,11 @@ public class CreationMode extends GalaxyMode {
                 new PhysicsVector3d(5, 6, 7, 8),
                 10,
                 10,
-                255, 255, 255,
+                red(activeColor), green(activeColor) blue(activeColor),
                 255,
                 1);
-        //TODO just for testing
-        disconnectEvent();
-        //mClient = new Client(mParent, "141.213.30.171", 1966);
+        mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
+        mClient.write("color " + activeColor);
         popMatrix();
     }
 

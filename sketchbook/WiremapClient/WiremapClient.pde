@@ -1,19 +1,20 @@
 import processing.net.*;
 import ddf.minim.*;
+import ddf.minim.signals.SineWave;
 
 Server mServer;
 Client mCurrentClient;
 
-boolean mBusy = false;
+boolean mActivated = false;
+boolean mSimulationRunning = false;
 boolean mHeartbeatSet = false;
-boolean mColorSet = false;
 
 float mHeartbeatFrequency;
-color mColor;
+color mColor; //TODO set to some default
 
 Minim mMinim;
 AudioPlayer mAmbientPlayers[];
-AudioPlayer mVoiceOverPlayers[];
+AudioPlayer mSequenceVoiceOverPlayers[];
 AudioPlayer mCurrentAmbientPlayer;
 SineWave mSineWave;
 AudioOutput mAudioOutput;
@@ -27,21 +28,9 @@ void setup() {
 }
 
 void draw() {
-    //TODO figure out order of voiceovers
-    if(mBusy) {
-        if(!mColorSet) {
-            //TODO get color from client - MT has camera
-            if(!mColorVoiceOver.isPlaying()) {
-
-            }
-        } else if(!mHeartbeatSet) {
-            if(!mHeartbeatVoiceOver.isLooping()) {
-                mHeartbeatVoiceOver.loop();
-            }
+    if(mActivated) {
+        if(!mHeartbeatSet) {
         } else {
-            if(mHeartbeatVoiceOver.isLooping()) {
-                mHeartbeatVoiceOver.play();
-            }
             //TODO star formation
         }
     } else {
@@ -49,49 +38,69 @@ void draw() {
         //disconnect from client when finished with message of final state
     }
 
+    listen();
+
     if(!mCurrentAmbientPlayer.isPlaying()) {
-        mCurrentAmbientPlayer = mAmbientPlayers[random(mAmbientPlayers.length)];
+        mCurrentAmbientPlayer = mAmbientPlayers[(int)random(mAmbientPlayers.length)];
         mCurrentAmbientPlayer.play();
     }
 }
 
+void listen() {
+    Client client = mServer.available();
+    if(client != null) {
+        String data = client.readString();
+        if(data != null) {
+            println("client sent: " + data);
+            //TODO if we get heartbeat, play lifelineconnected
+        }
+    }
+}
+
 void serverEvent(Server server, Client client) {
-    mBusy = true;
+    mActivated = true;
     mCurrentClient = client;
-    mColorSet = false;
     mHeartbeatSet = false;
+    mSimulationRunning = false;
 }
 
 void initializeAudio() {
-    mAudioOutput = mMinim.getLineOut(Minimum.MONO);
+    mAudioOutput = mMinim.getLineOut(Minim.MONO);
     mSineWave = new SineWave(440, .5, mAudioOutput.sampleRate());
     mSineWave.portamento(200);
     mAudioOutput.addSignal(mSineWave);
     mAudioOutput.disableSignal(mSineWave);
 
     mAmbientPlayers = new AudioPlayer[7];
-    for(int i = 0; i < 7; i++) {
-        mAmbientPlayers[i] = mMinim.loadFile("ambient" + i + ".wav", 2048);
+    for(int i = 0; i < 1; i++) {
+        mAmbientPlayers[i] = mMinim.loadFile("ambient" + (i + 1) + ".wav", 2048);
     }
-    mCurrentAmbientPlayer = mAmbientPlayers[i];
+    mCurrentAmbientPlayer = mAmbientPlayers[0];
 
-    //TODO get exact count
-    mVoiceOverPlayers = new AudioPlayer[40];
-    for(int i = 0; i < 40; i++) {
-        mVoiceOverPlayers[i] = mMinim.loadFile("vo" + i + ".wav", 2048);
+    //TODO this number goes up when we record the rest tomorrow
+    mSequenceVoiceOverPlayers = new AudioPlayer[8];
+    /*for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
+        mSequenceVoiceOverPlayers[i]
+            = mMinim.loadFile("sequenceVo" + i + ".mp3", 2048);
     }
+    mSequenceVoiceOverPlayers[2] = mMinim.loadFile("sequenceVo3.wav", 2048);
+    mSequenceVoiceOverPlayers[3] = mMinim.loadFile("sequenceVo4.wav", 2048);
+    mSequenceVoiceOverPlayers[5] = mMinim.loadFile("sequenceVo6.wav", 2048);
+    mSequenceVoiceOverPlayers[6] = mMinim.loadFile("sequenceVo7.wav", 2048);
+    mSequenceVoiceOverPlayers[7] = mMinim.loadFile("sequenceVo8.wav", 2048);
+    */
 }
 
 void stop() {
     for(int i = 0; i < mAmbientPlayers.length; i++) {
         if(mAmbientPlayers[i] != null) {
-            mAmbientPlayers.close();
+            mAmbientPlayers[i].close();
         }
     }
 
-    for(int i = 0; i < mVoiceOverPlayers.length; i++) {
-        if(mVoiceOverPlayers[i] != null) {
-            mVoiceOverPlayers.close();
+    for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
+        if(mSequenceVoiceOverPlayers[i] != null) {
+            mSequenceVoiceOverPlayers[i].close();
         }
     }
     mMinim.stop();
