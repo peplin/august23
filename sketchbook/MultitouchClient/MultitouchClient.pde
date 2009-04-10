@@ -125,6 +125,6 @@ void removeTuioCursor(TuioCursor tcur) {
 
 void clientEvent(Client client) {
     if(mCurrentMode == 2) {
-        ((CreationMode)getMode()).clientEvent(); 
+        //((CreationMode)getMode()).clientEvent(); 
     }
 }

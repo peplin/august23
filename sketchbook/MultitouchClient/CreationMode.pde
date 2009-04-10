@@ -61,7 +61,7 @@ public class CreationMode extends GalaxyMode {
     mNewStar = null;
   }
 
-  public void clientEvent() {
+ /* public void clientEvent() {
     if(mClient != null) {
       String data = mClient.readString();
       if(data != null) {
@@ -90,7 +90,7 @@ public class CreationMode extends GalaxyMode {
         }
       }
     }
-  }
+  }*/  
 
   public void cursorPressed(Point cursor) {
     pushMatrix();
@@ -113,8 +113,9 @@ public class CreationMode extends GalaxyMode {
     (int)blue(activeColor),
     255,
     1);
-    mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
-    mClient.write("color " + activeColor);
+    saveStar();
+    //mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
+    //mClient.write("color " + activeColor);
     popMatrix();
   }
 
