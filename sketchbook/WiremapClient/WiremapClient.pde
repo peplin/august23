@@ -5,10 +5,16 @@ Server mServer;
 Client mCurrentClient;
 
 boolean mBusy = false;
+boolean mHeartbeatSet = false;
+boolean mColorSet = false;
+
+float mHeartbeatFrequency;
+color mColor;
 
 Minim mMinim;
 AudioPlayer mAmbientPlayers[];
 AudioPlayer mVoiceOverPlayers[];
+AudioPlayer mCurrentAmbientPlayer;
 SineWave mSineWave;
 AudioOutput mAudioOutput;
 
@@ -21,20 +27,39 @@ void setup() {
 }
 
 void draw() {
+    //TODO figure out order of voiceovers
     if(mBusy) {
-        // do star formation
+        if(!mColorSet) {
+            //TODO get color from client - MT has camera
+            if(!mColorVoiceOver.isPlaying()) {
+
+            }
+        } else if(!mHeartbeatSet) {
+            if(!mHeartbeatVoiceOver.isLooping()) {
+                mHeartbeatVoiceOver.loop();
+            }
+        } else {
+            if(mHeartbeatVoiceOver.isLooping()) {
+                mHeartbeatVoiceOver.play();
+            }
+            //TODO star formation
+        }
     } else {
         // do interesting light show stuff, or stay silent
+        //disconnect from client when finished with message of final state
     }
 
-    //TODO always play sounds 
-    //disconnect from client when finished with message of final state
+    if(!mCurrentAmbientPlayer.isPlaying()) {
+        mCurrentAmbientPlayer = mAmbientPlayers[random(mAmbientPlayers.length)];
+        mCurrentAmbientPlayer.play();
+    }
 }
 
 void serverEvent(Server server, Client client) {
     mBusy = true;
     mCurrentClient = client;
-    //TODO begin info grab sequence
+    mColorSet = false;
+    mHeartbeatSet = false;
 }
 
 void initializeAudio() {
@@ -48,6 +73,7 @@ void initializeAudio() {
     for(int i = 0; i < 7; i++) {
         mAmbientPlayers[i] = mMinim.loadFile("ambient" + i + ".wav", 2048);
     }
+    mCurrentAmbientPlayer = mAmbientPlayers[i];
 
     //TODO get exact count
     mVoiceOverPlayers = new AudioPlayer[40];
