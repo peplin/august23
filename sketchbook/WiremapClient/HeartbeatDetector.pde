@@ -90,4 +90,4 @@ public class HeartbeatDetector {
         mBigAverage = 0;
         mBigAverageIndex = 0;
     }
-}
+
