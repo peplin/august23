@@ -3,7 +3,7 @@ import ddf.minim.*;
 import ddf.minim.signals.SineWave;
 
 public class CreationMode extends GalaxyMode {
-  private final String WIREMAP_SERVER_IP = "141.211.4.193";
+  private final String WIREMAP_SERVER_IP = "localhost"; //"141.211.4.193";
   private Star mNewStar = null;
   private boolean mSimulationRunning = false;
   private ActiveColorGrabber mColorGrabber;
@@ -22,7 +22,7 @@ public class CreationMode extends GalaxyMode {
   Camera camera) {
     super(parent, objectManager, camera);
     mMinim = new Minim(mParent);
-    mColorGrabber = new ActiveColorGrabber(mParent);
+    //mColorGrabber = new ActiveColorGrabber(mParent);
     mStarSimulation = new StarSimulation(null, this);
     mFont = loadFont("promptFont.vlw");
     initializeAudio();
@@ -94,8 +94,7 @@ public class CreationMode extends GalaxyMode {
 
   public void cursorPressed(Point cursor) {
     pushMatrix();
-    //TODO this may be too dark - perhaps just grab average
-    color activeColor = mColorGrabber.getActiveColor();
+    color activeColor = color(255); //mColorGrabber.getActiveColor();
     mNewStar = new Star(0,
     "Your Star",
     MASTER_PARENT_ID,
