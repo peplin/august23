@@ -34,12 +34,12 @@ float y = 0;
 float z = 10;
 
 void setup() {
-    size(1024, 768, P3D);
+    size(1024, 768, OPENGL);
     mServer = new Server(this, 1966);
     mMinim = new Minim(this);
     mWiremap = new Wiremap(this, 256, 90, 36, 48, 36.0/9.0, .1875, 2, 
             "depths.txt");
-    mStarSimulation = new StarSimulation(null);  
+    mStarSimulation = new StarSimulation(this, null);  
     mHeartbeatDetector = new HeartbeatDetector(this);
     
     mGlowingSphere = new WiremapGlowingSphere(
@@ -71,13 +71,13 @@ void draw() {
                 mSequenceVoiceOverPlayers[0].pause();
                 mSequenceVoiceOverPlayers[1].play();
                 sendMessage("play seq 1");
-                //delay(3000);
+                delay(3000);
                 mSequenceVoiceOverPlayers[2].play();
                 sendMessage("play seq 2");
-                //delay(3000);
+                delay(3000);
                 mSequenceVoiceOverPlayers[3].play();
                 sendMessage("play seq 3");
-                //delay(2000);
+                delay(2000);
                 mSequenceVoiceOverPlayers[4].play();
                 sendMessage("play seq 4");
                 mStarted = true;
@@ -88,6 +88,7 @@ void draw() {
                 pushMatrix();
                 mStarSimulation.display();
                 popMatrix();
+                //TODO send messages to play narrations
             }
         }
 
@@ -161,14 +162,15 @@ void initializeAudio() {
 
     mAmbientPlayers = new AudioPlayer[7];
     for(int i = 0; i < 7; i++) {
-        mAmbientPlayers[i] = mMinim.loadFile("ambient" + (i + 1) + ".mp3");
+        mAmbientPlayers[i] =
+            mMinim.loadFile("ambient" + (i + 1) + ".mp3", 2048);
     }
     mCurrentAmbientPlayer = mAmbientPlayers[0];
 
     mSequenceVoiceOverPlayers = new AudioPlayer[5];
     for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
         mSequenceVoiceOverPlayers[i]
-            = mMinim.loadFile("sequence" + (i + 1) + ".mp3");
+            = mMinim.loadFile("sequence" + (i + 1) + ".mp3", 2048);
     }
 }
 

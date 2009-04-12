@@ -60,15 +60,18 @@ public class StarSimulation {
     private float t2bmax;
     private float t2cmin;
     private float t2cmax;
+    private PulsarSimulation pulsarSim;
 
     /**
     ** Set map to null to use regular graphics
     */
-    public StarSimulation(Wiremap map) {
+    public StarSimulation(PApplet parent, Wiremap map) {
         if (wmap != null){
             wmap = map;
             wrect = new WiremapRectangle(wmap, 400,400, 5 , 255, sqwidth, sqheight, sqdepth, 0, 0);
         }
+
+        pulsarSim = new PulsarSimulation(parent);
 
         initialize();
     }
@@ -189,7 +192,10 @@ public class StarSimulation {
 
             // PULSAR
             if (eol == 2) {
-                //TODO insert jiangang's code
+                pushMatrix();
+                translate(-width/2, -height/2);
+                pulsarSim.display();
+                popMatrix();
             }
         }
     }
@@ -261,6 +267,8 @@ public class StarSimulation {
         } else {
             eol = 2;
         }
+
+        eol=2;
 
         float a0 = 40;
         float u1,u2;

@@ -1,10 +1,13 @@
-StarSimulation sim;
+StarSimulation starSim;
+PulsarSimulation pulsarSim;
 
 void setup() {
-    size(1024, 768, P3D);
-    sim = new StarSimulation(null);
+    size(1024, 768, OPENGL);
+    starSim = new StarSimulation(this, null);
+    pulsarSim = new PulsarSimulation(this);
 }
 
 void draw() {
-    sim.display();
+    starSim.display();
+    //pulsarSim.display();
 }

@@ -24,7 +24,7 @@ public class CreationMode extends GalaxyMode {
     super(parent, objectManager, camera);
     mMinim = new Minim(mParent);
     //mColorGrabber = new ActiveColorGrabber(mParent);
-    mStarSimulation = new StarSimulation(null);
+    mStarSimulation = new StarSimulation(parent, null);
     mFont = loadFont("promptFont.vlw");
     mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
     initializeAudio();
@@ -183,17 +183,17 @@ public class CreationMode extends GalaxyMode {
 
     for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
       mSequenceVoiceOverPlayers[i]
-        = mMinim.loadFile("sequence" + (i + 1) + ".mp3");
+        = mMinim.loadFile("sequence" + (i + 1) + ".mp3", 2048);
     }
 
     for(int i = 0; i < mGrabBagVoiceOverPlayers.length; i++) {
       mGrabBagVoiceOverPlayers[i]
-        = mMinim.loadFile("grabbag" + (i + 1) + ".mp3");
+        = mMinim.loadFile("grabbag" + (i + 1) + ".mp3", 2048);
     }
 
     for(int i = 0; i < mNarrationVoiceOverPlayers.length; i++) {
       mNarrationVoiceOverPlayers[i]
-        = mMinim.loadFile("narration" + (i + 1) + ".mp3");
+        = mMinim.loadFile("narration" + (i + 1) + ".mp3", 2048);
     }
   }
 

@@ -45,7 +45,7 @@ private int mCurrentMode = 0;
 
 void setup() {
     frameRate(FRAME_RATE);
-    size(WINDOW_WIDTH, WINDOW_HEIGHT, P3D);
+    size(WINDOW_WIDTH, WINDOW_HEIGHT, OPENGL);
 
     mCamera =
             new Camera(this,
