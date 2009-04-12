@@ -64,9 +64,8 @@ public class CreationMode extends GalaxyMode {
         textAlign(CENTER);
         text("Please enter the airlock", width/2, height/2);
         textAlign(LEFT);
-        //TODO display static particle field
       }
-      //TODO display gauge cluster
+      //TODO display gauge cluster and heartbeat monitor
     }
     listen();
   } 
@@ -102,10 +101,9 @@ public class CreationMode extends GalaxyMode {
                     if(messageParts.length == 2) {
                         mNewStar.setFrequency(
                                 (double)Float.parseFloat(messageParts[1]));
-                        if(mSimulationRunning) {
-                            mStarSimulation.setFrequency(
-                                    (float)mNewStar.getFrequency()); 
-                        }
+                        //TODO make sure this is being stored
+                        mStarSimulation.setFrequency(
+                                (float)mNewStar.getFrequency()); 
                     } else {
                         throw new Exception("Malformed message: " + message);
                     }
@@ -113,6 +111,7 @@ public class CreationMode extends GalaxyMode {
                     if(messageParts.length == 2) {
                         int endState = Integer.parseInt(messageParts[1]);
                         mNewStar.setState(endState);
+                        //TODO make sure this is being stored in DB
                         mStarSimulation.setEndState(endState);
                     } else {
                         throw new Exception("Malformed message: " + message);

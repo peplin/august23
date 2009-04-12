@@ -67,11 +67,11 @@ public class RectButton extends Button {
     }
     
     private void label() {
-        mParentApplet.textFont(mFont, 12);
+        mParentApplet.textFont(mFont, 24);
         mParentApplet.fill(255);
         mParentApplet.text(getName(),
                 (float) getCorner().getX(),
-                (float) getCorner().getY());
+                (float) getCorner().getY() - 5);
     }
 
     public void setWidth(int width) {

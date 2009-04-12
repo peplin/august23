@@ -11,6 +11,7 @@ public class ConnectionMode extends GalaxyMode {
         super.display();
         mCamera.resetScale();
         pushMatrix();
+        smooth();
         stroke(255);
         noFill();
         translate(-width/2, -height/2);
@@ -28,6 +29,7 @@ public class ConnectionMode extends GalaxyMode {
 
             }
         }
+        noSmooth();
         popMatrix();
     }
 

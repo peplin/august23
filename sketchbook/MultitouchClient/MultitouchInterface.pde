@@ -6,6 +6,8 @@ public class MultitouchInterface {
     private final int BUTTON_HEIGHT = 75;
     private final int BUTTON_PADDING = 25;
     private final float ZOOM_STEP = .1;
+    private final color BUTTON_BASE_COLOR = color(2, 104, 115);
+    private final color BUTTON_HIGHLIGHT_COLOR = color(3, 140, 140);
     private RectButton mZoomInButton;
     private RectButton mZoomOutButton;
     private RectButton mCreateButton;
@@ -13,6 +15,7 @@ public class MultitouchInterface {
     private RectButton mGalaxyButton;
     private PApplet mParent;
     private Point mPreviousCursor;
+    private PFont mFont;
 
     public MultitouchInterface(PApplet parent) {
         mParent = parent;
@@ -22,58 +25,58 @@ public class MultitouchInterface {
             mouseWheel(evt.getWheelRotation());
         }}); 
 
-        PFont font = loadFont("buttonFont.vlw");
+        mFont = loadFont("buttonFont.vlw");
 
         // TODO make buttons pretty
         mZoomInButton = new RectButton(parent,
                 new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
                     BUTTON_PADDING + BUTTON_HEIGHT, 0),
-                color(255, 0, 0),
-                color(255, 255, 255),
+                BUTTON_BASE_COLOR,
+                BUTTON_HIGHLIGHT_COLOR,
                 "Zoom In",
                 BUTTON_WIDTH,
                 BUTTON_HEIGHT,
-                font);
+                mFont);
 
         mZoomOutButton = new RectButton(parent,
                 new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
                     2 * (BUTTON_PADDING + BUTTON_HEIGHT), 0),
-                color(255, 0, 0),
-                color(255, 255, 255),
+                BUTTON_BASE_COLOR,
+                BUTTON_HIGHLIGHT_COLOR,
                 "Zoom Out",
                 BUTTON_WIDTH,
                 BUTTON_HEIGHT,
-                font);
+                mFont);
 
         mCreateButton = new RectButton(parent,
                 new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
                     3 * (BUTTON_PADDING + BUTTON_HEIGHT), 0),
-                color(255, 0, 0),
-                color(255, 255, 255),
+                BUTTON_BASE_COLOR,
+                BUTTON_HIGHLIGHT_COLOR,
                 "Create",
                 BUTTON_WIDTH,
                 BUTTON_HEIGHT,
-                font);
+                mFont);
 
         mConnectButton = new RectButton(parent,
                 new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
                     4 * (BUTTON_PADDING + BUTTON_HEIGHT), 0),
-                color(255, 0, 0),
-                color(255, 255, 255),
+                BUTTON_BASE_COLOR,
+                BUTTON_HIGHLIGHT_COLOR,
                 "Connect",
                 BUTTON_WIDTH,
                 BUTTON_HEIGHT,
-                font);
+                mFont);
 
         mGalaxyButton = new RectButton(parent,
                 new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
                     5 * (BUTTON_PADDING + BUTTON_HEIGHT), 0),
-                color(255, 0, 0),
-                color(255, 255, 255),
-                "Galaxy View",
+                BUTTON_BASE_COLOR,
+                BUTTON_HIGHLIGHT_COLOR,
+                "Galaxy",
                 BUTTON_WIDTH,
                 BUTTON_HEIGHT,
-                font);
+                mFont);
         mGalaxyButton.setLocked(true);
     }
 
@@ -138,6 +141,18 @@ public class MultitouchInterface {
         return true;
     }
 
+    private void drawTitle() {
+        pushMatrix();
+        stroke(166, 38, 38);
+        fill(166, 38, 38);
+        textMode(SCREEN);
+        textAlign(RIGHT);
+        textFont(mFont, 48);
+        text("August 23, 1966", width - 10, height - 10);
+        textAlign(LEFT);
+        popMatrix();
+    }
+
     public void display() {
         pushMatrix();
         hint(DISABLE_DEPTH_TEST);
@@ -149,5 +164,7 @@ public class MultitouchInterface {
         mGalaxyButton.display(cursor);
         hint(ENABLE_DEPTH_TEST);
         popMatrix();
+
+        drawTitle();
     }
 }

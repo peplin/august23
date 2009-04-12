@@ -71,7 +71,7 @@ public class StarSimulation {
             wrect = new WiremapRectangle(wmap, 400,400, 5 , 255, sqwidth, sqheight, sqdepth, 0, 0);
         }
 
-        pulsarSim = new PulsarSimulation(parent);
+        //pulsarSim = new PulsarSimulation(parent);
 
         initialize();
     }
