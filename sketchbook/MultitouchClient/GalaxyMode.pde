@@ -26,6 +26,21 @@ public class GalaxyMode implements MultitouchModeInterface {
                     println(e);
                 }
             }
+            ArrayList starLinks = mObjectManager.getAllLinks();
+            stroke(255);
+            for(int i = 0; i < starLinks.size(); i++) {
+                Link link = (Link) starLinks.get(i);
+                Star first
+                    = (Star)mObjectManager.getCelestialBody(link.getFirstId());
+                Star second
+                    = (Star)mObjectManager.getCelestialBody(link.getSecondId());
+                beginShape(LINES);
+                vertex((float) first.getPosition().getX(),
+                        (float) first.getPosition().getY());
+                vertex((float) second.getPosition().getX(),
+                        (float) second.getPosition().getY());
+                endShape();
+            }
         } catch(UnhandledCelestialBodyException e) {
             println("Caught exception when updating universe: " + e);
         }

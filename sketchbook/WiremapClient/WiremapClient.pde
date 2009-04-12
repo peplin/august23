@@ -39,7 +39,7 @@ void setup() {
     mMinim = new Minim(this);
     mWiremap = new Wiremap(this, 256, 90, 36, 48, 36.0/9.0, .1875, 2, 
             "depths.txt");
-    mStarSimulation = new StarSimulation(mWiremap);  
+    mStarSimulation = new StarSimulation(null);  
     mHeartbeatDetector = new HeartbeatDetector(this);
     
     mGlowingSphere = new WiremapGlowingSphere(
@@ -70,28 +70,28 @@ void draw() {
             if(!mStarted) {
                 mSequenceVoiceOverPlayers[0].pause();
                 mSequenceVoiceOverPlayers[1].play();
-                sendMessage("play seq 2");
+                sendMessage("play seq 1");
                 //delay(3000);
                 mSequenceVoiceOverPlayers[2].play();
-                sendMessage("play seq 3");
+                sendMessage("play seq 2");
                 //delay(3000);
                 mSequenceVoiceOverPlayers[3].play();
-                sendMessage("play seq 4");
+                sendMessage("play seq 3");
                 //delay(2000);
                 mSequenceVoiceOverPlayers[4].play();
-                sendMessage("play seq 5");
+                sendMessage("play seq 4");
                 mStarted = true;
                 sendMessage("start");
+                sendMessage("state " + mStarSimulation.getEndState());
                 mSequenceVoiceOverPlayers[0].loop(2);
             } else {
                 pushMatrix();
-                scale(1.5);
                 mStarSimulation.display();
                 popMatrix();
             }
         }
 
-        if(mStarSimulation.isEnded()) {
+        if(mStarted && mStarSimulation.isEnded()) {
             sendMessage("done");
             mActivated = false;
             mHeartbeatSet = false;
@@ -122,17 +122,30 @@ void listen() {
 }
 
 void processMessage(String message) {
-
+    try {
+        String messageParts[] = message.split(" ");
+        if(messageParts[0].equals("color")) {
+            if(messageParts.length == 2) {
+                mActivated = true;
+                mActivatedTime = millis();
+                mHeartbeatSet = false;
+                mSimulationRunning = false;
+                mStarSimulation.initialize();
+                mHeartbeatDetector.resetAverages();
+                //TODO set color
+            } else {
+                throw new Exception("Malformed message: " + message);
+            }
+        } else {
+            throw new Exception("Unrecognized message: " + message);
+        }
+    } catch(Exception e) {
+        println(e);
+    }
 }
 
 void serverEvent(Server server, Client client) {
-    mActivated = true;
-    mActivatedTime = millis();
     mCurrentClient = client;
-    mHeartbeatSet = false;
-    mSimulationRunning = false;
-    mStarSimulation.initialize();
-    mHeartbeatDetector.resetAverages();
 }
 
 void sendMessage(String message) {

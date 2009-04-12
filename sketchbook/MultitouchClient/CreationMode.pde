@@ -26,6 +26,7 @@ public class CreationMode extends GalaxyMode {
     //mColorGrabber = new ActiveColorGrabber(mParent);
     mStarSimulation = new StarSimulation(null);
     mFont = loadFont("promptFont.vlw");
+    mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
     initializeAudio();
     textFont(mFont);
   }
@@ -91,13 +92,13 @@ public class CreationMode extends GalaxyMode {
             if(message.equals("start")) {
                 mStarSimulation.initialize();
                 mSimulationRunning = true;
-            } else if(message == "done") {
+            } else if(message.equals("done")) {
                 saveStar();
                 mSimulationRunning = false;
                 setMode(0);
             } else {
                 String messageParts[] = message.split(" ");
-                if(messageParts[0] == "beat") {
+                if(messageParts[0].equals("beat")) {
                     if(messageParts.length == 2) {
                         mNewStar.setFrequency(
                                 (double)Float.parseFloat(messageParts[1]));
@@ -108,12 +109,31 @@ public class CreationMode extends GalaxyMode {
                     } else {
                         throw new Exception("Malformed message: " + message);
                     }
-                } else if(messageParts[0] == "state") {
+                } else if(messageParts[0].equals("state")) {
                     if(messageParts.length == 2) {
-                        mNewStar.setState(Integer.parseInt(messageParts[1]));
+                        int endState = Integer.parseInt(messageParts[1]);
+                        mNewStar.setState(endState);
+                        mStarSimulation.setEndState(endState);
                     } else {
                         throw new Exception("Malformed message: " + message);
                     }
+                } else if(messageParts[0].equals("play")) {
+                    if(messageParts.length == 3) {
+                        if(messageParts[1].equals("seq")) {
+                            int player = Integer.parseInt(messageParts[2]);
+                            if(player >= 0 && player < mSequenceVoiceOverPlayers.length) {
+                                mCurrentPlayer =
+                                    mSequenceVoiceOverPlayers[player];
+                                mCurrentPlayer.play();
+                            } else {
+                                throw new Exception("Bad audio index requested: " + message);
+                            }
+                        }
+                    } else {
+                        throw new Exception("Malformed message: " + message);
+                    }
+
+
                 } else {
                     throw new Exception("Unrecognized message: " + message);
                 }
@@ -147,7 +167,6 @@ public class CreationMode extends GalaxyMode {
             (int)blue(activeColor),
             255,
             1);
-    mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
     sendMessage("color " + activeColor);
     popMatrix();
   }

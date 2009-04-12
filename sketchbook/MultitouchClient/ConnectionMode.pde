@@ -14,22 +14,18 @@ public class ConnectionMode extends GalaxyMode {
         stroke(255);
         noFill();
         translate(-width/2, -height/2);
-        ArrayList starLinks = mObjectManager.getAllLinks();
-        for(int i = 0; i < starLinks.size(); i++) {
-            Link link = (Link) starLinks.get(i);
+        if(mOpenLink != null) {
             try {
                 Star first
-                    = (Star)mObjectManager.getCelestialBody(link.getFirstId());
-                Star second
-                    = (Star)mObjectManager.getCelestialBody(link.getSecondId());
+                    = (Star)mObjectManager.getCelestialBody(mOpenLink.getFirstId());
                 beginShape(LINES);
                 vertex((float) first.getPosition().getX(),
                         (float) first.getPosition().getY());
-                vertex((float) second.getPosition().getX(),
-                        (float) second.getPosition().getY());
+                vertex(-mCamera.getCenterX() + mouseX + width/2,
+                        -mCamera.getCenterY() + mouseY + height/2);
                 endShape();
             } catch(UnhandledCelestialBodyException e) {
-                println(e);
+
             }
         }
         popMatrix();
@@ -47,5 +43,9 @@ public class ConnectionMode extends GalaxyMode {
                 mOpenLink = new Link(selectedStar);
             }
         }
+    }
+
+    public void disable() {
+        mOpenLink = null;
     }
 }

@@ -3,18 +3,7 @@ import wiremap.WiremapGlowingSphere;
 import wiremap.WiremapRectangle;
 
 public class StarSimulation {
-    private Wiremap wmap;
-    private WiremapRectangle wrect;
-    private int sqheight;
-    private int sqwidth;
-    private int sqdepth;
-
     /** Constants **/
-    private final float tamin = 0;
-    private final float t0min = 5000;
-    private final float t1min = 10000;
-    private final float t2min = 10000;
-    private final float t2aamin = 10000;
     private final float dta = 5000;
     private final float dt0 = 5000;
     private final float dt1 = 5000;
@@ -22,22 +11,8 @@ public class StarSimulation {
     private final float dt3 = 5000;
     private final float dt4 = 15000;
     private final float dt2aa = 5000;
-    private final float t2amin = 500000;
-    private final float t2bmin = 15000;
     private final float dt2b = 5000;
-    private final float t2cmin = 200000;
     private final float dt2c = 5000;
-    private final float t3min = 20000;
-    private final float t4min = 25000;
-    private final float tamax = tamin + dta;
-    private final float t0max = t0min + dt0;
-    private final float t1max = t1min + dt1;
-    private final float t2max = t2min + dt2;
-    private final float t2aamax = t2aamin + dt2aa;
-    private final float t2bmax = t2bmin + dt2b;
-    private final float t2cmax = t2cmin + dt2c;
-    private final float t3max = t3min + dt3;
-    private final float t4max = t4min + dt4;
     private final float c_cond = 5.0;
     private final float amp_osc = .2;
     private final float amp_conv = .4; 
@@ -46,6 +21,14 @@ public class StarSimulation {
     private final int nbkg = 400;
     private final int nsph = 200;
     private final int nc = 1000;
+    private final float c_bh = 4;
+    private final float c_sn = 15;
+
+    private Wiremap wmap;
+    private WiremapRectangle wrect;
+    private int sqheight;
+    private int sqwidth;
+    private int sqdepth;
 
     // evo color for using up material and for expressing inherent metallicity
     // create pulsar beacon
@@ -59,12 +42,25 @@ public class StarSimulation {
     private float oscb = 1;
 
     // times
-    private float dt2a;
-    private float t2amax = t2amin  + dt2a;
+    private float tamin;
+    private float t0min;
+    private float t1min;
+    private float t2min;
+    private float t3min;
+    private float t4min;
+    private float tamax;
+    private float t0max;
+    private float t1max;
+    private float t2max;
+    private float t3max;
+    private float t4max;
+    private float t2aamin;
+    private float t2aamax;
+    private float t2bmin;
+    private float t2bmax;
+    private float t2cmin;
+    private float t2cmax;
 
-    private final float c_bh = 4;
-    private final float c_sn = 15;
-    
     /**
     ** Set map to null to use regular graphics
     */
@@ -79,12 +75,18 @@ public class StarSimulation {
 
     public void setFrequency(float frequency) {
         freq_osc = frequency;
-        dt2a   = 2*PI/freq_osc;
-        t2amax = t2amin + dt2a;
     }
     
     public boolean isEnded() {
-      return millis() / 1000 >= t4max;
+      return millis() >= t4max;
+    }
+
+    public int getEndState() {
+        return eol;
+    }
+
+    public void setEndState(int endState) {
+        eol = endState;
     }
 
     public void display() {
@@ -232,6 +234,24 @@ public class StarSimulation {
         ybkg = new float[nbkg];
         zbkg = new float[nbkg];
 
+        tamin = millis();
+        tamax = tamin + dta;
+        t0min = tamax;
+        t0max = t0min + dt0;
+        t1min = t0max;
+        t1max = t1min + dt1;
+        t2min = t1max;
+        t2max = t2min + dt2;
+        t3min = t2max;
+        t3max = t3min + dt3;
+        t4min = t3max;
+        t4max = t4min + dt4;
+        t2aamin = tamin + 10000;
+        t2aamax = t2aamin + dt2aa;
+        t2bmin = tamin + 15000; 
+        t2bmax = t2bmin + dt2b;
+        t2cmin = tamin + 20000;
+        t2cmax = t2cmin + dt2c;
 
         float endOfLifeWeight = random(1);
         if (endOfLifeWeight < .33) {
@@ -273,7 +293,7 @@ public class StarSimulation {
             u2 = random(0,1);
             phi[i] = PI*sqrt(-2*log(u1))*cos(2*PI*u2);
             the[i] = PI*sqrt(-2*log(u1))*sin(2*PI*u2);
-}
+        }
 
         for (int i = 0; i<nbkg; i++){
             xbkg[i] = random(-rbkg,rbkg);
