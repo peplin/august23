@@ -9,6 +9,7 @@ public class CreationMode extends GalaxyMode {
   private ActiveColorGrabber mColorGrabber;
   private StarSimulation mStarSimulation;
   private Client mClient;
+  private String mPartialMessage;
   private PFont mFont;
 
   private Minim mMinim;
@@ -23,10 +24,10 @@ public class CreationMode extends GalaxyMode {
     super(parent, objectManager, camera);
     mMinim = new Minim(mParent);
     //mColorGrabber = new ActiveColorGrabber(mParent);
-    mStarSimulation = new StarSimulation(null, this);
+    mStarSimulation = new StarSimulation(null);
     mFont = loadFont("promptFont.vlw");
     initializeAudio();
-    textFont(mFont, 48);
+    textFont(mFont);
   }
 
   public void display() {
@@ -40,20 +41,33 @@ public class CreationMode extends GalaxyMode {
         translate(-mCamera.getCenterX(), -mCamera.getCenterY());
         mStarSimulation.display();
         popMatrix();
-        //TODO also select randomly from narrations
-        if(mCurrentPlayer == null || !mCurrentPlayer.isPlaying() && mNextPlayTime <= millis()) {
-          mCurrentPlayer
-            = mGrabBagVoiceOverPlayers[
-            (int)random(mGrabBagVoiceOverPlayers.length)];
+        if(mCurrentPlayer == null || !mCurrentPlayer.isPlaying()
+                && mNextPlayTime <= millis()) {
+          if(random(1) <= .3) {
+            mCurrentPlayer
+                = mGrabBagVoiceOverPlayers[
+                (int)random(mGrabBagVoiceOverPlayers.length)];
+          } else {
+            mCurrentPlayer
+                = mNarrationVoiceOverPlayers[
+                (int)random(mNarrationVoiceOverPlayers.length)];
+          }
           mCurrentPlayer.play();
+          mNextPlayTime = millis() + random(3000, 6000);
         }
       } 
       else {
-        text("Please enter the airlock", 0, 0);
+        stroke(255);
+        fill(255);
+        textMode(SCREEN);
+        textAlign(CENTER);
+        text("Please enter the airlock", width/2, height/2);
+        textAlign(LEFT);
         //TODO display static particle field
       }
       //TODO display gauge cluster
     }
+    listen();
   } 
 
   private void saveStar() {
@@ -61,65 +75,84 @@ public class CreationMode extends GalaxyMode {
     mNewStar = null;
   }
 
- /* public void clientEvent() {
-    if(mClient != null) {
-      String data = mClient.readString();
-      if(data != null) {
-        println("DEBUG: Received data from client " + data);
-        String dataArray[] = data.split(" ");
-        //TODO confirm these packets aren't split up very often if ever
-        if(dataArray.length >= 1) {
-          if(dataArray.length > 1 && dataArray[0].equals("beat")) {
-            mNewStar.setFrequency(Integer.parseInt(dataArray[1]));
-            if(mSimulationRunning) {
-              // mStarSimulation.setFrequency(mNewStar.getFrequency()); 
+    private void listen() {
+        if(mClient != null && mClient.available() > 0) {
+            String message = mClient.readStringUntil('/');
+            if(message != null) {
+                message = message.substring(0, message.length() - 1);
+                println("DEBUG: Received message from server " + message);
+                processMessage(message);
             }
-          }
-          if(dataArray[0].equals("start")) {
-            mStarSimulation.initialize();
-            mSimulationRunning = true;
-          }
-          if(dataArray.length > 1 && dataArray[0].equals("state")) {
-            mNewStar.setState(Integer.parseInt(dataArray[1]));
-          }
-          if(dataArray[0].equals("done")) {
-            saveStar();
-            mSimulationRunning = false;
-            setMode(0);
-          }
         }
-      }
+    }  
+
+    private void processMessage(String message) {
+        try {
+            if(message.equals("start")) {
+                mStarSimulation.initialize();
+                mSimulationRunning = true;
+            } else if(message == "done") {
+                saveStar();
+                mSimulationRunning = false;
+                setMode(0);
+            } else {
+                String messageParts[] = message.split(" ");
+                if(messageParts[0] == "beat") {
+                    if(messageParts.length == 2) {
+                        mNewStar.setFrequency(
+                                (double)Float.parseFloat(messageParts[1]));
+                        if(mSimulationRunning) {
+                            mStarSimulation.setFrequency(
+                                    (float)mNewStar.getFrequency()); 
+                        }
+                    } else {
+                        throw new Exception("Malformed message: " + message);
+                    }
+                } else if(messageParts[0] == "state") {
+                    if(messageParts.length == 2) {
+                        mNewStar.setState(Integer.parseInt(messageParts[1]));
+                    } else {
+                        throw new Exception("Malformed message: " + message);
+                    }
+                } else {
+                    throw new Exception("Unrecognized message: " + message);
+                }
+            }
+        } catch(Exception e) {
+            println(e);
+        }
     }
-  }*/  
+
+    private void sendMessage(String message) {
+        mClient.write(message + "/");
+    }
 
   public void cursorPressed(Point cursor) {
     pushMatrix();
     color activeColor = color(255); //mColorGrabber.getActiveColor();
     mNewStar = new Star(0,
-    "Your Star",
-    MASTER_PARENT_ID,
-    new Point(
-    modelX(mouseX - mCamera.getCenterX(), 
-    mouseY - mCamera.getCenterY(), 0),
-    modelY(mouseX - mCamera.getCenterX(),
-    mouseY - mCamera.getCenterY(), 0), 0),
-    new PhysicsVector3d(1, 2, 3, 4),
-    new PhysicsVector3d(5, 6, 7, 8),
-    10,
-    10,
-    (int)red(activeColor),
-    (int)green(activeColor),
-    (int)blue(activeColor),
-    255,
-    1);
-    saveStar();
-    //mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
-    //mClient.write("color " + activeColor);
+            "Your Star",
+            MASTER_PARENT_ID,
+            new Point(
+            modelX(mouseX - mCamera.getCenterX(), 
+            mouseY - mCamera.getCenterY(), 0),
+            modelY(mouseX - mCamera.getCenterX(),
+            mouseY - mCamera.getCenterY(), 0), 0),
+            new PhysicsVector3d(1, 2, 3, 4),
+            new PhysicsVector3d(5, 6, 7, 8),
+            10,
+            10,
+            (int)red(activeColor),
+            (int)green(activeColor),
+            (int)blue(activeColor),
+            255,
+            1);
+    mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
+    sendMessage("color " + activeColor);
     popMatrix();
   }
 
   public void disable() {
-    //TODO block disabling while client is connected
     mNewStar = null;
     mSimulationRunning = false;
   }

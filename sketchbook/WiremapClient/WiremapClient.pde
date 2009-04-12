@@ -22,6 +22,7 @@ Wiremap mWiremap;
 AudioOutput mAudioOutput;
 HeartbeatDetector mHeartbeatDetector;
 WiremapGlowingSphere mGlowingSphere;
+int mActivatedTime;
 boolean mStarted = false;
 
 boolean goingUp = false;
@@ -38,12 +39,14 @@ void setup() {
     mMinim = new Minim(this);
     mWiremap = new Wiremap(this, 256, 90, 36, 48, 36.0/9.0, .1875, 2, 
             "depths.txt");
-    mStarSimulation = new StarSimulation(mWiremap, this);  
+    mStarSimulation = new StarSimulation(mWiremap);  
     mHeartbeatDetector = new HeartbeatDetector(this);
     
     mGlowingSphere = new WiremapGlowingSphere(
     mWiremap, 500, 300, 20, color(255, 255, 0), 8, 
     color(255, 0, 0)); 
+    
+    mActivatedTime = millis();
 
     initializeAudio();
 }
@@ -56,23 +59,30 @@ void draw() {
             if(currentRate > .5 && currentRate< 3) {
                 mHeartbeatSet = true;
                 mStarSimulation.setFrequency(currentRate);
-                mCurrentClient.write("beat " + currentRate);
+                sendMessage("beat " + currentRate);
+            }
+
+            if(mActivatedTime + 1000 <= millis()) {
+                mHeartbeatSet = true;
+                sendMessage("beat " + currentRate);
             }
         } else {
-            if(mStarted) {
+            if(!mStarted) {
                 mSequenceVoiceOverPlayers[0].pause();
                 mSequenceVoiceOverPlayers[1].play();
-                mCurrentClient.write("play seq 2");
-                delay(3000);
+                sendMessage("play seq 2");
+                //delay(3000);
                 mSequenceVoiceOverPlayers[2].play();
-                mCurrentClient.write("play seq 3");
-                delay(3000);
+                sendMessage("play seq 3");
+                //delay(3000);
                 mSequenceVoiceOverPlayers[3].play();
-                mCurrentClient.write("play seq 4");
-                delay(2000);
+                sendMessage("play seq 4");
+                //delay(2000);
                 mSequenceVoiceOverPlayers[4].play();
-                mCurrentClient.write("play seq 5");
+                sendMessage("play seq 5");
                 mStarted = true;
+                sendMessage("start");
+                mSequenceVoiceOverPlayers[0].loop(2);
             } else {
                 pushMatrix();
                 scale(1.5);
@@ -82,54 +92,13 @@ void draw() {
         }
 
         if(mStarSimulation.isEnded()) {
-            client.write("done");
+            sendMessage("done");
             mActivated = false;
             mHeartbeatSet = false;
             mStarted = false;
         }
     } else {
         // do interesting light show stuff, or stay silent
-        background(0);
-        if(goingBack) {
-            z += 1;
-            if(z >= 35) {
-            goingBack = false; 
-            }
-        } 
-        else {
-            z -= 1;
-            if(z <= 1) {
-            goingBack = true; 
-            }
-        }
-
-        if(goingUp) {
-            y -= 10;
-            if(y <= 20) {
-            goingUp = false; 
-            }
-        } 
-        else {
-            y += 10;
-            if(y >= height - 40) {
-            goingUp = true; 
-            }
-        }
-
-        if(goingLeft) {
-            x -= 10;
-            if(x <= 20) {
-            goingLeft = false; 
-            }
-        } 
-        else {
-            x += 10;
-            if(x >= width - 60) {
-                goingLeft = true;
-            }
-        }    
-        glowingSphere.setPosition((int)x, (int)y, (int)z);
-        glowingSphere.display();
     }
 
     listen();
@@ -143,22 +112,31 @@ void draw() {
 void listen() {
     Client client = mServer.available();
     if(client != null) {
-        String data = client.readString();
-        if(data != null) {
-            println("client sent: " + data);
+        String message = client.readStringUntil('/');
+        if(message != null) {
+            message = message.substring(0, message.length() - 1);
+            println("DEBUG: Received message from client " + message);
+            processMessage(message);
         }
     }
 }
 
+void processMessage(String message) {
+
+}
+
 void serverEvent(Server server, Client client) {
     mActivated = true;
+    mActivatedTime = millis();
     mCurrentClient = client;
     mHeartbeatSet = false;
     mSimulationRunning = false;
-    client.write("start");
-    mSequenceVoiceOverPlayers[0].loop(2);
-    mStarSimulation.initialie();
+    mStarSimulation.initialize();
     mHeartbeatDetector.resetAverages();
+}
+
+void sendMessage(String message) {
+    mCurrentClient.write(message + "/");
 }
 
 void initializeAudio() {
