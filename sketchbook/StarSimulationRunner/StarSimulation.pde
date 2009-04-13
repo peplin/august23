@@ -35,6 +35,7 @@ private color starColor;
     // evo color for using up material and for expressing inherent metallicity
     // create pulsar beacon
 
+
     private float freq_osc;
     private float xsph[], ysph[], zsph[] ;
     private float xbkg[], ybkg[], zbkg[], rsph[] ;
