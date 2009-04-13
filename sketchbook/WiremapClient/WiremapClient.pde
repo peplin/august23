@@ -67,7 +67,10 @@ void draw() {
             }
         } else {
             if(!mStarted) {
-                mSequenceVoiceOverPlayers[0].pause();
+                if(mSequenceVoiceOverPlayers[0].isLooping()) {
+                    mSequenceVoiceOverPlayers[0].play();
+                }
+                delay(1000);
                 mSequenceVoiceOverPlayers[1].play();
                 sendMessage("play seq 1");
                 delay(3000);
