@@ -106,7 +106,7 @@ public class StarSimulationWire {
     float greenValue = green(starColor);
     float blueValue = blue(starColor);
     
-    if(redValue >= greenValue 24441111&& redValue >= blueValue) {
+    if(redValue >= greenValue && redValue >= blueValue) {
        c_eol = 0; 
     } else if(greenValue >= redValue && greenValue >= blueValue) {
        c_eol = 1; 
