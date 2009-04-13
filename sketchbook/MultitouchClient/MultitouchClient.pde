@@ -82,8 +82,6 @@ void setup() {
         handlers[i].setLevel(Level.WARNING);
     }
     
-    //TODO set log level to info
-
     textMode(SCREEN);
     textAlign(LEFT);
 }

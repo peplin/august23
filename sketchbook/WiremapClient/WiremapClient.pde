@@ -16,6 +16,7 @@ Minim mMinim;
 AudioPlayer mAmbientPlayers[];
 AudioPlayer mSequenceVoiceOverPlayers[];
 AudioPlayer mCurrentAmbientPlayer;
+boolean mNarrationPlayStatus[];
 StarSimulationWire mStarSimulation;
 SineWave mSineWave;
 Wiremap mWiremap;
@@ -94,8 +95,10 @@ void draw() {
                 mStarSimulation.display();
                 popMatrix();
                 if(mNextPlayTime <= millis()) {
-                    if(random(1) <= .8) {
-                        sendMessage("play nar " + (mStarSimulation.getStarState() - 1));
+                    int index = mStarSimulation.getStarState() - 1;
+                    if(random(1) <= .8 && !mNarrationPlayStatus[index]) {
+                        sendMessage("play nar " + index);
+                        mNarrationPlayStatus[index] = true;
                     }
                     mNextPlayTime = millis() + random(2000, 5000);
                 }
@@ -111,6 +114,7 @@ void draw() {
             mActivated = false;
             mHeartbeatSet = false;
             mStarted = false;
+            resetPlayStatus();
             mCurrentAmbientPlayer.play();
         }
     }
@@ -179,6 +183,16 @@ void initializeAudio() {
     for(int i = 0; i < mSequenceVoiceOverPlayers.length; i++) {
         mSequenceVoiceOverPlayers[i]
             = mMinim.loadFile("sequence" + (i + 1) + ".mp3", 2048);
+    }
+
+    //TODO watch this number....will have to change with new audio files
+    mNarrationPlayStatus = new boolean[9];
+    resetPlayStatus();
+}
+
+void resetPlayStatus() {
+    for(int i =0; i < mNarrationPlayStatus.length; i++) {
+        mNarrationPlayStatus = false;
     }
 }
 
