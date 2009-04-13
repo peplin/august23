@@ -120,7 +120,7 @@ public class CreationMode extends GalaxyMode {
                             int player = Integer.parseInt(messageParts[2]);
                             if(player >= 0 && player < mNarrationVoiceOverPlayers.length) {
                                 mCurrentPlayer =
-                                    mSequenceVoiceOverPlayers[player];
+                                    mNarrationVoiceOverPlayers[player];
                                 mCurrentPlayer.loop(0);
                             } else {
                                 throw new Exception("Bad audio index requested: " + message);
