@@ -201,7 +201,7 @@ public class StarSimulationWire {
     // fade in bkg particles:
     if (time < tbkg2 && time >= tbkg1) {
       alpha_bkg = 255*(time-tbkg1)/(tbkg2-tbkg1); 
-      starState = 0;
+      starState = 1;
     }
     
     if (time < tbkg2a && time >= tbkg1a) {
@@ -213,7 +213,7 @@ public class StarSimulationWire {
     // SPHERE
     // fade from black
     if (time < tsph2a && time >= tsph1a){
-          starState = 1;
+          starState = 2;
       float c1 = 255*(time-tsph1a)/(tsph2a-tsph1a); 
       glowingSphere.setBaseColor(color(c1,c1,c1,c1));
       glowingSphere.setCoreColor(color(c1,c1,c1,c1));
@@ -221,13 +221,13 @@ public class StarSimulationWire {
 
     // grow 
     if (time <= tsph2b && time > tsph1b){
-            starState = 2;
       rad0 = grow(r0, 7, 1. ,tsph1b, tsph2b);
+       starState = 3;
     }
 
     // fade from white to red and orange
     if (time < tsph2c && time >= tsph1c){
-                  starState = 3;
+                  starState = 4;
       float c1 = 100 *(time-tsph1c)/(tsph2c-tsph1c); 
       float c2 = 50  *(time-tsph1c)/(tsph2c-tsph1c); 
       float c3 = 255 *(time-tsph1c)/(tsph2c-tsph1c);
@@ -240,7 +240,7 @@ public class StarSimulationWire {
     // oscillate
     c_osc = 0;
     if (time < tosc2a && time >= tosc1a){ 
-starState = 4;
+starState = 5;
       rad1 = osc( c_osc, amp_rad_random, rad0, freq_osc, tosc1a, tosc2a );
       //      rad1 = osc( c_osc, 2. , rad0, freq_osc, tosc1a, tosc2a );  
     }
@@ -294,7 +294,7 @@ starState = 4;
       float rad2 = osc(0, rand,  rini, freq,  t1, t2 );
       //float rad2 = osc(1, random(0,1)*255, rad1 ,1./250.,   t1, t2 );
       float rad = grow(rad2, 0, 1. ,t1, t3);
-      starState = 5;
+      starState = 7;
     }
     if (eol_type == 1){
 
@@ -306,7 +306,7 @@ starState = 4;
       float rad2 = osc(0, random(3,6),  rini , freq,  t1, t2 );
       float rad  = grow(rad2, 25., 1.5, t2, t3);
       println(rad+" "+rad2);
-      starState = 6;
+      starState =8 
     }
 
     if (eol_type == 2){  
@@ -324,7 +324,7 @@ starState = 4;
       float rotation = 2*PI*freq/1000.;
       lighthouse.rotate(rotation);
       lighthouse.display();
-      starState = 7;
+      starState = 9;
     }
   }
 
