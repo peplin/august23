@@ -137,7 +137,7 @@ void processMessage(String message) {
                 mSimulationRunning = false;
                 mHeartbeatDetector.resetAverages();
                 mSequenceVoiceOverPlayers[0].loop(2);
-                //TODO set color
+		mStarSimulation.setColor(Integer.parseInt(messageParts[1]));
             } else {
                 throw new Exception("Malformed message: " + message);
             }
