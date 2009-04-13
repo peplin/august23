@@ -93,8 +93,12 @@ void draw() {
                 pushMatrix();
                 mStarSimulation.display();
                 popMatrix();
-                //TODO send messages to play narrations based on current state -
-                //or should we just do this from the MT? that's how it works now
+                if(mNextPlayTime <= millis()) {
+                    if(random(1) <= .8) {
+                        sendMessage("play nar " + (mStarSimulation.getStarState() - 1));
+                    }
+                    mNextPlayTime = millis() + random(2000, 5000);
+                }
             }
             if(!mCurrentAmbientPlayer.isLooping()) {
                 mCurrentAmbientPlayer = mAmbientPlayers[(int)random(mAmbientPlayers.length)];
