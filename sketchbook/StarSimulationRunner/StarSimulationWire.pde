@@ -88,7 +88,7 @@ public class StarSimulationWire {
     zbkg = new float[nbkg];
     col  = new int[nbkg];
     initialize();
-    setFrequency(); //oscillations per second
+    setFrequency(1); //oscillations per second
 
   }
 
@@ -212,7 +212,7 @@ public class StarSimulationWire {
 
     // SPHERE
     // fade from black
-    if (time < tsph2a && time >= tsph1a){'
+    if (time < tsph2a && time >= tsph1a){
           starState = 1;
       float c1 = 255*(time-tsph1a)/(tsph2a-tsph1a); 
       glowingSphere.setBaseColor(color(c1,c1,c1,c1));
