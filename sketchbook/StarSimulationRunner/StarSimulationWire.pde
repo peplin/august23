@@ -37,6 +37,7 @@ import wiremap.WiremapLighthouse;
 
 public class StarSimulationWire {
 
+      private int starState;
   private Wiremap map;
   private WiremapGlowingSphere glowingSphere;
   private WiremapRectangle rectangle;
@@ -87,7 +88,7 @@ public class StarSimulationWire {
     zbkg = new float[nbkg];
     col  = new int[nbkg];
     initialize();
-    setFrequency(1.5); //oscillations per second
+    setFrequency(1); //oscillations per second
 
   }
 
@@ -106,7 +107,7 @@ public class StarSimulationWire {
     float greenValue = green(starColor);
     float blueValue = blue(starColor);
     
-    if(redValue >= greenValue 24441111&& redValue >= blueValue) {
+    if(redValue >= greenValue && redValue >= blueValue) {
        c_eol = 0; 
     } else if(greenValue >= redValue && greenValue >= blueValue) {
        c_eol = 1; 
@@ -146,8 +147,8 @@ public class StarSimulationWire {
     tosc1b =tbkg1 + 0;//1130 * 1000;// osc color
     tosc2b =tbkg1 + 0;//1132 * 1000;  
     teol1  =tbkg1 + 65 * 1000;// end
-    teol2  =tbkg1 + 80 * 1000;
-    teol3  =tbkg1 + 100 * 1000;
+    teol2  =tbkg1 + 85 * 1000;
+    teol3  =tbkg1 + 115 * 1000;
 
     //test times; do not erase
 /*
@@ -184,6 +185,9 @@ public class StarSimulationWire {
   public int getEndState() {
     return c_eol;
   }
+  public int getStarState(){
+    return starState;
+  }
   
   public void setColor(color c) {
      starColor = c; 
@@ -197,6 +201,7 @@ public class StarSimulationWire {
     // fade in bkg particles:
     if (time < tbkg2 && time >= tbkg1) {
       alpha_bkg = 255*(time-tbkg1)/(tbkg2-tbkg1); 
+      starState = 1;
     }
     
     if (time < tbkg2a && time >= tbkg1a) {
@@ -208,6 +213,7 @@ public class StarSimulationWire {
     // SPHERE
     // fade from black
     if (time < tsph2a && time >= tsph1a){
+          starState = 2;
       float c1 = 255*(time-tsph1a)/(tsph2a-tsph1a); 
       glowingSphere.setBaseColor(color(c1,c1,c1,c1));
       glowingSphere.setCoreColor(color(c1,c1,c1,c1));
@@ -215,11 +221,13 @@ public class StarSimulationWire {
 
     // grow 
     if (time <= tsph2b && time > tsph1b){
-      rad0 = grow(r0, 5, 1. ,tsph1b, tsph2b);
+      rad0 = grow(r0, 7, 1. ,tsph1b, tsph2b);
+       starState = 3;
     }
 
     // fade from white to red and orange
     if (time < tsph2c && time >= tsph1c){
+                  starState = 4;
       float c1 = 100 *(time-tsph1c)/(tsph2c-tsph1c); 
       float c2 = 50  *(time-tsph1c)/(tsph2c-tsph1c); 
       float c3 = 255 *(time-tsph1c)/(tsph2c-tsph1c);
@@ -232,13 +240,14 @@ public class StarSimulationWire {
     // oscillate
     c_osc = 0;
     if (time < tosc2a && time >= tosc1a){ 
-
+starState = 5;
       rad1 = osc( c_osc, amp_rad_random, rad0, freq_osc, tosc1a, tosc2a );
       //      rad1 = osc( c_osc, 2. , rad0, freq_osc, tosc1a, tosc2a );  
     }
 
     // eol
     if (time >= teol1 && time < teol3){ 
+      
       eol(c_eol, rad1, freq_osc, teol1, teol2, teol3); 
     }
 
@@ -285,6 +294,7 @@ public class StarSimulationWire {
       float rad2 = osc(0, rand,  rini, freq,  t1, t2 );
       //float rad2 = osc(1, random(0,1)*255, rad1 ,1./250.,   t1, t2 );
       float rad = grow(rad2, 0, 1. ,t1, t3);
+      starState = 7;
     }
     if (eol_type == 1){
 
@@ -296,6 +306,7 @@ public class StarSimulationWire {
       float rad2 = osc(0, random(3,6),  rini , freq,  t1, t2 );
       float rad  = grow(rad2, 25., 1.5, t2, t3);
       println(rad+" "+rad2);
+      starState =8 ;
     }
 
     if (eol_type == 2){  
@@ -313,6 +324,7 @@ public class StarSimulationWire {
       float rotation = 2*PI*freq/1000.;
       lighthouse.rotate(rotation);
       lighthouse.display();
+      starState = 9;
     }
   }
 
