@@ -49,6 +49,7 @@ void setup() {
     mActivatedTime = millis();
 
     initializeAudio();
+    background(0);
 }
 
 void draw() {
@@ -61,7 +62,7 @@ void draw() {
                 sendMessage("beat " + currentRate);
             }
 
-            if(mActivatedTime + 10000 <= millis()) {
+            if(mActivatedTime + 20000 <= millis()) {
                 mHeartbeatSet = true;
                 sendMessage("beat " + currentRate);
             }
@@ -69,18 +70,20 @@ void draw() {
             if(!mStarted) {
                 if(mSequenceVoiceOverPlayers[0].isLooping()) {
                     mSequenceVoiceOverPlayers[0].play();
+                } 
+                while(mSequenceVoiceOverPlayers[0].isPlaying()) {
+                    continue;
                 }
-                delay(1000);
-                mSequenceVoiceOverPlayers[1].play();
+                mSequenceVoiceOverPlayers[1].loop(0);
                 sendMessage("play seq 1");
                 delay(3000);
-                mSequenceVoiceOverPlayers[2].play();
+                mSequenceVoiceOverPlayers[2].loop(0);
                 sendMessage("play seq 2");
                 delay(3000);
-                mSequenceVoiceOverPlayers[3].play();
+                mSequenceVoiceOverPlayers[3].loop(0);
                 sendMessage("play seq 3");
                 delay(2000);
-                mSequenceVoiceOverPlayers[4].play();
+                mSequenceVoiceOverPlayers[4].loop(0);
                 sendMessage("play seq 4");
                 mStarted = true;
                 mStarSimulation.initialize();
@@ -93,6 +96,10 @@ void draw() {
                 //TODO send messages to play narrations based on current state -
                 //or should we just do this from the MT? that's how it works now
             }
+            if(!mCurrentAmbientPlayer.isLooping()) {
+                mCurrentAmbientPlayer = mAmbientPlayers[(int)random(mAmbientPlayers.length)];
+                mCurrentAmbientPlayer.loop(0);
+            }
         }
 
         if(mStarted && mStarSimulation.isEnded()) {
@@ -100,17 +107,11 @@ void draw() {
             mActivated = false;
             mHeartbeatSet = false;
             mStarted = false;
+            mCurrentAmbientPlayer.play();
         }
-    } else {
-        // do interesting light show stuff, or stay silent
     }
 
     listen();
-
-    if(!mCurrentAmbientPlayer.isPlaying()) {
-        mCurrentAmbientPlayer = mAmbientPlayers[(int)random(mAmbientPlayers.length)];
-        mCurrentAmbientPlayer.play();
-    }
 }
 
 void listen() {
