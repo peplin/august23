@@ -16,7 +16,7 @@ Minim mMinim;
 AudioPlayer mAmbientPlayers[];
 AudioPlayer mSequenceVoiceOverPlayers[];
 AudioPlayer mCurrentAmbientPlayer;
-StarSimulation mStarSimulation;
+StarSimulationWire mStarSimulation;
 SineWave mSineWave;
 Wiremap mWiremap;
 AudioOutput mAudioOutput;
@@ -39,7 +39,7 @@ void setup() {
     mMinim = new Minim(this);
     mWiremap = new Wiremap(this, 256, 90, 36, 36, 48, 36.0/9.0, .1875, 2, 
             "depths.txt");
-    mStarSimulation = new StarSimulation(this, null);  
+    mStarSimulation = new StarSimulationWire(this, mWiremap);  
     mHeartbeatDetector = new HeartbeatDetector(this);
     
     mGlowingSphere = new WiremapGlowingSphere(

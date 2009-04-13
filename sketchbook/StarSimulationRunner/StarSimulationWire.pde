@@ -67,12 +67,11 @@ public class StarSimulationWire {
   
   private color starColor = color(255);
 
-  public StarSimulationWire(PApplet parent) {
+  public StarSimulationWire(PApplet parent, Wiremap wiremap) {
 
     // wiremap
-    map = new Wiremap(parent, 256, 90, 36, 36, 48, .1875, .1875, 4,
-    "../wiremap/depth256.txt");
-
+    map = wiremap;
+   
     // initialize sphere
     glowingSphere = new WiremapGlowingSphere(map, 500, 300, 10, c0_base, r0, c0_core); 
 
