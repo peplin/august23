@@ -26,9 +26,13 @@ public class CreationMode extends GalaxyMode {
     //mColorGrabber = new ActiveColorGrabber(mParent);
     mStarSimulation = new StarSimulation(parent, null);
     mFont = loadFont("promptFont.vlw");
-    mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
+    connectToServer();
     initializeAudio();
     textFont(mFont);
+  }
+
+  private void connectToServer() {
+    mClient = new Client(mParent, WIREMAP_SERVER_IP, 1966);
   }
 
   public void display() {
@@ -42,7 +46,7 @@ public class CreationMode extends GalaxyMode {
         translate(-mCamera.getCenterX(), -mCamera.getCenterY());
         mStarSimulation.display();
         popMatrix();
-        if(mCurrentPlayer == null || !mCurrentPlayer.isPlaying()
+        if(mCurrentPlayer == null || !mCurrentPlayer.isLooping()
                 && mNextPlayTime <= millis()) {
           if(random(1) <= .3) {
             mCurrentPlayer
@@ -53,14 +57,14 @@ public class CreationMode extends GalaxyMode {
                 = mNarrationVoiceOverPlayers[
                 (int)random(mNarrationVoiceOverPlayers.length)];
           }
-          mCurrentPlayer.play();
+          mCurrentPlayer.loop(0);
           mNextPlayTime = millis() + random(3000, 6000);
         }
       } 
       else {
         stroke(255);
         fill(255);
-        //textMode(SCREEN);
+        textMode(SCREEN);
         textAlign(CENTER);
         text("Please enter the airlock", width/2, height/2);
         textAlign(LEFT);
@@ -94,7 +98,6 @@ public class CreationMode extends GalaxyMode {
             } else if(message.equals("done")) {
                 saveStar();
                 mSimulationRunning = false;
-                setMode(0);
             } else {
                 String messageParts[] = message.split(" ");
                 if(messageParts[0].equals("beat")) {
@@ -123,7 +126,7 @@ public class CreationMode extends GalaxyMode {
                             if(player >= 0 && player < mSequenceVoiceOverPlayers.length) {
                                 mCurrentPlayer =
                                     mSequenceVoiceOverPlayers[player];
-                                mCurrentPlayer.play();
+                                mCurrentPlayer.loop(0);
                             } else {
                                 throw new Exception("Bad audio index requested: " + message);
                             }
@@ -143,7 +146,12 @@ public class CreationMode extends GalaxyMode {
     }
 
     private void sendMessage(String message) {
-        mClient.write(message + "/");
+        if(mClient != null) {
+            mClient.write(message + "/");
+        } else {
+            println("DEBUG: Unable to write to null server");
+
+        }
     }
 
   public void cursorPressed(Point cursor) {
@@ -166,6 +174,9 @@ public class CreationMode extends GalaxyMode {
             (int)blue(activeColor),
             255,
             1);
+    if(mClient == null) {
+        connectToServer();
+    }
     sendMessage("color " + activeColor);
     popMatrix();
   }
