@@ -306,7 +306,7 @@ starState = 5;
       float rad2 = osc(0, random(3,6),  rini , freq,  t1, t2 );
       float rad  = grow(rad2, 25., 1.5, t2, t3);
       println(rad+" "+rad2);
-      starState =8 
+      starState =8 ;
     }
 
     if (eol_type == 2){  

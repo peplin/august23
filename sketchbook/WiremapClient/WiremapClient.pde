@@ -23,6 +23,7 @@ AudioOutput mAudioOutput;
 HeartbeatDetector mHeartbeatDetector;
 WiremapGlowingSphere mGlowingSphere;
 int mActivatedTime;
+float mNextPlayTime = 0;
 boolean mStarted = false;
 
 boolean goingUp = false;
@@ -37,7 +38,7 @@ void setup() {
     size(1024, 768, P3D);
     mServer = new Server(this, 1966);
     mMinim = new Minim(this);
-    mWiremap = new Wiremap(this, 256, 90, 36, 36, 48, 36.0/9.0, .1875, 2, 
+    mWiremap = new Wiremap(this, 256, 90, 36, 36, 48, .1875, .1875, 2, 
             "depths.txt");
     mStarSimulation = new StarSimulationWire(this, mWiremap);  
     mHeartbeatDetector = new HeartbeatDetector(this);
@@ -94,10 +95,10 @@ void draw() {
                 mStarSimulation.display();
                 popMatrix();
                 if(mNextPlayTime <= millis()) {
-                    if(random(1) <= .8) {
+                    if(random(1) <= .8 && mStarSimulation.getStarState() > 0) {
                         sendMessage("play nar " + (mStarSimulation.getStarState() - 1));
                     }
-                    mNextPlayTime = millis() + random(2000, 5000);
+                    mNextPlayTime = millis() + random(5000, 8000);
                 }
             }
             if(!mCurrentAmbientPlayer.isLooping()) {
