@@ -57,12 +57,11 @@ void draw() {
         if(!mHeartbeatSet) {
             float currentRate = mHeartbeatDetector.getCurrentRate();
             if(currentRate > .5 && currentRate< 3) {
-                mHeartbeatSet = true;
                 mStarSimulation.setFrequency(currentRate);
                 sendMessage("beat " + currentRate);
             }
 
-            if(mActivatedTime + 1000 <= millis()) {
+            if(mActivatedTime + 10000 <= millis()) {
                 mHeartbeatSet = true;
                 sendMessage("beat " + currentRate);
             }
@@ -84,7 +83,6 @@ void draw() {
                 mStarSimulation.initialize();
                 sendMessage("start");
                 sendMessage("state " + mStarSimulation.getEndState());
-                mSequenceVoiceOverPlayers[0].loop(2);
             } else {
                 pushMatrix();
                 mStarSimulation.display();
@@ -134,6 +132,7 @@ void processMessage(String message) {
                 mHeartbeatSet = false;
                 mSimulationRunning = false;
                 mHeartbeatDetector.resetAverages();
+                mSequenceVoiceOverPlayers[0].loop(2);
                 //TODO set color
             } else {
                 throw new Exception("Malformed message: " + message);

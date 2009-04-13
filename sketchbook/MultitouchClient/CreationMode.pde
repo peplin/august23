@@ -3,7 +3,7 @@ import ddf.minim.*;
 import ddf.minim.signals.SineWave;
 
 public class CreationMode extends GalaxyMode {
-  private final String WIREMAP_SERVER_IP = "localhost"; //"141.211.4.193";
+  private final String WIREMAP_SERVER_IP = "192.168.1.6"; //"141.211.4.193";
   private Star mNewStar = null;
   private boolean mSimulationRunning = false;
   private ActiveColorGrabber mColorGrabber;
@@ -60,7 +60,7 @@ public class CreationMode extends GalaxyMode {
       else {
         stroke(255);
         fill(255);
-        textMode(SCREEN);
+        //textMode(SCREEN);
         textAlign(CENTER);
         text("Please enter the airlock", width/2, height/2);
         textAlign(LEFT);

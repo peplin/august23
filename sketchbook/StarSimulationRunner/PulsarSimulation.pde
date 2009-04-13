@@ -11,7 +11,6 @@ public class PulsarSimulation {
 
     public void display() {
         background(0);
-        translate(width/2,height/2,0);
         rotateZ(-PI/4);
         rotateY(jetRotation);
         stroke(5,255,255,255); 

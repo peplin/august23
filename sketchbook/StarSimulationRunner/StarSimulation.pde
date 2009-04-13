@@ -191,7 +191,6 @@ public class StarSimulation {
             // PULSAR
             if (eol == 2) {
                 pushMatrix();
-                translate(-width/2, -height/2);
                 pulsarSim.display();
                 popMatrix();
             }
