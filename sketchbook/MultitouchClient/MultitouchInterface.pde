@@ -6,8 +6,8 @@ public class MultitouchInterface {
     private final int BUTTON_HEIGHT = 75;
     private final int BUTTON_PADDING = 25;
     private final float ZOOM_STEP = .1;
-    private final color BUTTON_BASE_COLOR = color(2, 104, 115);
-    private final color BUTTON_HIGHLIGHT_COLOR = color(3, 140, 140);
+    private final color BUTTON_BASE_COLOR = color(110, 166, 217);
+    private final color BUTTON_HIGHLIGHT_COLOR = color(129, 194, 255);
     private RectButton mZoomInButton;
     private RectButton mZoomOutButton;
     private RectButton mCreateButton;
@@ -143,11 +143,10 @@ public class MultitouchInterface {
 
     private void drawTitle() {
         pushMatrix();
-        stroke(166, 38, 38);
-        fill(166, 38, 38);
+        fill(255, 255, 255);
         textMode(SCREEN);
         textAlign(RIGHT);
-        textFont(mFont, 48);
+        textFont(mFont);
         text("August 23, 1966", width - 10, height - 10);
         textAlign(LEFT);
         popMatrix();

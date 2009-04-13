@@ -70,9 +70,7 @@ public class StarSimulation {
             wmap = map;
             wrect = new WiremapRectangle(wmap, 400,400, 5 , 255, sqwidth, sqheight, sqdepth, 0, 0);
         }
-
-        //pulsarSim = new PulsarSimulation(parent);
-
+        pulsarSim = new PulsarSimulation(parent);
         initialize();
     }
 
@@ -267,8 +265,6 @@ public class StarSimulation {
         } else {
             eol = 2;
         }
-
-        eol=2;
 
         float a0 = 40;
         float u1,u2;

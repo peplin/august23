@@ -34,7 +34,7 @@ float y = 0;
 float z = 10;
 
 void setup() {
-    size(1024, 768, OPENGL);
+    size(1024, 768, P3D);
     mServer = new Server(this, 1966);
     mMinim = new Minim(this);
     mWiremap = new Wiremap(this, 256, 90, 36, 48, 36.0/9.0, .1875, 2, 

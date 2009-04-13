@@ -1,33 +1,31 @@
 import processing.opengl.*;
-//import wiremap.Wiremap;
-//import wiremap.WiremapGlowingSphere;
-
 
 public class PulsarSimulation {
-    private VBPointCloud core, jet;
-    private float i;
+    private float jet[];
+    private float core[];
+    private float jetRotation;
     public PulsarSimulation(PApplet parent) {
-        core = new VBPointCloud(parent);
-        jet = new VBPointCloud(parent);
-        core.loadFloats(loadPoints("data1.csv"));
-        jet.loadFloats(loadPoints("jet.csv"));
-        core.pointSize = 1.f;
-        jet.pointSize=0.1f; 
+        core = loadPoints("core.csv");
+        jet = loadPoints("jet.csv");
     }
 
     public void display() {
         background(0);
         translate(width/2,height/2,0);
         rotateZ(-PI/4);
-        rotateY(i);
+        rotateY(jetRotation);
         stroke(5,255,255,255); 
         scale(0.3);
-        core.draw();
+        for(int i = 0; i < core.length; i += 3) {
+            point(core[i], core[i + 1], core[i + 2]);
+        }
         
         stroke(5,5,250,255);
         scale(20,10,10);
-        jet.draw();
-        i = (i + .05) % (2 * PI);
+        for(int i = 0; i < jet.length; i += 3) {
+            point(jet[i], jet[i + 1], jet[i + 2]);
+        }
+        jetRotation = (jetRotation + .05) % (2 * PI);
     }
 
     private float[] loadPoints(String path) {

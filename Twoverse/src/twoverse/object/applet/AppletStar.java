@@ -1,36 +1,16 @@
 package twoverse.object.applet;
 
 import processing.core.PApplet;
-import processing.core.PGraphics;
-import processing.core.PImage;
 import twoverse.object.Star;
 import twoverse.util.Point.TwoDimensionalException;
 
 @SuppressWarnings("serial")
 public class AppletStar extends Star implements AppletBodyInterface {
     private PApplet mParent;
-    private static PImage wormImg, wormTexture;
-    private static PGraphics mBlackHoleGraphic;
-    private int[] reg = new int[15];
-    private static boolean sInitialized;
-    private static boolean sShifted = false;
 
     public AppletStar(PApplet parent, Star star) {
         super(star);
         mParent = parent;
-
-        if(!sInitialized) {
-            // Reference image used to transpose texture
-            wormImg = mParent.loadImage("wormhole.png");
-            wormImg.loadPixels();
-
-            // Texture image array
-            wormTexture = mParent.loadImage("texture.gif");
-            wormTexture.loadPixels();
-
-            mBlackHoleGraphic = mParent.createGraphics(100, 100, mParent.P2D);
-            sInitialized = true;
-        }
     }
 
     public void display() throws TwoDimensionalException {
@@ -48,22 +28,22 @@ public class AppletStar extends Star implements AppletBodyInterface {
     }
 
     private void drawPulsar() {
-      //TODO
+        // TODO
         drawFormation();
     }
 
     private void drawSupernova() {
-      //TODO
+        // TODO
         drawFormation();
     }
 
     private void drawInert() {
-      //TODO
+        // TODO
         drawFormation();
     }
 
     private void drawBlackHole() {
-        //TODO
+        // TODO
         drawFormation();
     }
 
@@ -82,6 +62,15 @@ public class AppletStar extends Star implements AppletBodyInterface {
                 (float) getColorG(),
                 (float) getColorB());
         mParent.ellipse(0, 0, (float) getRadius(), (float) getRadius());
+
+        for(int i = 2; i < 25; i++) {
+            mParent.fill((float) getColorR(),
+                    (float) getColorG(),
+                    (float) getColorB(),
+                    (float) (255.0 / i/2.0));
+            mParent.ellipse(0, 0, (float) getRadius() + i, (float) getRadius()
+                    + i);
+        }
         mParent.popMatrix();
     }
 }
