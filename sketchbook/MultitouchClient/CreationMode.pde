@@ -46,20 +46,6 @@ public class CreationMode extends GalaxyMode {
         translate(-mCamera.getCenterX(), -mCamera.getCenterY());
         mStarSimulation.display();
         popMatrix();
-        if(mCurrentPlayer == null || !mCurrentPlayer.isLooping()
-                && mNextPlayTime <= millis()) {
-          if(random(1) <= .3) {
-            mCurrentPlayer
-                = mGrabBagVoiceOverPlayers[
-                (int)random(mGrabBagVoiceOverPlayers.length)];
-          } else {
-            mCurrentPlayer
-                = mNarrationVoiceOverPlayers[
-                (int)random(mNarrationVoiceOverPlayers.length)];
-          }
-          mCurrentPlayer.loop(0);
-          mNextPlayTime = millis() + random(3000, 6000);
-        }
       } 
       else {
         stroke(255);
@@ -124,6 +110,15 @@ public class CreationMode extends GalaxyMode {
                         if(messageParts[1].equals("seq")) {
                             int player = Integer.parseInt(messageParts[2]);
                             if(player >= 0 && player < mSequenceVoiceOverPlayers.length) {
+                                mCurrentPlayer =
+                                    mSequenceVoiceOverPlayers[player];
+                                mCurrentPlayer.loop(0);
+                            } else {
+                                throw new Exception("Bad audio index requested: " + message);
+                            }
+                        } else if(messageParts[1].equals("nar")) {
+                            int player = Integer.parseInt(messageParts[2]);
+                            if(player >= 0 && player < mNarrationVoiceOverPlayers.length) {
                                 mCurrentPlayer =
                                     mSequenceVoiceOverPlayers[player];
                                 mCurrentPlayer.loop(0);

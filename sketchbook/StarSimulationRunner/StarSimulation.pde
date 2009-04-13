@@ -30,8 +30,11 @@ public class StarSimulation {
     private int sqwidth;
     private int sqdepth;
 
+private color starColor;
+
     // evo color for using up material and for expressing inherent metallicity
     // create pulsar beacon
+
 
     private float freq_osc;
     private float xsph[], ysph[], zsph[] ;
@@ -77,6 +80,10 @@ public class StarSimulation {
     public void setFrequency(float frequency) {
         freq_osc = frequency;
     }
+
+  public void setColor(color c) {
+     starColor = c; 
+  }
     
     public boolean isEnded() {
       return millis() >= t4max;
