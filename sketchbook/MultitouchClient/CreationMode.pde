@@ -3,7 +3,7 @@ import ddf.minim.*;
 import ddf.minim.signals.SineWave;
 
 public class CreationMode extends GalaxyMode {
-  private final String WIREMAP_SERVER_IP = "192.168.1.6"; //"141.211.4.193";
+  private final String WIREMAP_SERVER_IP = "141.213.39.155";
   private Star mNewStar = null;
   private boolean mSimulationRunning = false;
   private ActiveColorGrabber mColorGrabber;
@@ -23,7 +23,7 @@ public class CreationMode extends GalaxyMode {
   Camera camera) {
     super(parent, objectManager, camera);
     mMinim = new Minim(mParent);
-    //mColorGrabber = new ActiveColorGrabber(mParent);
+    mColorGrabber = new ActiveColorGrabber(mParent);
     mStarSimulation = new StarSimulation(parent, null);
     mFont = loadFont("promptFont.vlw");
     connectToServer();
@@ -46,20 +46,6 @@ public class CreationMode extends GalaxyMode {
         translate(-mCamera.getCenterX(), -mCamera.getCenterY());
         mStarSimulation.display();
         popMatrix();
-        if(mCurrentPlayer == null || !mCurrentPlayer.isLooping()
-                && mNextPlayTime <= millis()) {
-          if(random(1) <= .3) {
-            mCurrentPlayer
-                = mGrabBagVoiceOverPlayers[
-                (int)random(mGrabBagVoiceOverPlayers.length)];
-          } else {
-            mCurrentPlayer
-                = mNarrationVoiceOverPlayers[
-                (int)random(mNarrationVoiceOverPlayers.length)];
-          }
-          mCurrentPlayer.loop(0);
-          mNextPlayTime = millis() + random(3000, 6000);
-        }
       } 
       else {
         stroke(255);
@@ -130,6 +116,15 @@ public class CreationMode extends GalaxyMode {
                             } else {
                                 throw new Exception("Bad audio index requested: " + message);
                             }
+                        } else if(messageParts[1].equals("nar")) {
+                            int player = Integer.parseInt(messageParts[2]);
+                            if(player >= 0 && player < mNarrationVoiceOverPlayers.length) {
+                                mCurrentPlayer =
+                                    mNarrationVoiceOverPlayers[player];
+                                mCurrentPlayer.loop(0);
+                            } else {
+                                throw new Exception("Bad audio index requested: " + message);
+                            }
                         }
                     } else {
                         throw new Exception("Malformed message: " + message);
@@ -156,7 +151,7 @@ public class CreationMode extends GalaxyMode {
 
   public void cursorPressed(Point cursor) {
     pushMatrix();
-    color activeColor = color(255); //mColorGrabber.getActiveColor();
+    color activeColor = mColorGrabber.getActiveColor();
     mNewStar = new Star(0,
             "Your Star",
             MASTER_PARENT_ID,
@@ -178,6 +173,7 @@ public class CreationMode extends GalaxyMode {
         connectToServer();
     }
     sendMessage("color " + activeColor);
+    mStarSimulation.setColor(activeColor);
     popMatrix();
   }
 
