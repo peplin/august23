@@ -65,9 +65,7 @@ public class StarSimulationWire {
   private float teol1, teol2, teol3;
 
   private float amp_rad_random = random(2,9);
-  
   private color starColor = color(255);
-
   public StarSimulationWire(PApplet parent, Wiremap wiremap) {
 
     // wiremap
@@ -126,8 +124,8 @@ public class StarSimulationWire {
     }
 
     // times
-    tbkg1  =millis();
-    tbkg2  =tbkg1 + 10  * 1000; 
+    tbkg1  = millis();
+    tbkg2  = tbkg1 + 10  * 1000; 
     
     tbkg1a = tbkg1 + 9*1000;
     tbkg2a = tbkg1 + 18*1000;
