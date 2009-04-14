@@ -15,7 +15,8 @@ public class StarSimulation {
   private final float c_bh = 4;
   private final float c_sn = 15;
   private float zoom = 0;
-  
+  private float zoom_sph=2;
+
   private Wiremap wmap;
   private WiremapRectangle wrect;
   private int sqheight;
@@ -27,7 +28,7 @@ public class StarSimulation {
   private float xbkg[], ybkg[], zbkg[], rsph[] ;
   private float rsph_max;
   private int  eol;
-  
+
   private float rad_core;
   private float rad_core0;
   private float freq_osc; 
@@ -38,6 +39,7 @@ public class StarSimulation {
   private float scale_p;
   private float scale_core;
   private float scale0;
+  private float rad_core_max;
 
   // times
   private float teol1; 
@@ -113,70 +115,72 @@ public class StarSimulation {
       zoom = 1;
       color_p = 255* (time - tbkg1)/(tbkg2-tbkg1);
     } 
-    else if ( time > tbkg1a && time <=tbkg2a){ // === rotate view
+
+    if ( time > tbkg1a && time <=tbkg2a){ // === rotate view
       rotateY(2*PI*(time-tbkg1a)/(tbkg2a-tbkg1a)); 
       zoom = 1;
     } 
-    else if ( time > tbkg1b && time <=tbkg2b ){ // === zoom in
-      zoom = 1 + log(1 + (time-tbkg1b)/(tbkg2b - tbkg1b) );
+
+    if ( time > tbkg1b && time <=tbkg2b ){ // === zoom in
+      zoom = 1 + 2*log(1 + (time-tbkg1b)/(tbkg2b - tbkg1b) );
     }
 
     if (time > tbkg1){
-      stroke(constrain(255 * (time - tbkg1), 0, 255));
-      pushMatrix();
+      // stroke(constrain(255 * (time - tbkg1), 0, 255));
+      stroke(constrain(color_p,0,255));
+      // pushMatrix();
       scale(zoom);
-      drawPoints(xbkg, ybkg, zbkg, nbkg,0.,rbkg*1000000);
-      popMatrix();
+      //popMatrix();
     }
+    drawPoints(xbkg, ybkg, zbkg, nbkg,0.,rbkg*1000000);
 
     // ===================================
     // === Star particles  
     // CONDENSE (in expanding bkg)
-    if ( time >= tsph1 && time <=tsph2 ){    
-      rotateY(2*PI*(time-tsph2)/(tsph2-tsph1));
-      float scale0 = zoom * 1./(1 + c_cond*(time-tsph2)/(tsph2-tsph1));
+    if ( time >= tsph1 && time <tsph2 ){    
+      rotateY(-2*PI*(time-tsph1)/(tsph2-tsph1));
+      float scale0 = zoom_sph * 1./(1 + 7.*(time-tsph1)/(tsph2-tsph1));
       scale_p = scale0;
     }
 
-    if ( time <= tsph2) {
-      osc_p = 1;   
-    }
-
     // FUSION starts
-    if ( time >=tsph1a && time <= tsph2a){
-      rad_core = rad_core + rad_core0*(time-tsph1)/(tsph2-tsph1);
+    if ( time >= tsph1a && time <= tsph2a){
+      rad_core   = rad_core0 + rad_core_max*(time-tsph1a)/(tsph2a-tsph1a);
+      color_core = color(85);
+      scale_core = 1;
     }
-
-    if ( time >=tsph1b && time <= tsph2b){
-      float t = (time-tsph1b)/(tsph2b-tsph1b);
-      float c1 = 100 * t;
-      float c2 = 255 * t;
-      float color_core = color(255-c2,255-c2,255-c2, 0);
-      stroke(color_core);
+    
+    if ( time >= tsph1b && time <= tsph2b ){
+       float t = (time-tsph1b)/(tsph2b-tsph1b);
+       float c1 = 100 * t;
+       float c2 = 255 * t;
+       color_core = color(255,255-c2,255-c2, c2);
+       scale_core=1;
     }
-
+    
     // oscillate
     if ( time >= tsph1c && time <=tsph2c){         
       float t = (time-tsph1c)/(tsph2c-tsph1c);
-      osc_p = scale_p + amp_osc_p*abs(sin(freq_osc*t));
-      osc_core = scale_core + amp_osc_core*abs(sin(freq_osc*t));      
+      osc_p = scale_p + amp_osc_p*abs(sin(freq_osc*t/1000.));
+      osc_core = rad_core + amp_osc_core*abs(sin(freq_osc*t/1000.)); 
+      scale_core = osc_core;     
     }
 
-   
+
     // ===================================
     // === End life
     if ( time >=teol3 && time <= teol1) {
       // BLACK HOLE
       if ( eol == 0 ) {
-        color_p = 255 * (teol3 - time)/(teol3-teol1);
-        osc_p = 1 +  1./(1+c_bh*(time-teol1)/(teol3-teol1));       
+        // color_p = 255 * (teol3 - time)/(teol3-teol1);
+        // osc_p = 1 +  1./(1+c_bh*(time-teol1)/(teol3-teol1));       
 
       }
 
       // SUPERNOVA
       if ( eol == 1 ) {
         // particle blow out
-        osc_p = exp(c_sn * pow((time-teol1)/(teol3-teol1), 3));
+        //  osc_p = exp(c_sn * pow((time-teol1)/(teol3-teol1), 3));
       }
 
       // PULSAR
@@ -189,20 +193,21 @@ public class StarSimulation {
         popMatrix();
       }
     }
-    
+
     // ===================================
     // === DRAW PARTICLES
-    if ( time > tsph1d && time <=tsph2d ){           // DRAW PARTICLES
+    if ( time > tsph1 ){           // DRAW PARTICLES
+
+      //stroke(color_p);
+      //TODO aren't we scaling this twice now? ... no maintains scaling.
     
-      stroke(color_p);
-      scale(osc_p); //TODO aren't we scaling this twice now? ... no maintains scaling.
-      drawPoints(xsph, ysph, zsph, nsph,0., rsph_max*1000);
-      
-      scale(osc_core);
-      stroke(color_core);
+      scale(scale_p);
+      drawPoints(xsph, ysph, zsph, nsph,0., rsph_max*100000);
+
+      scale(scale_core);
       sphere(rad_core);
     }
-    
+
   }
 
   private void drawPoints(float[] x, float[] y, float[] z, int n,
@@ -229,6 +234,7 @@ public class StarSimulation {
       for (int j=0;j<n;j++){
         r2 = x[j]*x[j]+y[j]*y[j]+z[j]*z[j];
         if (r2 > rmin*rmin && r2 < rmax*rmax){
+          //   println(x[j]+" "+y[j]);
           point(x[j],y[j],z[j]);
         }
       } 
@@ -240,31 +246,33 @@ public class StarSimulation {
     ysph = new float[nsph];
     zsph = new float[nsph];
     rsph = new float[nsph];
-    
+
     xbkg = new float[nbkg];
     ybkg = new float[nbkg];
     zbkg = new float[nbkg];
 
-    tbkg1  = millis();
-    tbkg2  = tbkg1 + 10*1000;
-    tbkg1a = tbkg1 + 15*1000;
-    tbkg2a = tbkg1 + 20*1000;
-    tbkg1b = tbkg1 + *1000;
-    tbkg2b = tbkg1 + *1000;
-    tsph1  = tbkg1 + *1000;
-    tsph2  = tbkg1 + *1000;
-    tsph1a = tbkg1 + *1000;
-    tsph2a = tbkg1 + *1000;
-    tsph1b = tbkg1 + *1000;
-    tsph2b = tbkg1 + *1000;
-    tsph1c = tbkg1 + *1000;
-    tsph2c = tbkg1 + *1000;
-    tsph1d = tbkg1 + *1000;
-    tsph2d = tbkg1 + *1000;
+    tbkg1  = millis();       // fade
+    tbkg2  = tbkg1 + 8*1000;
+    tbkg1a = tbkg1 + 6*1000;// rotate
+    tbkg2a = tbkg1 + 9*1000;
+    tbkg1b = tbkg1 + 1*1000;// zoom
+    tbkg2b = tbkg1 + 7*1000; // about 10 sec for bkg
+    
+    tsph1  = tbkg1 + 8*1000;// condense
+    tsph2  = tbkg1 + 13*1000;
+    tsph1a = tbkg1 + 15*1000; //enlarge/fusion start
+    tsph2a = tbkg1 + 20*1000;
+    tsph1b = tbkg1 + 22*1000; //color fusion start/fade to color
+    tsph2b = tbkg1 + 29*1000;
+    tsph1c = tbkg1 + 32*1000; //oscillate radius
+    tsph2c = tbkg1 + 62*1000;
 
-    teol3  = tbkg1 + *1000;
-    teol2  = tbkg1 + *1000;
-    teol1  = tbkg1 + *1000;
+    teol1  = tbkg1 + 65*1000;  //eol
+    teol2  = tbkg1 + 85*1000;
+    teol3  = tbkg1 + 115*1000;
+    
+    rad_core0 = random(0,1);
+    rad_core_max = rad_core0+5;
 
     float endOfLifeWeight = random(1);
     if (endOfLifeWeight < .33) {
@@ -277,7 +285,7 @@ public class StarSimulation {
       eol = 2;
     }
 
-    float a0 = 40;
+    float a0 = 10;
     float u1,u2;
     for(int i=0; i<nsph; i++) {
       u1 = random(0,1);
@@ -287,7 +295,8 @@ public class StarSimulation {
     for(int i=0; i<nsph; i++) {
       u1 = random(0,1);
       u2 = random(0,1);
-      ysph[i] =a0*PI*sqrt(-2*log(u1))*cos(2*PI*u2);
+      ysph[i] =a0*PI*sqrt(-2*log(u1))*sin(2*PI*u2);
+      //println(ysph[i]+" "+sqrt(-2*log(u1)));
     }
     for(int i=0; i<nsph; i++) {
       u1 = random(0,1);
@@ -297,13 +306,14 @@ public class StarSimulation {
     }
 
     rsph_max = max(rsph);
-
     for (int i = 0; i<nbkg; i++){
       xbkg[i] = random(-rbkg,rbkg);
       ybkg[i] = random(-rbkg,rbkg);
       zbkg[i] = random(-rbkg,rbkg);
     }
-    setFrequency(6);
+    setFrequency(10.);
   }
 }
+
+
 
