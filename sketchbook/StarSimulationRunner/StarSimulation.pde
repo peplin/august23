@@ -4,59 +4,61 @@ import wiremap.WiremapRectangle;
 
 public class StarSimulation {
   /** Constants **/
-  private final float dta = 5000;
-  private final float dt0 = 5000;
-  private final float dt1 = 5000;
-  private final float dt2 = 5000;
-  private final float dt3 = 5000;
-  private final float dt4 = 15000;
-  private final float dt2aa = 5000;
-  private final float dt2b = 5000;
-  private final float dt2c = 5000;
   private final float c_cond = 5.0;
   private final float amp_osc = .2;
-  private final float amp_oscb = .2;
-  private final float amp_osca = .2;
-  private final float amp_conv = .4; 
-  private final float freq_conv = 9;
+  private final float amp_osc_p = .2;
+  private final float amp_osc_core = .2;
   private final float rbkg = 2.e2;
   private final int nbkg = 300;
   private final int nsph = 200;
   private final int nc = 1000;
   private final float c_bh = 4;
   private final float c_sn = 15;
-
+  private float zoom = 0;
+  
   private Wiremap wmap;
   private WiremapRectangle wrect;
   private int sqheight;
   private int sqwidth;
   private int sqdepth;
 
-  private color starColor;
-
-  // evo color for using up material and for expressing inherent metallicity
-  // create pulsar beacon
-
-  private float rad_core;
-  private float freq_osca;
-  private float freq_oscb;
-  private float freq_osc;
+  private color starColor; 
   private float xsph[], ysph[], zsph[] ;
   private float xbkg[], ybkg[], zbkg[], rsph[] ;
   private float rsph_max;
   private int  eol;
-  private float zoom = 0;
+  
+  private float rad_core;
+  private float rad_core0;
+  private float freq_osc; 
   private float osc_p = 1;
   private float color_p;
   private float osc_core;
   private float color_core;
- 
+  private float scale_p;
+  private float scale_core;
+  private float scale0;
 
   // times
-
-  private float teol1,teol2,teol3;
-  private float tbkg1, tbkg2, tbkg1a, tbkg2a, tbkg1b, tbkg2b;
-  private float tsph1, tsph2, tsph1a, tsph2a, tsph1b, tsph2b, tsph1c, tsph2c, tsph1d, tsph2d
+  private float teol1; 
+  private float teol2;
+  private float teol3;
+  private float tbkg1;
+  private float tbkg2;
+  private float tbkg1a;
+  private float tbkg2a;
+  private float tbkg1b; 
+  private float tbkg2b;
+  private float tsph1;
+  private float tsph2;
+  private float tsph1a;
+  private float tsph2a;
+  private float tsph1b;
+  private float tsph2b;
+  private float tsph1c;
+  private float tsph2c;
+  private float tsph1d;
+  private float tsph2d;
   private PulsarSimulation pulsarSim;
 
   /**
@@ -80,7 +82,7 @@ public class StarSimulation {
   }
 
   public boolean isEnded() {
-    return millis() >= t4max;
+    return millis() >= teol3;
   }
 
   public int getEndState() {
@@ -95,13 +97,10 @@ public class StarSimulation {
     float time = millis();
     float color_p = 255;
 
-    if (time >= t2aamin && time <= t2aamax){ 
-      color_p = 255* (time - t2aamin)/dt2aa;
-    }
 
     // BACKGROUND SCENE
     if ( time >= teol1 && time <= teol3 && eol == 1) {
-      background(255* (time - teol3)/(teol3-teol1)); // fade to white (SN)
+      background(255* (time - teol1)/(teol3-teol1)); // fade to white (SN)
     }
     else{
       background(0);
@@ -112,13 +111,14 @@ public class StarSimulation {
     // === Background particles
     if (time > tbkg1 && time <=tbkg2) { // === fade open particles
       zoom = 1;
+      color_p = 255* (time - tbkg1)/(tbkg2-tbkg1);
     } 
     else if ( time > tbkg1a && time <=tbkg2a){ // === rotate view
-      rotateY(2*PI*(time-t0min)/()); 
+      rotateY(2*PI*(time-tbkg1a)/(tbkg2a-tbkg1a)); 
       zoom = 1;
     } 
     else if ( time > tbkg1b && time <=tbkg2b ){ // === zoom in
-      zoom = 1 + log(1 + (time-t1min)/() );
+      zoom = 1 + log(1 + (time-tbkg1b)/(tbkg2b - tbkg1b) );
     }
 
     if (time > tbkg1){
@@ -133,8 +133,9 @@ public class StarSimulation {
     // === Star particles  
     // CONDENSE (in expanding bkg)
     if ( time >= tsph1 && time <=tsph2 ){    
-      rotateY(2*PI*(time-t2min)/dt2);
-      osc_p = zoom * 1./(1 + c_cond*(time-t2min)/dt2);
+      rotateY(2*PI*(time-tsph2)/(tsph2-tsph1));
+      float scale0 = zoom * 1./(1 + c_cond*(time-tsph2)/(tsph2-tsph1));
+      scale_p = scale0;
     }
 
     if ( time <= tsph2) {
@@ -143,43 +144,44 @@ public class StarSimulation {
 
     // FUSION starts
     if ( time >=tsph1a && time <= tsph2a){
-      rad_core = rad_core + (time-t2amin)/(t2amax-t2amin);
+      rad_core = rad_core + rad_core0*(time-tsph1)/(tsph2-tsph1);
     }
 
     if ( time >=tsph1b && time <= tsph2b){
-      float c1 = 100 *(time-tsph)/(tsph-tsph); 
-      float c2 = 255 *(time-tsph)/(tsph-tsph);
+      float t = (time-tsph1b)/(tsph2b-tsph1b);
+      float c1 = 100 * t;
+      float c2 = 255 * t;
       float color_core = color(255-c2,255-c2,255-c2, 0);
       stroke(color_core);
     }
 
     // oscillate
     if ( time >= tsph1c && time <=tsph2c){         
-      float t = (time-tsph)/dt3;
-      osc_p = dcolldt + amp_osc_p*abs(sin(freq_osc*t));
-      osc_core = dcolldt + amp_osc_core*abs(sin(freq_osc*t));      
+      float t = (time-tsph1c)/(tsph2c-tsph1c);
+      osc_p = scale_p + amp_osc_p*abs(sin(freq_osc*t));
+      osc_core = scale_core + amp_osc_core*abs(sin(freq_osc*t));      
     }
 
    
     // ===================================
     // === End life
-    if ( time >=t4min && time <= t4max) {
+    if ( time >=teol3 && time <= teol1) {
       // BLACK HOLE
       if ( eol == 0 ) {
-        color_p = 255 * (t4max - time)/dt4);
-        osc_p = 1 +  1./(1+c_bh*(time-t4min)/dt4));       
+        color_p = 255 * (teol3 - time)/(teol3-teol1);
+        osc_p = 1 +  1./(1+c_bh*(time-teol1)/(teol3-teol1));       
 
       }
 
       // SUPERNOVA
       if ( eol == 1 ) {
         // particle blow out
-        osc_p = exp(c_sn * pow((time-t4min)/dt4, 3));
+        osc_p = exp(c_sn * pow((time-teol1)/(teol3-teol1), 3));
       }
 
       // PULSAR
       if (eol == 2) {
-        float c_pulsar0 = 255 *(time-t4min)/(t4max-t4min);
+        float c_pulsar0 = 255 *(time-teol1)/(teol3-teol1);
         float c_pulsar1 = color(c_pulsar0, c_pulsar0,c_pulsar0, c_pulsar0);
         stroke(c_pulsar1);
         pushMatrix();
@@ -190,7 +192,7 @@ public class StarSimulation {
     
     // ===================================
     // === DRAW PARTICLES
-    if ( time > tsph1d && time <=t3max ){           // DRAW PARTICLES
+    if ( time > tsph1d && time <=tsph2d ){           // DRAW PARTICLES
     
       stroke(color_p);
       scale(osc_p); //TODO aren't we scaling this twice now? ... no maintains scaling.
@@ -234,34 +236,35 @@ public class StarSimulation {
   }
 
   public void initialize() {
-    float phi[] = new float[nsph];
-    float the[] = new float[nsph];
     xsph = new float[nsph];
     ysph = new float[nsph];
     zsph = new float[nsph];
     rsph = new float[nsph];
+    
     xbkg = new float[nbkg];
     ybkg = new float[nbkg];
     zbkg = new float[nbkg];
 
-    tamin = millis();
-    tamax = tamin + dta;
-    t0min = tamax;
-    t0max = t0min + dt0;
-    t1min = t0max;
-    t1max = t1min + dt1;
-    t2min = t1max;
-    t2max = t2min + dt2;
-    t3min = t2max;
-    t3max = t3min + dt3;
-    t4min = t3max;
-    t4max = t4min + dt4;
-    t2aamin = tamin + 10000;
-    t2aamax = t2aamin + dt2aa;
-    t2bmin = tamin + 15000; 
-    t2bmax = t2bmin + dt2b;
-    t2cmin = tamin + 20000;
-    t2cmax = t2cmin + dt2c;
+    tbkg1  = millis();
+    tbkg2  = tbkg1 + 10*1000;
+    tbkg1a = tbkg1 + 15*1000;
+    tbkg2a = tbkg1 + 20*1000;
+    tbkg1b = tbkg1 + *1000;
+    tbkg2b = tbkg1 + *1000;
+    tsph1  = tbkg1 + *1000;
+    tsph2  = tbkg1 + *1000;
+    tsph1a = tbkg1 + *1000;
+    tsph2a = tbkg1 + *1000;
+    tsph1b = tbkg1 + *1000;
+    tsph2b = tbkg1 + *1000;
+    tsph1c = tbkg1 + *1000;
+    tsph2c = tbkg1 + *1000;
+    tsph1d = tbkg1 + *1000;
+    tsph2d = tbkg1 + *1000;
+
+    teol3  = tbkg1 + *1000;
+    teol2  = tbkg1 + *1000;
+    teol1  = tbkg1 + *1000;
 
     float endOfLifeWeight = random(1);
     if (endOfLifeWeight < .33) {
@@ -294,18 +297,6 @@ public class StarSimulation {
     }
 
     rsph_max = max(rsph);
-
-    for(int i=0; i<nsph; i++) {
-      u1 = random(0,1);
-      u2 = random(0,1);
-      phi[i] = PI*sqrt(-2*log(u1))*cos(2*PI*u2);
-      the[i] = PI*sqrt(-2*log(u1))*sin(2*PI*u2);
-
-      u1 = random(0,1);
-      u2 = random(0,1);
-      phi[i] = PI*sqrt(-2*log(u1))*cos(2*PI*u2);
-      the[i] = PI*sqrt(-2*log(u1))*sin(2*PI*u2);
-    }
 
     for (int i = 0; i<nbkg; i++){
       xbkg[i] = random(-rbkg,rbkg);
