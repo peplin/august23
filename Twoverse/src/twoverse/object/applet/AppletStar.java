@@ -55,8 +55,6 @@ public class AppletStar extends Star implements AppletBodyInterface {
                     (float) getPosition().getY(),
                     (float) getPosition().getZ());
         } catch(TwoDimensionalException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
         mParent.fill((float) getColorR(),
                 (float) getColorG(),

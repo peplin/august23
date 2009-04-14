@@ -193,7 +193,7 @@ void initializeAudio() {
 
 void resetPlayStatus() {
     for(int i =0; i < mNarrationPlayStatus.length; i++) {
-        mNarrationPlayStatus = false;
+        mNarrationPlayStatus[i] = false;
     }
 }
 
