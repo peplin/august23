@@ -133,9 +133,9 @@ public class StarSimulationWire {
     tbkg2a = tbkg1 + 18*1000;
 
     tsph1a =tbkg1 + 9   * 1000;//fade in
-    tsph2a =tbkg1 + 18  * 1000;  
+    tsph2a =tbkg1 + 16  * 1000;  
 
-    tsph1b =tbkg1 + 9  * 1000;//enlarge
+    tsph1b =tbkg1 + 16  * 1000;//enlarge
     tsph2b =tbkg1 + 20  * 1000;
 
     tsph1c =tbkg1 + 22 * 1000;//fade to color
