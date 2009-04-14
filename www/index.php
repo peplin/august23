@@ -4,35 +4,37 @@ require_once("connections/august.php");
 include("include/$topfile");
 
 $stars = mysql_query(
-    "SELECT username, birth, death, mass, radius, luminosity, frequency, state.name
+    "SELECT birth, colorR, colorG, colorB, frequency, state.name
         FROM object NATURAL JOIN star 
-        LEFT JOIN (user) ON (object.owner = user.id)
-        LEFT JOIN (state ON (object.state = state.id)
+        LEFT JOIN (user, state)
+            ON (object.owner = user.id AND star.state = state.id) 
         ORDER BY birth DESC", $august);
-echo "<div><table id=\"star_table\">";
+echo "<div><table id=\"star_table\" class=\"center\">";
 echo "<thead>";
 echo "<tr>
-        <th scope=\"col\" id=\"place_col\">Birth Place</th>
-        <th scope=\"col\" id=\"birth_col\">Birthday</th>
-        <th scope=\"col\" id=\"death_col\">Collapse Day</th>
-        <th scope=\"col\" id=\"mass_col\">Mass</th>
-        <th scope=\"col\" id=\"radius_col\">Radius</th>
-        <th scope=\"col\" id=\"luminosity_col\">Luminosity</th>
+        <th scope=\"col\" id=\"birth_col\">Born</th>
+        <th scope=\"col\" id=\"color_r_col\">Color (Red)</th>
+        <th scope=\"col\" id=\"color_g_col\">Color (Green)</th>
+        <th scope=\"col\" id=\"color_b_col\">Color (Blue)</th>
         <th scope=\"col\" id=\"frequency_col\">Frequency</th>
         <th scope=\"col\" id=\"state_col\">State</th>
      </tr>";
 echo "</thead><tbody>";
+$row = 0;
 while ($star = mysql_fetch_row($stars)) {
-    echo "<tr>";
+    echo "<tr class=\"row".($row & 1)."\">\n";
     for ($i = 0; $i < count($star); $i++){
-        echo "<td>";
+        echo "\t<td>";
         echo $star[$i];
-        echo "</td>";
+        echo "</td>\n";
     }
-    echo "</tr>";
+    echo "</tr>\n";
+    $row++;
 }
 echo "</tbody></table>";
 
-echo "<div><ul>";
-echo "<li>
+echo "<div id=\"menu\"><ul class=\"center\">";
+echo "<li><a href=\"http://august231966.com\">August 23, 1966</a></li>";
+echo "<li><a href=\"http://www.dc.umich.edu/grocs/\">GROCS</a></ul></div>";
+include("include/$botfile");
 ?>
