@@ -65,16 +65,14 @@ public class StarSimulationWire {
   private float teol1, teol2, teol3;
 
   private float amp_rad_random = random(2,9);
-  
   private color starColor = color(255);
-
   public StarSimulationWire(PApplet parent, Wiremap wiremap) {
 
     // wiremap
     map = wiremap;
    
     // initialize sphere
-    glowingSphere = new WiremapGlowingSphere(map, 500, 300, 10, c0_base, r0, c0_core); 
+    glowingSphere = new WiremapGlowingSphere(map, 500, 300, 18, c0_base, r0, c0_core); 
 
     // initialize rectangles for bkg stars and condensing statge
     rectangle = new WiremapRectangle(map, 0,0,0,0,4,1,2,0,0);
@@ -93,7 +91,6 @@ public class StarSimulationWire {
   }
 
   public void initialize() {
-    /*
     float endOfLifeWeight = random(1);
      if (endOfLifeWeight < .33) {
      c_eol = 0;
@@ -102,18 +99,6 @@ public class StarSimulationWire {
      } else {
      c_eol = 2;
      }
-     */
-    float redValue = red(starColor);
-    float greenValue = green(starColor);
-    float blueValue = blue(starColor);
-    
-    if(redValue >= greenValue && redValue >= blueValue) {
-       c_eol = 0; 
-    } else if(greenValue >= redValue && greenValue >= blueValue) {
-       c_eol = 1; 
-    } else {
-       c_eol = 2; 
-    }
 
     for (int i = 0; i< nbkg; i++){
       xbkg[i] = (random(0,width));
@@ -126,16 +111,16 @@ public class StarSimulationWire {
     }
 
     // times
-    tbkg1  =millis();
-    tbkg2  =tbkg1 + 10  * 1000; 
+    tbkg1  = millis();
+    tbkg2  = tbkg1 + 10  * 1000; 
     
     tbkg1a = tbkg1 + 9*1000;
     tbkg2a = tbkg1 + 18*1000;
 
-    tsph1a =tbkg1 + 9   * 1000;//fade in
-    tsph2a =tbkg1 + 18  * 1000;  
+    tsph1a =tbkg1 + 9   * 1000;//fade in/condense
+    tsph2a =tbkg1 + 16  * 1000;  
 
-    tsph1b =tbkg1 + 9  * 1000;//enlarge
+    tsph1b =tbkg1 + 16  * 1000;//enlarge/fusion start
     tsph2b =tbkg1 + 20  * 1000;
 
     tsph1c =tbkg1 + 22 * 1000;//fade to color
@@ -208,7 +193,13 @@ public class StarSimulationWire {
       alpha_bkg = 255 - 155*(time-tbkg1a)/(tbkg2a-tbkg1a);
     }
 
-    pdraw(rectangle, xbkg, ybkg,zbkg,col,alpha_bkg,nbkg);
+	color bkgColor = color(255, 255, 255, alpha_bkg);
+	rectangle.setBaseColor(bkgColor);
+    for (int i = 0; i< nbkg; i++){
+      rectangle.setPosition(xbkg[i],ybkg[i],zbkg[i]);
+      rectangle.display();
+    }
+  
 
     // SPHERE
     // fade from black
@@ -327,16 +318,4 @@ starState = 5;
       starState = 9;
     }
   }
-
-  void pdraw(WiremapRectangle myrect, float[] x, float[] y, float[] z, int[] c, float myalpha, int n){
-    for (int i = 0; i< n; i++){
-      c[i] = color(255,255,255, myalpha);
-      myrect.setBaseColor(c[i]);
-      myrect.setPosition(x[i],y[i],z[i]);
-      myrect.display();
-    }
-  }
 }
-
-
-

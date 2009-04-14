@@ -25,6 +25,8 @@ HeartbeatDetector mHeartbeatDetector;
 WiremapGlowingSphere mGlowingSphere;
 int mActivatedTime;
 float mNextPlayTime = 0;
+float mLastHeartbeatTime = 0;
+final float HEARTBEAT_DURATION = 50;
 boolean mStarted = false;
 
 boolean goingUp = false;
@@ -39,8 +41,8 @@ void setup() {
     size(1024, 768, P3D);
     mServer = new Server(this, 1966);
     mMinim = new Minim(this);
-    mWiremap = new Wiremap(this, 256, 90, 36, 36, 48, .1875, .1875, 2, 
-            "depths.txt");
+    mWiremap = new Wiremap(this, 256, 90, 36, 36, 48, 36.0/27.0, .1875, 4,
+            "/home/august/august/sketchbook/wiremap/ManualCalibrator/calibration-round2.txt");
     mStarSimulation = new StarSimulationWire(this, mWiremap);  
     mHeartbeatDetector = new HeartbeatDetector(this);
     
@@ -103,10 +105,20 @@ void draw() {
                     }
                     mNextPlayTime = millis() + random(5000, 8000);
                 }
-            }
-            if(!mCurrentAmbientPlayer.isLooping()) {
-                mCurrentAmbientPlayer = mAmbientPlayers[(int)random(mAmbientPlayers.length)];
-                mCurrentAmbientPlayer.loop(0);
+		    if(!mCurrentAmbientPlayer.isLooping()) {
+			mCurrentAmbientPlayer = mAmbientPlayers[(int)random(mAmbientPlayers.length)];
+			mCurrentAmbientPlayer.loop(0);
+		    }
+		if(mAudioOutput.isEnabled(mSineWave)) {
+			if(millis() >= mLastHeartbeatTime + HEARTBEAT_DURATION) {
+				mAudioOutput.disableSignal(mSineWave);
+			}
+		} else {
+			if(millis() >= mLastHeartbeatTime + (1 / mHeartbeatFrequency * 1000)) {
+				mAudioOutput.enableSignal(mSineWave);
+			}
+
+		}
             }
         }
 
@@ -193,7 +205,7 @@ void initializeAudio() {
 
 void resetPlayStatus() {
     for(int i =0; i < mNarrationPlayStatus.length; i++) {
-        mNarrationPlayStatus = false;
+        mNarrationPlayStatus[i] = false;
     }
 }
 

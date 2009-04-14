@@ -48,6 +48,5 @@ public class ConnectionMode extends GalaxyMode {
     }
 
     public void disable() {
-        mOpenLink = null;
     }
 }
