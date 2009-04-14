@@ -3,9 +3,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import processing.opengl.*;
-import tuio.TuioClient;
-import tuio.TuioCursor;
 import twoverse.ObjectManagerClient;
 import twoverse.RequestHandlerClient;
 import twoverse.ObjectManager.UnhandledCelestialBodyException;
@@ -18,14 +15,12 @@ import twoverse.util.User;
 import twoverse.util.Point.TwoDimensionalException;
 
 /** Constants for Configuration **/
-private static final boolean DEBUG = true;
 private static final int WINDOW_WIDTH = 1024;
 private static final int WINDOW_HEIGHT = 768;
 private static final int FRAME_RATE = 30;
 
-/** TUIO & Control Members **/
-private TuioController mTuioController;
-private MultitouchInterface mInterface;
+/** Control Members **/
+private DesktopInterface mInterface;
 
 /** Object & Server Members **/
 private ObjectManagerClient mObjectManager;
@@ -58,11 +53,10 @@ void setup() {
 
     mRequestHandler = new RequestHandlerClient("http://141.213.30.171:8080");
     //mRequestHandler = new RequestHandlerClient("http://localhost:8080");
-    mTuioController = new TuioController(this);
-    mInterface = new MultitouchInterface(this);
+    mInterface = new DesktopInterface(this);
 
     User user =
-            new User(0, "august_mt", null, null, 100);
+            new User(0, "august_client", null, null, 100);
     //TODO before releasing code, figure out how to hide this
     user.setPlaintextPassword("grocs1966");
     mRequestHandler.createAccount(user);
@@ -74,7 +68,6 @@ void setup() {
     mModes = new MultitouchModeInterface[4];
     mModes[0] = new GalaxyMode(this, mObjectManager, mCamera);
     mModes[1] = new InfoMode(this);
-    mModes[2] = new CreationMode(this, mObjectManager, mCamera);
     mModes[3] = new ConnectionMode(this, mObjectManager, mCamera);
 
     Handler[] handlers = Logger.getLogger("").getHandlers();
@@ -107,18 +100,4 @@ void setMode(int mode) {
 
 void mouseDragged() {
     mCamera.changeTranslateVelocity(mouseX - pmouseX, mouseY - pmouseY);
-}
-
-void addTuioCursor(TuioCursor tcur) {
-    mTuioController.addTuioCursor(tcur);
-}
-
-// called when a cursor is moved
-void updateTuioCursor(TuioCursor tcur) {
-    mTuioController.updateTuioCursor(tcur);
-}
-
-// called when a cursor is removed from the scene
-void removeTuioCursor(TuioCursor tcur) {
-    mTuioController.removeTuioCursor(tcur);
 }
