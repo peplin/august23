@@ -72,4 +72,8 @@ public class InfoMode implements MultitouchModeInterface {
     public void disable() {
         mSelectedStar = null;
     }
+
+    public boolean canDisable() {
+        return true;
+    }
 }

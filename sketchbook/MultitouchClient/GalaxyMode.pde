@@ -58,7 +58,7 @@ public class GalaxyMode implements MultitouchModeInterface {
         }
     }
 
-    Star checkStars(Point cursor) {
+    public Star checkStars(Point cursor) {
         pushMatrix();
         translate(-width/2, -height/2);
         try {
@@ -97,12 +97,15 @@ public class GalaxyMode implements MultitouchModeInterface {
         return null;
     }
 
-    void cursorDragged(Point cursor) {
+    public void cursorDragged(Point cursor) {
 
     }
 
-    void disable() {
+    public void disable() {
 
     }
 
+    public boolean canDisable() {
+        return true;
+    }
 }

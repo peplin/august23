@@ -26,17 +26,8 @@ void setup()
 {
   font = loadFont("NimbusSanL-BoldCond-48.vlw"); 
 
-  frameRate(320);
   size(600, 400);
   smooth();
-
-  
-
- 
-
- 
-
-  
 
   // Object create Buttons
   color buttoncolor = color(100);

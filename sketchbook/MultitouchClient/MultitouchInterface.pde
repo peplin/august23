@@ -103,40 +103,44 @@ public class MultitouchInterface {
 
     /** returns true if a button was pressed and this event was handled */
     private boolean checkButtons(Point cursor) {
-        if(mZoomInButton.isPressed(cursor)) {
-            mCamera.zoom(ZOOM_STEP);
-        } else if(mZoomOutButton.isPressed(cursor)) {
-            mCamera.zoom(-ZOOM_STEP);
-        } else if(mCreateButton.isPressed(cursor)) {
-            if(mCreateButton.isLocked()) {
+        if(getMode().canDisable()) {
+            if(mZoomInButton.isPressed(cursor)) {
+                mCamera.zoom(ZOOM_STEP);
+            } else if(mZoomOutButton.isPressed(cursor)) {
+                mCamera.zoom(-ZOOM_STEP);
+            } else if(mCreateButton.isPressed(cursor)) {
+                if(mCreateButton.isLocked()) {
+                    mCreateButton.setLocked(false);
+                    mGalaxyButton.setLocked(true);
+                    setMode(0);
+                } else {
+                    mCreateButton.setLocked(true);
+                    mConnectButton.setLocked(false);
+                    mGalaxyButton.setLocked(false);
+                    setMode(2);
+                    mCamera.resetScale();
+                }
+            } else if(mConnectButton.isPressed(cursor)) {
+                if(mConnectButton.isLocked()) {
+                    mConnectButton.setLocked(false);
+                    mGalaxyButton.setLocked(true);
+                    setMode(0);
+                } else {
+                    mConnectButton.setLocked(true);
+                    mCreateButton.setLocked(false);
+                    mGalaxyButton.setLocked(false);
+                    setMode(3);
+                }
+            } else if(mGalaxyButton.isPressed(cursor)) {
+                mConnectButton.setLocked(false);
                 mCreateButton.setLocked(false);
                 mGalaxyButton.setLocked(true);
                 setMode(0);
             } else {
-                mCreateButton.setLocked(true);
-                mConnectButton.setLocked(false);
-                mGalaxyButton.setLocked(false);
-                setMode(2);
-                mCamera.resetScale();
+                return false;
             }
-        } else if(mConnectButton.isPressed(cursor)) {
-            if(mConnectButton.isLocked()) {
-                mConnectButton.setLocked(false);
-                mGalaxyButton.setLocked(true);
-                setMode(0);
-            } else {
-                mConnectButton.setLocked(true);
-                mCreateButton.setLocked(false);
-                mGalaxyButton.setLocked(false);
-                setMode(3);
-            }
-        } else if(mGalaxyButton.isPressed(cursor)) {
-            mConnectButton.setLocked(false);
-            mCreateButton.setLocked(false);
-            mGalaxyButton.setLocked(true);
-            setMode(0);
         } else {
-            return false;
+            return true;
         }
         return true;
     }

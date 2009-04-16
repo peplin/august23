@@ -49,4 +49,8 @@ public class ConnectionMode extends GalaxyMode {
 
     public void disable() {
     }
+
+    public boolean canDisable() {
+        return true;
+    }
 }

@@ -127,6 +127,7 @@ void draw() {
             mActivated = false;
             mHeartbeatSet = false;
             mStarted = false;
+            mCurrentClient = null;
             resetPlayStatus();
             mCurrentAmbientPlayer.play();
         }
@@ -171,11 +172,20 @@ void processMessage(String message) {
 }
 
 void serverEvent(Server server, Client client) {
-    mCurrentClient = client;
+    if(mCurrentClient == null) {
+        mCurrentClient = client;
+    } else {
+        client.write("no/");
+
+    }
 }
 
 void sendMessage(String message) {
-    mCurrentClient.write(message + "/");
+    if(mCurrentClient != null) {
+        mCurrentClient.write(message + "/");
+    } else {
+        println("DEBUG: Unable to write to null server");
+    }
 }
 
 void initializeAudio() {

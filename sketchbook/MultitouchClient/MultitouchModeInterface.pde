@@ -3,4 +3,5 @@ public interface MultitouchModeInterface {
     void cursorPressed(Point cursor);
     void cursorDragged(Point cursor);
     void disable();
+    boolean canDisable();
 }

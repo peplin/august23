@@ -21,7 +21,6 @@ import twoverse.util.Point.TwoDimensionalException;
 private static final boolean DEBUG = true;
 private static final int WINDOW_WIDTH = 1024;
 private static final int WINDOW_HEIGHT = 768;
-private static final int FRAME_RATE = 30;
 
 /** TUIO & Control Members **/
 private TuioController mTuioController;
@@ -44,7 +43,6 @@ private MultitouchModeInterface mModes[];
 private int mCurrentMode = 0;
 
 void setup() {
-    frameRate(FRAME_RATE);
     size(WINDOW_WIDTH, WINDOW_HEIGHT, P3D);
 
     mCamera =
