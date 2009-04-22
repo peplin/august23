@@ -40,6 +40,24 @@ import twoverse.object.Link;
 import twoverse.util.Session;
 import twoverse.util.User;
 
+/**
+This class is the client side implementation of the Twoverse Public API.
+
+The RequestHandlerClient uses Apache XML-RPC to communicate with the Twoverse
+server.
+
+A client should generally use this class only to log into the system. The
+ObjectManagerClient should be used to modify the universe, as that then
+uses the requst handler to update the server.
+
+This should probably be changed in the future so that a client need only to 
+worry about one class.
+
+The request handler can only have one active session at a time.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class RequestHandlerClient implements TwoversePublicApi {
     private Session mSession;
     private XmlRpcClient mXmlRpcClient;
@@ -48,8 +66,41 @@ public class RequestHandlerClient implements TwoversePublicApi {
     private static Logger sLogger =
             Logger.getLogger(RequestHandlerClient.class.getName());
 
-    public RequestHandlerClient(String serverIp) {
+    private void setAuthentication(String username, String hashedPassword) {
+        sLogger.log(Level.INFO, "Setting authentication to username: "
+                + username + " and hashedPassword: " + hashedPassword);
+        mXmlRpcConfig.setBasicUserName(username);
+        mXmlRpcConfig.setBasicPassword(hashedPassword);
+    }
 
+    /**
+     * @param user hashed password candidate must be set
+     */
+    private Session login(User user) {
+        Object[] parameters = new Object[] { user };
+        try {
+            sLogger.log(Level.INFO, "Attempting to login with user " + user);
+            return (Session) (mXmlRpcClient.execute("RequestHandlerServer.login",
+                    parameters));
+        } catch(XmlRpcException e) {
+            sLogger.log(Level.WARNING, "Unknown user " + user, e);
+            return null;
+        }
+    }
+
+    private void clearAuthentication() {
+        mSession = null;
+        mXmlRpcConfig.setBasicUserName("");
+        mXmlRpcConfig.setBasicPassword("");
+        sLogger.log(Level.INFO, "Cleared authentication");
+    }
+
+    /**
+    Create a new RequestHandlerClient and attempt to connect to the XML-RPC server.
+
+    @param serverIp the IP address of the XML-RPC server
+    */
+    public RequestHandlerClient(String serverIp) {
         mServerIp = serverIp;
         mXmlRpcConfig = new XmlRpcClientConfigImpl();
         try {
@@ -67,35 +118,18 @@ public class RequestHandlerClient implements TwoversePublicApi {
         mXmlRpcClient.setConfig(mXmlRpcConfig);
     }
 
-    private void setAuthentication(String username, String hashedPassword) {
-        sLogger.log(Level.INFO, "Setting authentication to username: "
-                + username + " and hashedPassword: " + hashedPassword);
-        mXmlRpcConfig.setBasicUserName(username);
-        mXmlRpcConfig.setBasicPassword(hashedPassword);
-    }
-
-    /*
-     * @param user must already have correctly hashed password candidate
-     */
-    private Session login(User user) {
-        Object[] parameters = new Object[] { user };
-        try {
-            sLogger.log(Level.INFO, "Attempting to login with user " + user);
-            return (Session) (mXmlRpcClient.execute("RequestHandlerServer.login",
-                    parameters));
-        } catch(XmlRpcException e) {
-            sLogger.log(Level.WARNING, "Unknown user " + user, e);
-            return null;
-        }
-    }
-
     /**
-     * Used to get the correct hash salt for a candidate plaintext password and
-     * login over XML-RPC
+     * Given a plaintext password and a username, confirms with server and
+     * creates a new session if valid.
      * 
-     * @param username
-     * @param plaintextPassword
-     * @return
+     * This implementation tries to avoid sending the plaintext password over
+     * the wire, although at some point that may be inevitable.
+     *
+     * TODO Security needs to be entirely rethough and reimplemented.
+     * 
+     * @param username username of user attmempting to login
+     * @param plaintextPassword the candidate plaintext password to check
+     * @return a new session if the user is valid, null otherwise
      */
     public Session login(String username, String plaintextPassword) {
         Object[] parameters = new Object[] { username };
@@ -122,13 +156,11 @@ public class RequestHandlerClient implements TwoversePublicApi {
         return null;
     }
 
-    private void clearAuthentication() {
-        mSession = null;
-        mXmlRpcConfig.setBasicUserName("");
-        mXmlRpcConfig.setBasicPassword("");
-        sLogger.log(Level.INFO, "Cleared authentication");
-    }
-
+    /**
+    Logout from the current session, becoming unauthenticated.
+    
+    If there is no valid session, nothing happens.
+    */
     public void logout() {
         if(mSession != null) {
             Object[] parameters = new Object[] { mSession };
@@ -145,6 +177,14 @@ public class RequestHandlerClient implements TwoversePublicApi {
         }
     }
 
+
+    /**
+    Creates a new account on the server.
+
+    @param user the user to create an account for. The ID is set after returning
+    from this method.
+    @return the ID of the new user, 0 if unable to create
+    */
     public int createAccount(User user) {
         Object[] parameters = new Object[] { user };
         try {
@@ -162,6 +202,11 @@ public class RequestHandlerClient implements TwoversePublicApi {
         return 0;
     }
 
+    /**
+    Deletes the account for the current session from the server.
+
+    If there is no current, valid session, nothing happens.
+    */
     public void deleteAccount() {
         if(mSession != null) {
             Object[] parameters = new Object[] { mSession };
@@ -182,19 +227,16 @@ public class RequestHandlerClient implements TwoversePublicApi {
         }
     }
 
-    public void changeName(Session session, int objectId, String newName) {
-        Object[] parameters = new Object[] { mSession, objectId, newName };
-        try {
-            sLogger.log(Level.INFO, "Attempting to change name of objectId: "
-                    + objectId + " to " + newName);
-            mXmlRpcClient.execute("RequestHandlerServer.changeName", parameters);
-        } catch(XmlRpcException e) {
-            sLogger.log(Level.WARNING, "Unable to execute RPC changeName", e);
-        }
-    }
+    /**
+    Adds a new object to the server's universe.
 
+    Sets the owner of the body to the current session's user.
+    
+    @param body the object to add
+    @return the object from the server with a valid ID
+    */
     public CelestialBody add(CelestialBody body) {
-        sLogger.log(Level.INFO, "Seting owner of body: " + body + " to user: "
+        sLogger.log(Level.INFO, "Setting owner of body: " + body + " to user: "
                 + mSession.getUser());
         body.setOwnerId(mSession.getUser().getId());
         try {
@@ -212,6 +254,12 @@ public class RequestHandlerClient implements TwoversePublicApi {
         return body;
     }
 
+    /**
+    Updates an object in the server's universe.
+
+    @param body the object to update
+    @return the object returned from the server - should be identical
+    */
     public CelestialBody update(CelestialBody body) {
         try {
             Object[] parameters = new Object[] { body };
@@ -224,6 +272,15 @@ public class RequestHandlerClient implements TwoversePublicApi {
         return body;
     }
 
+    /**
+    Adds a new link to the server's universe.
+    
+    TODO should probably confirm the ends of the link exist, otherwise we just
+    get an exception. In that case, maybe it's okay.
+
+    @param body the link to add
+    @return the object from the server with a valid ID
+    */
     public Link add(Link link) {
         try {
             Object[] parameters = new Object[] { link };

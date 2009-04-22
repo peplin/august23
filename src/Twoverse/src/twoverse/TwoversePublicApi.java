@@ -32,42 +32,68 @@ import twoverse.util.Session;
 import twoverse.util.User;
 import twoverse.util.User.UnsetPasswordException;
 
-public interface TwoversePublicApi {
+/**
+The Twoverse Public API is my hacked up way of setting a public XML-RPC API
+for clients of Twoverse to use. Defined here are MOST of the functions the
+clients can call.
 
+The API because slightly more complicated when differences in loggin in with
+each request handler became obvious. There are now a few extra functions defined
+outside of this API.
+
+NOTE: All of these functions must return something - they CANNOT return void.
+This is due to a limitation in Apache XML-RPC. In some cases, the return value
+may seem unneccessary because of this.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
+public interface TwoversePublicApi {
     /**
-     * @throws UnsetPasswordException
-     *             Create a new account in the system
+     * Creates a new account.
      * 
-     * @param username
-     * @param hashedPassword
-     * @param email
-     * @param phone
-     * @return ID for new user account
-     * @throws
+     * @param user the user to create. Must have a hashed password set and
+     * must NOT have an ID set. The ID will be set when returning from this
+     * method.
+     * @return the ID for new account
+     * @throws ExistingUserException if an account with this username already
+     * exists
+     * @throws UnsetPasswordException if the hashed password is not set
      */
     public int createAccount(User user) throws ExistingUserException,
             UnsetPasswordException;
 
     /**
+     * Add a new object to the universe.
+
      * These functions modify galaxy, but over XML-RPC that doesn't really work.
-     * Need to explicitly return the new object
+     * So, we must explicitly return the new object
      * 
-     * @param body
-     * @return ID for new object
+     * @param body the object to add. The ID must NOT be set, and will be set
+     * on returning from this method.
+     * @return the ID for the new object
      * @throws UnhandledCelestialBodyException
      */
     public CelestialBody add(CelestialBody body)
             throws UnhandledCelestialBodyException;
 
+    /** 
+    * Updates an object in the universe with the one provided, overwriting any
+    previous values.
+
+    @param body the body to update. The ID must be set and it must be known
+    by the server.
+    @return the updated object
+    */
     public CelestialBody update(CelestialBody body);
 
-    public Link add(Link link);
-
     /**
-     * Change the name of an existing object. User must own the object.
-     * 
-     * @param objectId
-     * @param newName
+     *  Add a new link to the universe.
+     *
+     * @param body the object to add. The ID must NOT be set, and will be set
+     * on returning from this method.
+     * @return the ID for the new object
+     * @throws UnhandledCelestialBodyException
      */
-    public void changeName(Session session, int objectId, String newName);
+    public Link add(Link link);
 }

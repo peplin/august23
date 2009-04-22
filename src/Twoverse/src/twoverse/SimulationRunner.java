@@ -34,6 +34,15 @@ import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
 
+/**
+The SimulationRunner is a periodic task that effects each object in the
+universe based on their physical properties. 
+
+It is currenly unimplemented.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class SimulationRunner extends TimerTask {
     private static Logger sLogger =
             Logger.getLogger(SimulationRunner.class.getName());

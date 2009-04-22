@@ -22,6 +22,10 @@
  * limitations under the License. 
  */
 
+/**
+This is a package level source comment. 
+TODO
+*/
 package twoverse;
 
 import java.io.IOException;
@@ -40,9 +44,24 @@ import twoverse.util.Session;
 import twoverse.util.User;
 import twoverse.util.User.UnsetPasswordException;
 
+/**
+The SessionManager handles all user account creation, updates, authentication
+and session timeout.
+
+The list of know users is loaded from the database at runtime, and any new
+users created afterwards are flushed the database.
+
+Before using any methods defined by the RequestHandlerServer, a client
+must have created a session here with a valid account. If there is no activity
+for an extended period of time, the session is closed by a periodic task run 
+from this class.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class SessionManager extends TimerTask {
-    private HashMap<String, Session> mSessions; // username to session obj
-    private HashMap<String, User> mUsers; // username to user obj
+    private HashMap<String, Session> mSessions;
+    private HashMap<String, User> mUsers; 
     private Database mDatabase;
     private ReentrantReadWriteLock mUsersLock;
     private ReentrantReadWriteLock mSessionsLock;
@@ -50,6 +69,16 @@ public class SessionManager extends TimerTask {
     private static Logger sLogger =
             Logger.getLogger(SessionManager.class.getName());
 
+    /**
+    Create a new Session Manager, storing a reference to the database.
+
+    All known users are loaded into the manager at this point.
+    
+    Registers the periodic session timeout task to occur at the time specified
+    in at twoverse.conf.SessionManager.properties.
+
+    @param database reference to the database to use
+    */
     public SessionManager(Database database) {
         try {
             // Load properties file
@@ -78,6 +107,13 @@ public class SessionManager extends TimerTask {
         mUsers = mDatabase.getUsers();
     }
 
+    /**
+
+    /**
+    Run any tasks scheduled for periodic execution. 
+    
+    At the moment, this only includes cleaning up timed out sessions.
+    */
     @Override
     public void run() {
         sLogger.log(Level.FINE, "Cleaning up user sessions");
@@ -85,6 +121,14 @@ public class SessionManager extends TimerTask {
         sLogger.log(Level.FINE, "Done cleaning up user sessions");
     }
 
+    /**
+    Creates a new user account and stores it in the database.
+
+    @param user the user account to create. Must have the hashed password
+    set. If the account already exists, nothing happens. If it does not, the ID
+    is set.
+    @return the ID of the newly created or existing user
+    */
     public int createAccount(User user) throws UnsetPasswordException {
         sLogger.log(Level.INFO, "Attempting to create account for user: "
                 + user);
@@ -107,9 +151,16 @@ public class SessionManager extends TimerTask {
     }
 
     /**
-     * 
-     * @param user
-     */
+    Deletes an account from the session manager and database. The account
+    must have an active session before the account can be deleted. This is to
+    make sure that only the account holder can delete their account, as the
+    user must be authenticated to create a session.
+
+    If the session is not logged in, or the account of the session is not valid,
+    nothing happens.
+
+    @param session the owner of this session is the account to be deleted
+    */
     public void deleteAccount(Session session) {
         sLogger.log(Level.INFO, "Attempting to delete account from session: "
                 + session);
@@ -129,11 +180,10 @@ public class SessionManager extends TimerTask {
     }
 
     /**
-     * Create session if not logged in, else ignore.
+     * Creates a new session if not logged in, otherwise nothing happens.
      * 
-     * @return successful login or existing session
-     * @throws UnsetPasswordException
-     * @throws Exception
+     * @return a new or existing Session, null if invalid user
+     * @param user user to login with. Hashed password must be set.
      */
     public Session login(User user) throws UnsetPasswordException {
         sLogger.log(Level.INFO, "Attempting to login with user: " + user);
@@ -156,20 +206,22 @@ public class SessionManager extends TimerTask {
                     sLogger.log(Level.INFO, "User: " + user
                             + " already has existing session: " + userSession);
                 }
-                mUsersLock.readLock().unlock();
-                mSessionsLock.writeLock().unlock();
                 return mSessions.get(actualUser.getUsername());
             }
         } catch(UnsetPasswordException e) {
             sLogger.log(Level.WARNING,
                     "Tried to login with user with uninitialized password",
                     e);
+        } finally {
+            mUsersLock.readLock().unlock();
+            mSessionsLock.writeLock().unlock();
         }
-        mUsersLock.readLock().unlock();
-        mSessionsLock.writeLock().unlock();
         return null;
     }
 
+    /**
+    Logs a session out (destroys it) if valid.
+    */
     public void logout(Session session) {
         sLogger.log(Level.INFO, "Attempting to logout from session: " + session);
         mSessionsLock.writeLock().lock();
@@ -200,6 +252,12 @@ public class SessionManager extends TimerTask {
         mSessionsLock.writeLock().unlock();
     }
 
+    /**
+    Returns the user with a given username.
+
+    @param username the username of the requested user
+    @throws UnknownUserException if the username is not valid
+    */
     public User getUser(String username) throws UnknownUserException {
         sLogger.log(Level.INFO, "Requesting user for username: " + username);
         mUsersLock.readLock().lock();
@@ -213,6 +271,20 @@ public class SessionManager extends TimerTask {
         return user;
     }
 
+    /**
+    Checks if a user is currently logged in (they have a valid session).
+    Refreshes the last logged in time for a user if they have a valid session.
+
+    This function takes the hashed password because it is used by the request
+    handler to authenticate each server request. At the moment, every single
+    request must be invidually authenticated which somewhat negates the need
+    for sessions at all. In the future, however, the sessions can be used to
+    store the password and to keep a valid, authenticated window open.
+
+    @param username the username of the user to check
+    @param hashedPassword the hashed password of the user to authenticate with
+    @return true if the user has a valid session, false otherwise
+    */
     public boolean isLoggedIn(String username, String hashedPassword) {
         sLogger.log(Level.INFO, "Attempted to get login status of username : "
                 + username + " with hashed password: " + hashedPassword);

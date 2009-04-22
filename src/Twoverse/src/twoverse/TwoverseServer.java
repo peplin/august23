@@ -39,6 +39,19 @@ import org.apache.xmlrpc.webserver.XmlRpcServlet;
 
 import twoverse.Database.DatabaseException;
 
+/**
+Backend server for Twoverse simulation. The server must be run on the same
+machine as the database and web server.  Together, they provide access to the 
+list of all objects in the universe via an XML feed and API access via XML-RPC.
+
+Any watchdog threads are spawned from here, including the simulation runner
+and feed updater.
+
+Currently, the servlet web server is run from this clasS.
+
+@author Christopher Peplin (chris.peplin@rhubarbtech.com)
+@version 1.0, Copyright 2009 under Apache License
+*/
 public class TwoverseServer {
     private static Logger sLogger =
             Logger.getLogger(TwoverseServer.class.getName());
@@ -48,6 +61,11 @@ public class TwoverseServer {
     private SessionManager mSessionManager;
     private SimulationRunner mSimulation;
 
+    /**
+    Creates all threads for server and initialies required objects. This
+    function should only be called once - it will continuously run waiting
+    for XML-RPC requests on the servlet web server.
+    */
     public void run() {
         try {
             mDatabase = new Database();
@@ -75,7 +93,8 @@ public class TwoverseServer {
     }
 
     /**
-     * @param args
+     * Opens the log file for the server and begins running. The log level 
+     is set here.
      */
     public static void main(String[] args) {
         TwoverseServer server = new TwoverseServer();

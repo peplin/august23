@@ -39,15 +39,36 @@ import twoverse.object.CelestialBody;
 import twoverse.object.Link;
 import twoverse.object.Star;
 
+/**
+The Object Manager Server is an extentension of the Object Manager that 
+uses a Database instance as its backend storage. This derivative also 
+periodically pushes the universe to an XML feed file, so it must be run
+on the same machine as the web server.
+
+This class is thread-safe.
+
+@author Christopher Peplin (chris.peplin@rhubarbtech.com)
+@version 1.0, Copyright 2009 under Apache License
+*/
 public class ObjectManagerServer extends ObjectManager {
     private Database mDatabase;
 
+    /** 
+    Construct an instance of the ObjectManagerServer, storing a reference
+    to the database. Initializes the universe with all objects in the database.
+    */
     public ObjectManagerServer(Database database) {
         super();
         mDatabase = database;
         initialize();
     }
 
+
+    /**
+    Run any tasks scheduled for periodic execution. 
+    
+    At the moment, this only includes publishing the XML feed to a file.
+    */
     @Override
     public void run() {
         mLock.readLock().lock();
@@ -55,6 +76,13 @@ public class ObjectManagerServer extends ObjectManager {
         mLock.readLock().unlock();
     }
 
+    /** 
+    Build the XML feed for the universe and save it to a file. The filename
+    is specified in twoverse.conf.ObjectManager.properties.
+
+    For readability, the feed is formatted with tabs. To save bandwidth and 
+    increase performance, this formatting may be removed.
+    */
     public void publishFeed() {
         // TODO long term, or if performance is an issue, figure out if
         // a feed for each scale is feasible. right now, that wouldn't be very
@@ -86,6 +114,10 @@ public class ObjectManagerServer extends ObjectManager {
         }
     }
 
+    /**
+    Flush all locally stored objects to the database, updating only if 
+    the local object is marked dirty.
+    */
     protected void flushToDatabase() {
         sLogger.log(Level.INFO, "Flushing to database");
         mLock.writeLock().lock();
@@ -102,6 +134,10 @@ public class ObjectManagerServer extends ObjectManager {
         // TODO do we need to flush links? never modified, so probably not
     }
 
+    /**
+    Load all objects from the database into the universe. This method must be 
+    updated if a new object type is added.
+    */
     private void initialize() {
         sLogger.log(Level.INFO, "Initializing ObjectManager from Database");
         // All of these are marked clean explicitly
@@ -123,7 +159,10 @@ public class ObjectManagerServer extends ObjectManager {
     }
 
     /**
-     * Modifies galaxy, sets ID and birth time
+     * Add an object to the universe and database.
+     
+     @param body the object to insert. The ID and birth time of the object are set after being
+     inserted into the database.
      * 
      * @throws UnhandledCelestialBodyException
      */
@@ -138,6 +177,13 @@ public class ObjectManagerServer extends ObjectManager {
         sLogger.log(Level.INFO, "Body added is: " + body);
     }
 
+    /**
+     * Add a link to the universe and database.
+     
+     @param link the link to insert. The ID of the object is set after being
+     inserted into the database.
+     * 
+     */
     @Override
     public void add(Link link) {
         sLogger.log(Level.INFO, "Adding link: " + link);
@@ -149,6 +195,14 @@ public class ObjectManagerServer extends ObjectManager {
         sLogger.log(Level.INFO, "Link added is: " + link);
     }
 
+    /**
+     * Update an object locally and in the database.
+     
+     @param body the object to updateinsert. The ID must be set, and it must
+     match an ID in the database.
+     * 
+     * @throws UnhandledCelestialBodyException
+     */
     @Override
     public void update(CelestialBody body) {
         sLogger.log(Level.INFO, "Updating with body: " + body);

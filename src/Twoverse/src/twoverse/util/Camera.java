@@ -26,6 +26,17 @@ package twoverse.util;
 
 import processing.core.PApplet;
 
+/**
+This class is a wrapper for the 3D camera in Processing.
+
+It provides a neat
+way to store camera position, rotation and direction, as well as a good
+interface for changing each value and applying them to the screen every time
+through the draw() method.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class Camera {
     private float mEyeX; // position of the camera in space
     private float mEyeY;
@@ -34,12 +45,18 @@ public class Camera {
     private float mCenterY;
     private float mCenterZ;
     private float mScale;
-    private PApplet mParent;
-
     private float mCenterXVelocity;
     private float mCenterYVelocity;
     private float mScaleTarget;
+    private PApplet mParent;
 
+    /**
+    Construct a new instance of the camera. Requires a reference to the parent
+    applet.
+
+    TODO make a constructor that just takes the parent and sets everything
+    else to the Processing defaults
+    */
     public Camera(PApplet parent, float eyeX, float eyeY, float eyeZ,
             float centerX, float centerY, int centerZ, float scale) {
         mEyeX = eyeX;
@@ -51,9 +68,12 @@ public class Camera {
         mScale = scale;
         mScaleTarget = scale;
         mParent = parent;
-        // mParent.pushMatrix();
     }
 
+    /**
+    Applies the current camera settings to the parent applet's view.
+    Slows down the velocity of any translation or scale in progress.
+    */
     public void setCamera() {
         mParent.camera(mEyeX,
                 mEyeY,
