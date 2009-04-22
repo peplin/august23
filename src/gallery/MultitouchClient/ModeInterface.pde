@@ -22,6 +22,14 @@
 ** limitations under the License. 
 */
 
+/**
+The Twoverse clients use a "mode" for each view they show. Every mode must
+implement this interface so that the client can properly switch between them and
+also so it can pass on input events.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public interface ModeInterface {
     void display();
     void cursorPressed(Point cursor);

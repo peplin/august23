@@ -57,7 +57,7 @@ private RequestHandlerClient mRequestHandler;
 /** Camera Properties **/
 private Camera mCamera;
 
-/** View Modes - nasty numbers becase there is no enum in 1.4 
+/** View Modes - nasty numbers becase there is no enum in Java 1.4 
 ** 0 - galaxy view
 ** 1 - star info view
 ** 2 - create star view (same as galaxy but different click function) 

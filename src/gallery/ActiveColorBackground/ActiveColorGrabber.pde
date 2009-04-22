@@ -25,6 +25,38 @@
 import codeanticode.gsvideo.*;
 import java.awt.event.KeyEvent;
 
+/**
+This is a utility class for keeping track of the average active color in a video
+capture feed. Rather than grab the overall average color of the screen, this
+class only averages pixels that are determined to be "active".
+
+In order to know which pixels are active, the class must be registered with the
+parent applet in order to be called every time the draw() method is called.
+
+A pixel is considered "active" if all of the R, G and B values have changed
+more than MINIMUM_DIFFERENCE_THRESHOLD. This value can be lowered to count
+smaller changes in color/luminosity.
+
+Once the count of active pixels is determined for each frame, the total is
+compared with mBackgroundActivePixels. Since the video signal is usually noisy,
+there will often be many "changed" pixels. By subtracting the average number of
+"changed" pixels when there is actually no activity, we can filter out most of
+this noise.
+
+If there are truly a number of changed pixels, we set a new target average
+color based on the average of all of the "changed" pixels. TODO This is counting
+even the "background" pixels, which significantly darkens the image. Every time
+draw() is called, this class moves the average color a small bit closer to the
+target, giving a nice smooth color transition to anyone using this class.
+
+Interaction:
+
+Press "B" to clear the background. Do this if the camera changes viewpoints, or
+if the background image changes at all. 
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class ActiveColorGrabber {
     private final int MINIMUM_DIFFERENCE_THRESHOLD = 100;
     private final float AVERAGE_PERCENTAGE_CHANGE = .1;
@@ -43,7 +75,7 @@ public class ActiveColorGrabber {
     public ActiveColorGrabber(PApplet parent) {
         parent.registerDraw(this);
         parent.registerKeyEvent(this);
-        mVideo = new GSCapture(parent, width, height, 24);
+        mVideo = new GSCapture(parent, 640, 480, 24);
         mPreviousFrame = new int[width * height];
     }
 

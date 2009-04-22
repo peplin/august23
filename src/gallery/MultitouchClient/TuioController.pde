@@ -22,6 +22,19 @@
 ** limitations under the License. 
 */
 
+/**
+The TuioController is a utility class to handle incoming TUIO input events.
+
+This class is used to abstract input away from mouse+keyboard or TUIO, so that
+the same client code can be shared between a desktop or multitouch client.
+
+This class contains some skeleton code for tracking a "primary" finger (ie. the
+first finger you see), but it was not used for the August 23, 1966 gallery show
+and is not fully tested. Use it as a guideline for your own TUIO programming.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class TuioController {
     private PApplet mParent;
     private TuioClient mClient;

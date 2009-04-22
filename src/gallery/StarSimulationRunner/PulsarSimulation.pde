@@ -25,6 +25,19 @@
 
 import processing.opengl.*;
 
+/**
+The Pulsar Simulation is a 3D Processing visualization of a pulsar spinning.
+
+The sketch was created for the August 23, 1966 exhibition, where visitors
+could create a star with their own heartbeat and use the color of their clothes
+to determine some property of its creation. The pulsar was one possible end
+state.
+
+   @author Jiangang Hao (jghao@umich.ed)- timing, graphics, data set
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com) - cleanup, P3D
+   tweaking
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class PulsarSimulation {
     private float jet[];
     private float core[];
