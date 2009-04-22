@@ -41,27 +41,30 @@ import twoverse.object.Star;
 import twoverse.object.applet.AppletBodyInterface;
 
 /**
-The Object Manager Client handles adding and update client universe objects,
-as well as updating via an XML feed.
-
-All universe updates are handled locally as well as being passed to a RequestHandler for sending to the server.
-
-This class is thread-safe.
-
-@author Christopher Peplin (chris.peplin@rhubarbtech.com)
-@version 1.0, Copyright 2009 under Apache License
-*/
+ * The Object Manager Client handles adding and update client universe objects,
+ * as well as updating via an XML feed.
+ * 
+ * All universe updates are handled locally as well as being passed to a
+ * RequestHandler for sending to the server.
+ * 
+ * This class is thread-safe.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class ObjectManagerClient extends ObjectManager {
     private Builder mParser;
     private RequestHandlerClient mRequestHandler;
     private String mFeedUrl;
 
     /**
-    Construct an object manager for the client.
-
-    @param requestHandler the handler for server requests (eg. update, insert)
-    @param feedUrl the URL of the XML feed to watch for universe updates
-    */
+     * Construct an object manager for the client.
+     * 
+     * @param requestHandler
+     *            the handler for server requests (eg. update, insert)
+     * @param feedUrl
+     *            the URL of the XML feed to watch for universe updates
+     */
     public ObjectManagerClient(RequestHandlerClient requestHandler,
             String feedUrl) {
         super();
@@ -71,26 +74,27 @@ public class ObjectManagerClient extends ObjectManager {
     }
 
     /**
-    Run any tasks that are scheduled to run periodically. At the moment, this
-    includes only updating via the XML feed.
-    */
+     * Run any tasks that are scheduled to run periodically. At the moment, this
+     * includes only updating via the XML feed.
+     */
     @Override
     public void run() {
         pullFeed();
     }
 
     /**
-    Pulls a new copy of the XML and updates the universe with its contents.
-
-    This method handles parsing the feed as well as updating the local universe.
-    It currently eagerly updates, rather than checking each object to see
-    if there are actually any changes. This maybe introduce problems with 
-    simultaneous updates across clients or between client and server simulation.
-
-    There is currently no way to know whether an object was deleted, short of
-    occassionally scanning our local universe to see if there are objects
-    NOT in the XML feed.
-    */
+     * Pulls a new copy of the XML and updates the universe with its contents.
+     * 
+     * This method handles parsing the feed as well as updating the local
+     * universe. It currently eagerly updates, rather than checking each object
+     * to see if there are actually any changes. This maybe introduce problems
+     * with simultaneous updates across clients or between client and server
+     * simulation.
+     * 
+     * There is currently no way to know whether an object was deleted, short of
+     * occassionally scanning our local universe to see if there are objects NOT
+     * in the XML feed.
+     */
     private void pullFeed() {
         try {
             Document doc = mParser.build(mFeedUrl);
@@ -124,11 +128,13 @@ public class ObjectManagerClient extends ObjectManager {
     }
 
     /**
-    Returns all bodies in their applet form, suitable for drawing to the screen.
-
-    @param parent the parent applet this applet-style object belongs to
-    @return list of appet-style objects
-    */
+     * Returns all bodies in their applet form, suitable for drawing to the
+     * screen.
+     * 
+     * @param parent
+     *            the parent applet this applet-style object belongs to
+     * @return list of appet-style objects
+     */
     public ArrayList<AppletBodyInterface> getAllBodiesAsApplets(PApplet parent) {
         mLock.readLock().lock();
         ArrayList<AppletBodyInterface> allBodies =
@@ -143,11 +149,12 @@ public class ObjectManagerClient extends ObjectManager {
 
     /**
      * Add an object to the universe and requests the server to add.
-
-     The object is added locally even if the server request fails.
-     
-     @param body the object to insert. The ID and birth time of the object
-     are set after the server request returns.
+     * 
+     * The object is added locally even if the server request fails.
+     * 
+     * @param body
+     *            the object to insert. The ID and birth time of the object are
+     *            set after the server request returns.
      * 
      * @throws UnhandledCelestialBodyException
      */
@@ -166,11 +173,12 @@ public class ObjectManagerClient extends ObjectManager {
 
     /**
      * Update an object locally and request the server to update.
-
-     The object is updated locally even if the server request fails.
-     
-     @param body the object to updateinsert. The ID must be set, and it must
-     match an ID known on the server.
+     * 
+     * The object is updated locally even if the server request fails.
+     * 
+     * @param body
+     *            the object to updateinsert. The ID must be set, and it must
+     *            match an ID known on the server.
      * 
      * @throws UnhandledCelestialBodyException
      */
@@ -185,11 +193,12 @@ public class ObjectManagerClient extends ObjectManager {
 
     /**
      * Add a link to the universe and request the server to add it.
-
-     The object is added locally even if the server request fails.
-     
-     @param body the object to insert. The ID of the object
-     is set after the server request returns.
+     * 
+     * The object is added locally even if the server request fails.
+     * 
+     * @param body
+     *            the object to insert. The ID of the object is set after the
+     *            server request returns.
      * 
      */
     @Override

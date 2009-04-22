@@ -41,23 +41,23 @@ import twoverse.util.Session;
 import twoverse.util.User;
 
 /**
-This class is the client side implementation of the Twoverse Public API.
-
-The RequestHandlerClient uses Apache XML-RPC to communicate with the Twoverse
-server.
-
-A client should generally use this class only to log into the system. The
-ObjectManagerClient should be used to modify the universe, as that then
-uses the requst handler to update the server.
-
-This should probably be changed in the future so that a client need only to 
-worry about one class.
-
-The request handler can only have one active session at a time.
-
-   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
-   @version 1.0, Copyright 2009 under Apache License
-*/
+ * This class is the client side implementation of the Twoverse Public API.
+ * 
+ * The RequestHandlerClient uses Apache XML-RPC to communicate with the Twoverse
+ * server.
+ * 
+ * A client should generally use this class only to log into the system. The
+ * ObjectManagerClient should be used to modify the universe, as that then uses
+ * the requst handler to update the server.
+ * 
+ * This should probably be changed in the future so that a client need only to
+ * worry about one class.
+ * 
+ * The request handler can only have one active session at a time.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class RequestHandlerClient implements TwoversePublicApi {
     private Session mSession;
     private XmlRpcClient mXmlRpcClient;
@@ -74,7 +74,8 @@ public class RequestHandlerClient implements TwoversePublicApi {
     }
 
     /**
-     * @param user hashed password candidate must be set
+     * @param user
+     *            hashed password candidate must be set
      */
     private Session login(User user) {
         Object[] parameters = new Object[] { user };
@@ -96,10 +97,12 @@ public class RequestHandlerClient implements TwoversePublicApi {
     }
 
     /**
-    Create a new RequestHandlerClient and attempt to connect to the XML-RPC server.
-
-    @param serverIp the IP address of the XML-RPC server
-    */
+     * Create a new RequestHandlerClient and attempt to connect to the XML-RPC
+     * server.
+     * 
+     * @param serverIp
+     *            the IP address of the XML-RPC server
+     */
     public RequestHandlerClient(String serverIp) {
         mServerIp = serverIp;
         mXmlRpcConfig = new XmlRpcClientConfigImpl();
@@ -124,11 +127,13 @@ public class RequestHandlerClient implements TwoversePublicApi {
      * 
      * This implementation tries to avoid sending the plaintext password over
      * the wire, although at some point that may be inevitable.
-     *
+     * 
      * TODO Security needs to be entirely rethough and reimplemented.
      * 
-     * @param username username of user attmempting to login
-     * @param plaintextPassword the candidate plaintext password to check
+     * @param username
+     *            username of user attmempting to login
+     * @param plaintextPassword
+     *            the candidate plaintext password to check
      * @return a new session if the user is valid, null otherwise
      */
     public Session login(String username, String plaintextPassword) {
@@ -157,10 +162,10 @@ public class RequestHandlerClient implements TwoversePublicApi {
     }
 
     /**
-    Logout from the current session, becoming unauthenticated.
-    
-    If there is no valid session, nothing happens.
-    */
+     * Logout from the current session, becoming unauthenticated.
+     * 
+     * If there is no valid session, nothing happens.
+     */
     public void logout() {
         if(mSession != null) {
             Object[] parameters = new Object[] { mSession };
@@ -177,14 +182,14 @@ public class RequestHandlerClient implements TwoversePublicApi {
         }
     }
 
-
     /**
-    Creates a new account on the server.
-
-    @param user the user to create an account for. The ID is set after returning
-    from this method.
-    @return the ID of the new user, 0 if unable to create
-    */
+     * Creates a new account on the server.
+     * 
+     * @param user
+     *            the user to create an account for. The ID is set after
+     *            returning from this method.
+     * @return the ID of the new user, 0 if unable to create
+     */
     public int createAccount(User user) {
         Object[] parameters = new Object[] { user };
         try {
@@ -203,10 +208,10 @@ public class RequestHandlerClient implements TwoversePublicApi {
     }
 
     /**
-    Deletes the account for the current session from the server.
-
-    If there is no current, valid session, nothing happens.
-    */
+     * Deletes the account for the current session from the server.
+     * 
+     * If there is no current, valid session, nothing happens.
+     */
     public void deleteAccount() {
         if(mSession != null) {
             Object[] parameters = new Object[] { mSession };
@@ -228,13 +233,14 @@ public class RequestHandlerClient implements TwoversePublicApi {
     }
 
     /**
-    Adds a new object to the server's universe.
-
-    Sets the owner of the body to the current session's user.
-    
-    @param body the object to add
-    @return the object from the server with a valid ID
-    */
+     * Adds a new object to the server's universe.
+     * 
+     * Sets the owner of the body to the current session's user.
+     * 
+     * @param body
+     *            the object to add
+     * @return the object from the server with a valid ID
+     */
     public CelestialBody add(CelestialBody body) {
         sLogger.log(Level.INFO, "Setting owner of body: " + body + " to user: "
                 + mSession.getUser());
@@ -255,11 +261,12 @@ public class RequestHandlerClient implements TwoversePublicApi {
     }
 
     /**
-    Updates an object in the server's universe.
-
-    @param body the object to update
-    @return the object returned from the server - should be identical
-    */
+     * Updates an object in the server's universe.
+     * 
+     * @param body
+     *            the object to update
+     * @return the object returned from the server - should be identical
+     */
     public CelestialBody update(CelestialBody body) {
         try {
             Object[] parameters = new Object[] { body };
@@ -273,14 +280,15 @@ public class RequestHandlerClient implements TwoversePublicApi {
     }
 
     /**
-    Adds a new link to the server's universe.
-    
-    TODO should probably confirm the ends of the link exist, otherwise we just
-    get an exception. In that case, maybe it's okay.
-
-    @param body the link to add
-    @return the object from the server with a valid ID
-    */
+     * Adds a new link to the server's universe.
+     * 
+     * TODO should probably confirm the ends of the link exist, otherwise we
+     * just get an exception. In that case, maybe it's okay.
+     * 
+     * @param body
+     *            the link to add
+     * @return the object from the server with a valid ID
+     */
     public Link add(Link link) {
         try {
             Object[] parameters = new Object[] { link };

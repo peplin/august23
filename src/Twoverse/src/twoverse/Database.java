@@ -44,26 +44,27 @@ import twoverse.util.Point.TwoDimensionalException;
 /**
  * Database connection manager for Twoverse. All database queries are routed
  * through here, and database connections are divvied out from here as well.
- *
+ * 
  * Originally, all of the SQL queries for each object were stored in this class.
  * This was difficult to maintain, as every new object required multiple files
  * to be changed all across the package. Now, each object implements an
-   interface that requires it to implement its own database queries. This class
-   then call those functions to update/insert/delete objects from the database.
-
-   The only problem with this solution is the management of Connection objects.
-   In order to create a PreparedStatement object, each class needs the database
-   connection. So, each object must be initialized with a copy of the connection
-   first thing at runtime, or none of these database functions will work.
-
-   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
-   @version 1.0, Copyright 2009 under Apache License
-*/
+ * interface that requires it to implement its own database queries. This class
+ * then call those functions to update/insert/delete objects from the database.
+ * 
+ * The only problem with this solution is the management of Connection objects.
+ * In order to create a PreparedStatement object, each class needs the database
+ * connection. So, each object must be initialized with a copy of the connection
+ * first thing at runtime, or none of these database functions will work.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class Database {
     /**
-    Database driver for this class to use
-    @value
-    */
+     * Database driver for this class to use
+     * 
+     * @value
+     */
     private final String DB_CLASS_NAME = "com.mysql.jdbc.Driver";
     private Connection mConnection = null;
     private Properties mConfigFile;
@@ -115,13 +116,14 @@ public class Database {
     }
 
     /**
-    Initializes statements for all database queries.
-    
-    Each new object type must be added here in order to initialize its own
-    statements.
-
-    @throws DatabaseException if unable to prepare statments
-    */
+     * Initializes statements for all database queries.
+     * 
+     * Each new object type must be added here in order to initialize its own
+     * statements.
+     * 
+     * @throws DatabaseException
+     *             if unable to prepare statments
+     */
     private void prepareStatements() throws DatabaseException {
         try {
             mAddUserStatement =
@@ -167,14 +169,15 @@ public class Database {
     }
 
     /**
-    Constructs a new Database object, initializing all statements.
-    
-    Attemps to create a connection to the MySQL database specificed in
-    twoverse.conf.Database.properties. Initializes the statements for each
-    Twoverse object.
-
-    @throws DatabaseException if unable to connect to the database
-    */
+     * Constructs a new Database object, initializing all statements.
+     * 
+     * Attemps to create a connection to the MySQL database specificed in
+     * twoverse.conf.Database.properties. Initializes the statements for each
+     * Twoverse object.
+     * 
+     * @throws DatabaseException
+     *             if unable to connect to the database
+     */
     public Database() throws DatabaseException {
         try {
             // Load properties file
@@ -209,9 +212,9 @@ public class Database {
     }
 
     @Override
-    /**
-    Closes the connection to the database.
-    */
+    /*
+     * Closes the connection to the database.
+     */
     public void finalize() {
         try {
             closeConnection();
@@ -222,10 +225,11 @@ public class Database {
         }
     }
 
-    /** 
-    Selects all of the users from the database.
-    @return  map of usernames to User objects for all users in the database
-    */
+    /**
+     * Selects all of the users from the database.
+     * 
+     * @return map of usernames to User objects for all users in the database
+     */
     public synchronized HashMap<String, User> getUsers() {
         HashMap<String, User> users = new HashMap<String, User>();
         try {
@@ -249,11 +253,12 @@ public class Database {
     }
 
     /**
-    Inserts a user into the database.
-
-    @param user the User to add to the database
-    @return the ID of the new user returned from the database
-    */
+     * Inserts a user into the database.
+     * 
+     * @param user
+     *            the User to add to the database
+     * @return the ID of the new user returned from the database
+     */
     public synchronized int addUser(User user) {
         sLogger.log(Level.INFO, "Attempting to add user: " + user);
         try {
@@ -274,10 +279,11 @@ public class Database {
     }
 
     /**
-    Updates the last login time of a user to the current time.
-
-    @param user the user whose last login time should be updated
-    */
+     * Updates the last login time of a user to the current time.
+     * 
+     * @param user
+     *            the user whose last login time should be updated
+     */
     public synchronized void updateLoginTime(User user) {
         sLogger.log(Level.INFO, "Attempting to update login time for user: "
                 + user);
@@ -290,12 +296,13 @@ public class Database {
     }
 
     /**
-    Deletes a user from the database.
-
-    @param user the user to delete. The ID of the user must be set, and it must
-    correspond with an ID returned from addUser.
-    @see addUser
-    */
+     * Deletes a user from the database.
+     * 
+     * @param user
+     *            the user to delete. The ID of the user must be set, and it
+     *            must correspond with an ID returned from addUser.
+     * @see addUser
+     */
     public synchronized void deleteUser(User user) {
         sLogger.log(Level.INFO, "Attempting to delete user: " + user);
         try {
@@ -308,43 +315,44 @@ public class Database {
     }
 
     /**
-    Inserts an object into the database, using the CelestialBody interface.
-
-    @param body the body to insert
-    */
+     * Inserts an object into the database, using the CelestialBody interface.
+     * 
+     * @param body
+     *            the body to insert
+     */
     public synchronized void insert(CelestialBody body) {
         try {
             body.insertInDatabase();
         } catch(SQLException e) {
-            sLogger.log(Level.WARNING, "Insert failed for object: "
-                    + body, e);
+            sLogger.log(Level.WARNING, "Insert failed for object: " + body, e);
         }
     }
 
     /**
-    Inserts a Link into the database. This must be a separate method because
-    the Link object does not conform to the CelestialBody interface. This should
-    be revisited in later revisions, as this duplicated method is less than
-    ideal.
-
-    @param link the link to insert
-    */
+     * Inserts a Link into the database. This must be a separate method because
+     * the Link object does not conform to the CelestialBody interface. This
+     * should be revisited in later revisions, as this duplicated method is less
+     * than ideal.
+     * 
+     * @param link
+     *            the link to insert
+     */
     public synchronized void insert(Link link) {
         try {
             link.insertInDatabase();
         } catch(SQLException e) {
-            sLogger.log(Level.WARNING, "Insert failed for link: "
-                    + body, e);
+            sLogger.log(Level.WARNING, "Insert failed for link: " + link, e);
         }
     }
 
     /**
-    Deletes an object from the database.
-
-    @param body the object to delete. The ID of the body must be set, and it
-    must correspond with an ID returned from insert().
-    @see insert
-    */
+     * Deletes an object from the database.
+     * 
+     * @param body
+     *            the object to delete. The ID of the body must be set, and it
+     *            must correspond with an ID returned from insert().
+     * @see insert
+     */
     public synchronized void delete(CelestialBody body) {
         try {
             body.deleteFromDatabase();
@@ -354,12 +362,13 @@ public class Database {
     }
 
     /**
-    Update an object in the database.
-
-    @param body the object to update. The ID of the body must be set, and it
-    must correspond with an ID returned from insert().
-    @see insert
-    */
+     * Update an object in the database.
+     * 
+     * @param body
+     *            the object to update. The ID of the body must be set, and it
+     *            must correspond with an ID returned from insert().
+     * @see insert
+     */
     public synchronized void update(CelestialBody body) {
         try {
             body.updateInDatabase();

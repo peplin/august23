@@ -27,13 +27,13 @@ package twoverse.util;
 import nu.xom.XMLException;
 
 /**
-A general class to hold all XML exceptions.
-
-I don't believe Twoverse currently uses this.
-
-   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
-   @version 1.0, Copyright 2009 under Apache License
-*/
+ * A general class to hold all XML exceptions.
+ * 
+ * I don't believe Twoverse currently uses this.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class XmlExceptions {
     static public class UnexpectedXmlAttributeException extends XMLException {
         /**

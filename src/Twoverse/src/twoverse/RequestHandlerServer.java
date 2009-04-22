@@ -46,16 +46,16 @@ import twoverse.util.User;
 import twoverse.util.User.UnsetPasswordException;
 
 /**
-This class is the server side implementation of the Twoverse Public API.
-
-The RequestHandlerServer accepts incoming Apache XML-RPC requests from the
-Twoverse client.
-
-The server side can support more than one session at the same time.
-
-   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
-   @version 1.0, Copyright 2009 under Apache License
-*/
+ * This class is the server side implementation of the Twoverse Public API.
+ * 
+ * The RequestHandlerServer accepts incoming Apache XML-RPC requests from the
+ * Twoverse client.
+ * 
+ * The server side can support more than one session at the same time.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 @SuppressWarnings("serial")
 public class RequestHandlerServer extends XmlRpcServlet implements
         TwoversePublicApi {
@@ -67,34 +67,36 @@ public class RequestHandlerServer extends XmlRpcServlet implements
             new HashMap<String, Boolean>();
 
     /**
-    Construct a default RequestHandlerServer. An XML-RPC Servlet must have a
-    default constructor and must be stateless. The servlet server uses the same
-    instance to handle all incoming requests. 
-
-    For that reason, all of the attributes are static and this class is somewhat
-    dangerous when not used properly. Make sure the call the init() function
-    once on this class!
-    */
+     * Construct a default RequestHandlerServer. An XML-RPC Servlet must have a
+     * default constructor and must be stateless. The servlet server uses the
+     * same instance to handle all incoming requests.
+     * 
+     * For that reason, all of the attributes are static and this class is
+     * somewhat dangerous when not used properly. Make sure the call the init()
+     * function once on this class!
+     */
     public RequestHandlerServer() {
     }
 
     /**
-    Initialize the static attributes of this servlet.
-
-    This class MUST be called once before it can properly accept and handle
-    XML-RPC requests.
-
-    This method also initializes the list of functions available to XML-RPC
-    clients. Normally, this list can be read dynamically by the clients, but
-    since we have some functions that do NOT require authentication, we need 
-    to keep a list here to check whether or not to require a proper session.
-
-    ALL new API functions must be added to this list and marked "true" if they
-    require authentication.
-
-    @param objectManager refernece to the server's object manager
-    @param sessionManager reference to the server's session manager
-    */
+     * Initialize the static attributes of this servlet.
+     * 
+     * This class MUST be called once before it can properly accept and handle
+     * XML-RPC requests.
+     * 
+     * This method also initializes the list of functions available to XML-RPC
+     * clients. Normally, this list can be read dynamically by the clients, but
+     * since we have some functions that do NOT require authentication, we need
+     * to keep a list here to check whether or not to require a proper session.
+     * 
+     * ALL new API functions must be added to this list and marked "true" if
+     * they require authentication.
+     * 
+     * @param objectManager
+     *            refernece to the server's object manager
+     * @param sessionManager
+     *            reference to the server's session manager
+     */
     public static void init(ObjectManagerServer objectManager,
             SessionManager sessionManager) {
         sObjectManager = objectManager;
@@ -157,14 +159,15 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     }
 
     /**
-    Returns the hashed password for the user with the provided username.
-
-    TODO this is not safe - will get a null pointer exception if the username
-    doesn't exist. Need to handle unknown username.
-
-    @param username requesting this user's hashed password
-    @return hashed password for the user
-    */
+     * Returns the hashed password for the user with the provided username.
+     * 
+     * TODO this is not safe - will get a null pointer exception if the username
+     * doesn't exist. Need to handle unknown username.
+     * 
+     * @param username
+     *            requesting this user's hashed password
+     * @return hashed password for the user
+     */
     public String getHashedPassword(String username)
             throws UnknownUserException {
         sLogger.log(Level.INFO,
@@ -176,8 +179,10 @@ public class RequestHandlerServer extends XmlRpcServlet implements
      * Check that a user exists, confirm the password is correct. If so, create
      * a new session and return true to the client.
      * 
-     * @param username username to look up
-     * @param hashedPassword candidate hashed password
+     * @param username
+     *            username to look up
+     * @param hashedPassword
+     *            candidate hashed password
      * @return true if username and hashed password candidate are valid
      */
     private boolean isAuthenticated(String username, String hashedPassword) {
@@ -188,13 +193,13 @@ public class RequestHandlerServer extends XmlRpcServlet implements
     }
 
     /**
-    Sets the XML-RPC authentication handler so we can require authenticated
-    clients.
-
-    If the client is calling an authenitcated function (defined "true" in the
-    sMethodAuthorization map) and the provided username/password are valid,
-    the request is allowed to proceed.
-    */
+     * Sets the XML-RPC authentication handler so we can require authenticated
+     * clients.
+     * 
+     * If the client is calling an authenitcated function (defined "true" in the
+     * sMethodAuthorization map) and the provided username/password are valid,
+     * the request is allowed to proceed.
+     */
     @Override
     protected XmlRpcHandlerMapping newXmlRpcHandlerMapping()
             throws XmlRpcException {

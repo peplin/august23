@@ -35,28 +35,27 @@ import java.util.logging.Logger;
 
 import twoverse.object.CelestialBody;
 import twoverse.object.Link;
-import twoverse.util.User;
 
 /**
-The Object Manager is a middle man between any Twoverse client or server
-and wherever it is ultimately storing the information about the universe.
-
-In the case of the server, the Object Manager will act as a frontend to the
-database, since all objects are stored there.
-
-In the case of a client, the Object Manager will act as a frontend to XML-RPC
-calls (or as a frontend to an XML-RPC call handler), as its objects are stored
-elsewhere. 
-
-In both cases, a local copy of the object must be kept. This abstract class
-represents the common set of operations between client and server object
-management.
-
-This class is thread-safe.
-
-@author Christopher Peplin (chris.peplin@rhubarbtech.com)
-@version 1.0, Copyright 2009 under Apache License
-*/
+ * The Object Manager is a middle man between any Twoverse client or server and
+ * wherever it is ultimately storing the information about the universe.
+ * 
+ * In the case of the server, the Object Manager will act as a frontend to the
+ * database, since all objects are stored there.
+ * 
+ * In the case of a client, the Object Manager will act as a frontend to XML-RPC
+ * calls (or as a frontend to an XML-RPC call handler), as its objects are
+ * stored elsewhere.
+ * 
+ * In both cases, a local copy of the object must be kept. This abstract class
+ * represents the common set of operations between client and server object
+ * management.
+ * 
+ * This class is thread-safe.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public abstract class ObjectManager extends TimerTask {
     protected HashMap<Integer, CelestialBody> mCelestialBodies;
     protected HashMap<Integer, Link> mLinks;
@@ -65,12 +64,12 @@ public abstract class ObjectManager extends TimerTask {
     protected static Logger sLogger =
             Logger.getLogger(ObjectManager.class.getName());
 
-    /** 
-    Constructs a new Object Manager, using the configuration at
-    twoverse.conf.Objectmanager.properties.
-
-    Schedules the period at which to update or update from the XML feed.
-    */
+    /**
+     * Constructs a new Object Manager, using the configuration at
+     * twoverse.conf.Objectmanager.properties.
+     * 
+     * Schedules the period at which to update or update from the XML feed.
+     */
     public ObjectManager() {
         try {
             mConfigFile = new Properties();
@@ -93,10 +92,10 @@ public abstract class ObjectManager extends TimerTask {
     }
 
     /**
-    Get a list of all known objects as CelestialBody instances.
-
-    @return list of all objects know locally
-    */
+     * Get a list of all known objects as CelestialBody instances.
+     * 
+     * @return list of all objects know locally
+     */
     public ArrayList<CelestialBody> getAllBodies() {
         mLock.readLock().lock();
         ArrayList<CelestialBody> allBodies = new ArrayList<CelestialBody>();
@@ -106,10 +105,10 @@ public abstract class ObjectManager extends TimerTask {
     }
 
     /**
-    Get a list of all know Links.
-
-    @return list of all links know locally    
-    */
+     * Get a list of all know Links.
+     * 
+     * @return list of all links know locally
+     */
     public ArrayList<Link> getAllLinks() {
         mLock.readLock().lock();
         ArrayList<Link> allLinks = new ArrayList<Link>();
@@ -119,13 +118,15 @@ public abstract class ObjectManager extends TimerTask {
     }
 
     /**
-    Get a specific object, based on its primary key in the database.
-
-    @param objectId the ID of the object requested. Must be one set by the
-    database.
-    @return the local object, if found
-    @throws UnhandledCelestialBodyException if the object ID is not found
-    */
+     * Get a specific object, based on its primary key in the database.
+     * 
+     * @param objectId
+     *            the ID of the object requested. Must be one set by the
+     *            database.
+     * @return the local object, if found
+     * @throws UnhandledCelestialBodyException
+     *             if the object ID is not found
+     */
     public CelestialBody getCelestialBody(int objectId)
             throws UnhandledCelestialBodyException {
         CelestialBody result = null;
@@ -144,10 +145,11 @@ public abstract class ObjectManager extends TimerTask {
     }
 
     /**
-    Add an object to the universe, and to the list of children of its parent.
-
-    @param body the object to add. Must have a parent object ID.
-    */
+     * Add an object to the universe, and to the list of children of its parent.
+     * 
+     * @param body
+     *            the object to add. Must have a parent object ID.
+     */
     public void add(CelestialBody body) throws UnhandledCelestialBodyException {
         if(body.getParentId() == 0) {
             throw new UnhandledCelestialBodyException("Parent is required");
@@ -159,12 +161,13 @@ public abstract class ObjectManager extends TimerTask {
     }
 
     /**
-    Adds a link to the universe.
-
-    TODO require that the ends  of the link exist
-
-    @param link the link to add. 
-    */
+     * Adds a link to the universe.
+     * 
+     * TODO require that the ends of the link exist
+     * 
+     * @param link
+     *            the link to add.
+     */
     public void add(Link link) {
         mLock.writeLock().lock();
         mLinks.put(link.getId(), link);
@@ -172,15 +175,16 @@ public abstract class ObjectManager extends TimerTask {
     }
 
     /**
-    Update an object in the universe, overwriting it completely if it exists
-    or adding if it doesn't.
-    
-    This is intended for updating from an XML feed,
-    where in some cases we will know about the link already, and in others it
-    will have been added by another client.
-
-    @param body the body to add or update
-    */
+     * Update an object in the universe, overwriting it completely if it exists
+     * or adding if it doesn't.
+     * 
+     * This is intended for updating from an XML feed, where in some cases we
+     * will know about the link already, and in others it will have been added
+     * by another client.
+     * 
+     * @param body
+     *            the body to add or update
+     */
     public void update(CelestialBody body) {
         mLock.writeLock().lock();
         if(mCelestialBodies.containsKey(body.getId())) {
@@ -192,13 +196,15 @@ public abstract class ObjectManager extends TimerTask {
     }
 
     /**
-    Add a link to the database if it doesn't already exist.
-    
-    This is intended for updated from an XML feed, where in some cases we will know about the
-    link already, and in others it will have been added by another client.
-
-    @param link the link to add
-    */
+     * Add a link to the database if it doesn't already exist.
+     * 
+     * This is intended for updated from an XML feed, where in some cases we
+     * will know about the link already, and in others it will have been added
+     * by another client.
+     * 
+     * @param link
+     *            the link to add
+     */
     public void update(Link link) {
         mLock.writeLock().lock();
         if(!mLinks.containsKey(link.getId())) {
