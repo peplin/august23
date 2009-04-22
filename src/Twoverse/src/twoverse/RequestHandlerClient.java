@@ -1,3 +1,27 @@
+/**
+ * Twoverse Request Handler Client
+ *
+ * by Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * for August 23, 1966 (GROCS Project Group)
+ * University of Michigan, 2009
+ *
+ * http://august231966.com
+ * http://www.dc.umich.edu/grocs
+ *
+ * Copyright 2009 Christopher Peplin 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package twoverse;
 
 import java.net.MalformedURLException;
@@ -30,7 +54,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
         mXmlRpcConfig = new XmlRpcClientConfigImpl();
         try {
             mXmlRpcConfig.setServerURL(new URL(mServerIp));
-        } catch (MalformedURLException e) {
+        } catch(MalformedURLException e) {
             sLogger.log(Level.SEVERE,
                     "Unable to parse URL for XML-RPC server: " + mServerIp,
                     e);
@@ -59,7 +83,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
             sLogger.log(Level.INFO, "Attempting to login with user " + user);
             return (Session) (mXmlRpcClient.execute("RequestHandlerServer.login",
                     parameters));
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unknown user " + user, e);
             return null;
         }
@@ -90,7 +114,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
                 setAuthentication(username, actualHash);
                 return mSession;
             }
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to login with username: "
                     + username, e);
             return null;
@@ -112,7 +136,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
                 sLogger.log(Level.INFO, "Attempting to logout with session: "
                         + mSession);
                 mXmlRpcClient.execute("RequestHandlerServer.logout", parameters);
-            } catch (XmlRpcException e) {
+            } catch(XmlRpcException e) {
                 sLogger.log(Level.WARNING, "Unable to execute RPC logout", e);
             }
         } else {
@@ -132,7 +156,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
             user.setId(newId);
             sLogger.log(Level.INFO, "User created is: " + user);
             return newId;
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC createAccount", e);
         }
         return 0;
@@ -147,7 +171,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
                 mXmlRpcClient.execute("RequestHandlerServer.deleteAccount",
                         parameters);
                 clearAuthentication();
-            } catch (XmlRpcException e) {
+            } catch(XmlRpcException e) {
                 sLogger.log(Level.WARNING,
                         "Unable to execute RPC deleteAccount",
                         e);
@@ -164,7 +188,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
             sLogger.log(Level.INFO, "Attempting to change name of objectId: "
                     + objectId + " to " + newName);
             mXmlRpcClient.execute("RequestHandlerServer.changeName", parameters);
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC changeName", e);
         }
     }
@@ -182,7 +206,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
             body.setId(returnedBody.getId());
             body.setBirthTime(returnedBody.getBirthTime());
             sLogger.log(Level.INFO, "Body returned from add is: " + body);
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC add", e);
         }
         return body;
@@ -194,7 +218,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
             sLogger.log(Level.INFO, "Attempting to update body: " + body);
             mXmlRpcClient.execute("RequestHandlerServer.update", parameters);
             sLogger.log(Level.INFO, "Body returned from update is: " + body);
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC update", e);
         }
         return body;
@@ -209,7 +233,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
                             parameters);
             link.setId(returnedLink.getId());
             sLogger.log(Level.INFO, "Link returned from add is: " + link);
-        } catch (XmlRpcException e) {
+        } catch(XmlRpcException e) {
             sLogger.log(Level.WARNING, "Unable to execute RPC add", e);
         }
         return link;

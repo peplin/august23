@@ -1,16 +1,40 @@
+/**
+ * Twoverse Object Manager Client
+ *
+ * by Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * for August 23, 1966 (GROCS Project Group)
+ * University of Michigan, 2009
+ *
+ * http://august231966.com
+ * http://www.dc.umich.edu/grocs
+ *
+ * Copyright 2009 Christopher Peplin 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package twoverse;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
-import processing.core.PApplet;
 
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
+import processing.core.PApplet;
 import twoverse.object.CelestialBody;
 import twoverse.object.Link;
 import twoverse.object.Star;
@@ -21,7 +45,8 @@ public class ObjectManagerClient extends ObjectManager {
     private RequestHandlerClient mRequestHandler;
     private String mFeedUrl;
 
-    public ObjectManagerClient(RequestHandlerClient requestHandler, String feedUrl) {
+    public ObjectManagerClient(RequestHandlerClient requestHandler,
+            String feedUrl) {
         super();
         mParser = new Builder();
         mRequestHandler = requestHandler;

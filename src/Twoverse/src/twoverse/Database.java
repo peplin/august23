@@ -1,3 +1,27 @@
+/**
+ * Twoverse Database
+ *
+ * by Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * for August 23, 1966 (GROCS Project Group)
+ * University of Michigan, 2009
+ *
+ * http://august231966.com
+ * http://www.dc.umich.edu/grocs
+ *
+ * Copyright 2009 Christopher Peplin 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package twoverse;
 
 import java.io.IOException;
@@ -57,11 +81,11 @@ public class Database {
                     .getZ());
             mUpdateSimDataStatement.setInt(12, body.getId());
             mUpdateSimDataStatement.executeUpdate();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING,
                     "Update celestial body query failed for body: " + body,
                     e);
-        } catch (TwoDimensionalException e) {
+        } catch(TwoDimensionalException e) {
             sLogger.log(Level.WARNING,
                     "Expected 3D point but was 2D: " + body,
                     e);
@@ -99,7 +123,8 @@ public class Database {
                     mConfigFile.getProperty("DB_PASSWORD")));
             Link.prepareDatabaseStatements(DriverManager.getConnection(mConfigFile.getProperty("CONNECTION"),
                     mConfigFile.getProperty("DB_USER"),
-                    mConfigFile.getProperty("DB_PASSWORD")));        } catch (SQLException e) {
+                    mConfigFile.getProperty("DB_PASSWORD")));
+        } catch(SQLException e) {
             throw new DatabaseException("Couldn't prepare statements: "
                     + e.getMessage());
         }
@@ -120,11 +145,11 @@ public class Database {
                     .getResourceAsStream("twoverse/conf/Database.properties"));
 
             Class.forName(DB_CLASS_NAME);
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
             throw new DatabaseException("Unable to load config file: "
                     + e.getMessage());
-        } catch (ClassNotFoundException e) {
+        } catch(ClassNotFoundException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
             throw new DatabaseException("Unable to load JDBC class driver");
         }
@@ -135,7 +160,7 @@ public class Database {
                             mConfigFile.getProperty("DB_USER"),
                             mConfigFile.getProperty("DB_PASSWORD"));
             mConnection.setAutoCommit(true);
-        } catch (Exception e) {
+        } catch(Exception e) {
             sLogger.log(Level.SEVERE, "Connection to database failed", e);
             throw new DatabaseException("Connection to database failed: "
                     + e.getMessage());
@@ -144,10 +169,11 @@ public class Database {
         prepareStatements();
     }
 
+    @Override
     public void finalize() {
         try {
             closeConnection();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.SEVERE,
                     "Failed while closing database connection",
                     e);
@@ -158,7 +184,7 @@ public class Database {
         HashMap<String, User> users = new HashMap<String, User>();
         try {
             ResultSet resultSet = mSelectAllUsersStatement.executeQuery();
-            while (resultSet.next()) {
+            while(resultSet.next()) {
                 User user =
                         new User(resultSet.getInt("id"),
                                 resultSet.getString("username"),
@@ -170,7 +196,7 @@ public class Database {
                 users.put(user.getUsername(), user);
             }
             resultSet.close();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Select users query failed", e);
         }
         return users;
@@ -187,7 +213,7 @@ public class Database {
             ResultSet keySet = mAddUserStatement.getGeneratedKeys();
             keySet.next();
             user.setId(keySet.getInt(1));
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Add user query failed for user: "
                     + user, e);
         }
@@ -201,7 +227,7 @@ public class Database {
         try {
             mUpdateUserLastLoginStatement.setInt(1, user.getId());
             mUpdateUserLastLoginStatement.executeUpdate();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Update login time query failed", e);
         }
     }
@@ -211,7 +237,7 @@ public class Database {
         try {
             mDeleteUserStatement.setInt(1, user.getId());
             mDeleteUserStatement.executeUpdate();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Delete user query failed for user: "
                     + user, e);
         }
@@ -220,23 +246,23 @@ public class Database {
     public synchronized void insert(CelestialBody body) {
         try {
             body.insertInDatabase();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
 
         }
     }
-    
+
     public synchronized void insert(Link link) {
         try {
             link.insertInDatabase();
         } catch(SQLException e) {
-            
+
         }
     }
 
     public synchronized void delete(CelestialBody body) {
         try {
             body.deleteFromDatabase();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
 
         }
     }
@@ -244,7 +270,7 @@ public class Database {
     public synchronized void update(CelestialBody body) {
         try {
             body.updateInDatabase();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
 
         }
     }

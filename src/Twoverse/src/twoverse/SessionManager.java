@@ -1,3 +1,27 @@
+/**
+ * Session Manager
+ *
+ * by Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * for August 23, 1966 (GROCS Project Group)
+ * University of Michigan, 2009
+ *
+ * http://august231966.com
+ * http://www.dc.umich.edu/grocs
+ *
+ * Copyright 2009 Christopher Peplin 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package twoverse;
 
 import java.io.IOException;
@@ -33,7 +57,7 @@ public class SessionManager extends TimerTask {
             mConfigFile.load(this.getClass()
                     .getClassLoader()
                     .getResourceAsStream("twoverse/conf/SessionManager.properties"));
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
         }
         mDatabase = database;
@@ -136,7 +160,7 @@ public class SessionManager extends TimerTask {
                 mSessionsLock.writeLock().unlock();
                 return mSessions.get(actualUser.getUsername());
             }
-        } catch (UnsetPasswordException e) {
+        } catch(UnsetPasswordException e) {
             sLogger.log(Level.WARNING,
                     "Tried to login with user with uninitialized password",
                     e);
@@ -167,8 +191,8 @@ public class SessionManager extends TimerTask {
         Timestamp timeNow = new Timestamp((new java.util.Date()).getTime());
         Iterator<Map.Entry<String, Session>> it =
                 mSessions.entrySet().iterator();
-        while (it.hasNext()) {
-            Session session = (Session) it.next().getValue();
+        while(it.hasNext()) {
+            Session session = it.next().getValue();
             if(timeNow.getTime() - session.getLastRefresh().getTime() > Long.valueOf(mConfigFile.getProperty("SESSION_TIMEOUT"))) {
                 it.remove();
             }
@@ -213,7 +237,7 @@ public class SessionManager extends TimerTask {
                         "Unknown username or bad password for username: "
                                 + username + " and password: " + hashedPassword);
             }
-        } catch (UnsetPasswordException e) {
+        } catch(UnsetPasswordException e) {
             sLogger.log(Level.WARNING,
                     "Tried to login with user with uninitialized password",
                     e);

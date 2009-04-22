@@ -1,3 +1,27 @@
+/**
+ * Twoverse 3D Physical Vector
+ *
+ * by Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * for August 23, 1966 (GROCS Project Group)
+ * University of Michigan, 2009
+ *
+ * http://august231966.com
+ * http://www.dc.umich.edu/grocs
+ *
+ * Copyright 2009 Christopher Peplin 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package twoverse.util;
 
 import java.io.IOException;
@@ -30,7 +54,7 @@ public class PhysicsVector3d implements Serializable {
 
     public PhysicsVector3d(Element element) {
         loadConfig();
-        if (!element.getLocalName()
+        if(!element.getLocalName()
                 .equals(sConfigFile.getProperty("VECTOR_TAG"))) {
             throw new UnexpectedXmlElementException("Element is not a vector");
         }
@@ -38,7 +62,7 @@ public class PhysicsVector3d implements Serializable {
         Element directionElement =
                 element.getFirstChildElement(sConfigFile.getProperty("POINT_TAG"));
         Point direction = new Point(directionElement);
-        if (!directionElement.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
+        if(!directionElement.getAttribute(sConfigFile.getProperty("NAME_ATTRIBUTE_TAG"))
                 .getValue()
                 .equals(sConfigFile.getProperty("DIRECTION_ATTRIBUTE_VALUE"))
                 || direction == null) {
@@ -58,13 +82,13 @@ public class PhysicsVector3d implements Serializable {
 
     private void loadConfig() {
         try {
-            if (sConfigFile == null) {
+            if(sConfigFile == null) {
                 sConfigFile = new Properties();
                 sConfigFile.load(this.getClass()
                         .getClassLoader()
                         .getResourceAsStream("twoverse/conf/PhysicsVector3d.properties"));
             }
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.SEVERE, "Unable to laod config: "
                     + e.getMessage(), e);
         }
@@ -85,10 +109,11 @@ public class PhysicsVector3d implements Serializable {
     public double getMagnitude() {
         return mMagnitude;
     }
-    
+
+    @Override
     public String toString() {
-        return "[direction: " + getUnitDirection() + ", "
-                + "magnitude: " + getMagnitude() + "]";
+        return "[direction: " + getUnitDirection() + ", " + "magnitude: "
+                + getMagnitude() + "]";
     }
 
     public Element toXmlElement() {

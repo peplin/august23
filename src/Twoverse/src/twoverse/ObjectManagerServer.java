@@ -1,3 +1,27 @@
+/**
+ * Twoverse Object Manager Server
+ *
+ * by Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * for August 23, 1966 (GROCS Project Group)
+ * University of Michigan, 2009
+ *
+ * http://august231966.com
+ * http://www.dc.umich.edu/grocs
+ *
+ * Copyright 2009 Christopher Peplin 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package twoverse;
 
 import java.io.BufferedOutputStream;
@@ -41,7 +65,7 @@ public class ObjectManagerServer extends ObjectManager {
         for(CelestialBody body : mCelestialBodies.values()) {
             root.appendChild(body.toXmlElement());
         }
-        
+
         for(Link link : mLinks.values()) {
             root.appendChild(link.toXmlElement());
         }
@@ -75,7 +99,7 @@ public class ObjectManagerServer extends ObjectManager {
         }
         mLock.writeLock().unlock();
         sLogger.log(Level.INFO, "Flush to database completed");
-        //TODO do we need to flush links? never modified, so probably not
+        // TODO do we need to flush links? never modified, so probably not
     }
 
     private void initialize() {
@@ -91,7 +115,7 @@ public class ObjectManagerServer extends ObjectManager {
                             .addChild(body.getId());
                 }
             }
-            
+
             mLinks.putAll(Link.selectAllFromDatabase());
         } catch(SQLException e) {
             sLogger.log(Level.WARNING, "Unable to initialize objects", e);
@@ -124,7 +148,7 @@ public class ObjectManagerServer extends ObjectManager {
         mLock.writeLock().unlock();
         sLogger.log(Level.INFO, "Link added is: " + link);
     }
-    
+
     @Override
     public void update(CelestialBody body) {
         sLogger.log(Level.INFO, "Updating with body: " + body);

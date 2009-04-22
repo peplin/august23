@@ -1,3 +1,27 @@
+/**
+ * Twoverse Server
+ *
+ * by Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * for August 23, 1966 (GROCS Project Group)
+ * University of Michigan, 2009
+ *
+ * http://august231966.com
+ * http://www.dc.umich.edu/grocs
+ *
+ * Copyright 2009 Christopher Peplin 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package twoverse;
 
 import java.io.IOException;
@@ -16,8 +40,8 @@ import org.apache.xmlrpc.webserver.XmlRpcServlet;
 import twoverse.Database.DatabaseException;
 
 public class TwoverseServer {
-    private static Logger sLogger = Logger.getLogger(TwoverseServer.class
-            .getName());
+    private static Logger sLogger =
+            Logger.getLogger(TwoverseServer.class.getName());
     private ServletWebServer mWebServer;
     private Database mDatabase;
     private ObjectManagerServer mObjectManager;
@@ -36,16 +60,16 @@ public class TwoverseServer {
             XmlRpcServlet servlet = new RequestHandlerServer();
             mWebServer = new ServletWebServer(servlet, 8080);
             XmlRpcServer server = servlet.getXmlRpcServletServer();
-            XmlRpcServerConfigImpl config = (XmlRpcServerConfigImpl) server
-                    .getConfig();
+            XmlRpcServerConfigImpl config =
+                    (XmlRpcServerConfigImpl) server.getConfig();
             config.setEnabledForExtensions(true);
 
             mWebServer.start(); // accept requests
-        } catch (DatabaseException e) {
+        } catch(DatabaseException e) {
             sLogger.log(Level.WARNING, e.getMessage(), e);
-        } catch (ServletException e) {
+        } catch(ServletException e) {
             sLogger.log(Level.SEVERE, "Unable to create or start servlet", e);
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
         }
     }
@@ -56,15 +80,16 @@ public class TwoverseServer {
     public static void main(String[] args) {
         TwoverseServer server = new TwoverseServer();
         try {
-            Logger.getLogger("").addHandler(new FileHandler("twoverse.log", true));
-        } catch (SecurityException e) {
+            Logger.getLogger("").addHandler(new FileHandler("twoverse.log",
+                    true));
+        } catch(SecurityException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
-        } catch (IOException e) {
+        } catch(IOException e) {
             sLogger.log(Level.SEVERE, e.getMessage(), e);
         }
         Handler[] handlers = Logger.getLogger("").getHandlers();
-        for(int i =0; i < handlers.length; i++) {
-            handlers[i].setLevel(Level.INFO);
+        for(Handler handler : handlers) {
+            handler.setLevel(Level.INFO);
         }
         server.run();
     }

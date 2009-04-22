@@ -1,3 +1,27 @@
+/**
+ * Twoverse Request Handler Client Test Suite
+ *
+ * by Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * for August 23, 1966 (GROCS Project Group)
+ * University of Michigan, 2009
+ *
+ * http://august231966.com
+ * http://www.dc.umich.edu/grocs
+ *
+ * Copyright 2009 Christopher Peplin 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package twoverse.test;
 
 import junit.framework.Assert;
@@ -27,26 +51,22 @@ public class RequestHandlerClientTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-   /*     database = new Database();
-        server = new TwoverseServer();
-        server.run();
-        client = new RequestHandlerClient();
-        objectManagerClient = new ObjectManagerClient(client, "");
-
-        users = new User[4];
-        users[0] =
-                new User(0, "xmlrpcfirst", "first@first.org", "1111111111", 100);
-        users[1] =
-                new User(0, "second", "second@second.org", "2222222222", 100);
-        users[2] = new User(0, "third", "third@third.org", "3333333333", 100);
-        users[3] =
-                new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
-
-        users[0].setPlaintextPassword("firstpass");
-        users[1].setPlaintextPassword("secondpass");
-        users[2].setPlaintextPassword("thirdpass");
-        users[3].setPlaintextPassword("fourthpass");
-        */
+        /*
+         * database = new Database(); server = new TwoverseServer();
+         * server.run(); client = new RequestHandlerClient();
+         * objectManagerClient = new ObjectManagerClient(client, "");
+         * 
+         * users = new User[4]; users[0] = new User(0, "xmlrpcfirst",
+         * "first@first.org", "1111111111", 100); users[1] = new User(0,
+         * "second", "second@second.org", "2222222222", 100); users[2] = new
+         * User(0, "third", "third@third.org", "3333333333", 100); users[3] =
+         * new User(0, "fourth", "fourth@fourth.org", "4444444444", 100);
+         * 
+         * users[0].setPlaintextPassword("firstpass");
+         * users[1].setPlaintextPassword("secondpass");
+         * users[2].setPlaintextPassword("thirdpass");
+         * users[3].setPlaintextPassword("fourthpass");
+         */
     }
 
     @AfterClass

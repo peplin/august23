@@ -1,3 +1,27 @@
+/**
+ * Twoverse Manmade Body Object
+ *
+ * by Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * for August 23, 1966 (GROCS Project Group)
+ * University of Michigan, 2009
+ *
+ * http://august231966.com
+ * http://www.dc.umich.edu/grocs
+ *
+ * Copyright 2009 Christopher Peplin 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package twoverse.object;
 
 import java.io.Serializable;
@@ -12,9 +36,8 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Level;
 
-import processing.core.PApplet;
-
 import nu.xom.Element;
+import processing.core.PApplet;
 import twoverse.object.applet.AppletBodyInterface;
 import twoverse.object.applet.AppletManmadeBody;
 import twoverse.util.PhysicsVector3d;
@@ -74,6 +97,7 @@ public class ManmadeBody extends CelestialBody implements Serializable {
         }
     }
 
+    @Override
     public AppletBodyInterface getAsApplet(PApplet parent) {
         return new AppletManmadeBody(parent, this);
     }
@@ -115,6 +139,7 @@ public class ManmadeBody extends CelestialBody implements Serializable {
         return manmadeBodies;
     }
 
+    @Override
     public synchronized void insertInDatabase() throws SQLException {
         sLogger.log(Level.INFO, "Attempting to add manmade body: " + this);
         try {
@@ -128,6 +153,7 @@ public class ManmadeBody extends CelestialBody implements Serializable {
         }
     }
 
+    @Override
     public synchronized void updateInDatabase() throws SQLException {
         sLogger.log(Level.INFO, "Attempting to update manmade body: " + this);
         try {
