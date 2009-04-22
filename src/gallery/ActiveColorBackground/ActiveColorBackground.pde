@@ -22,6 +22,10 @@
 ** limitations under the License. 
 */
 
+import codeanticode.gsvideo.*;
+
+ActiveColorGrabber grabber;
+
 /**
 ActiveColorBackground is a test application for the ActiveColorGrabber utility
 class. It simply updates the background color of the screen to the average
@@ -30,11 +34,6 @@ active color on a video feed.
    @author Christopher Peplin (chris.peplin@rhubarbtech.com)
    @version 1.0, Copyright 2009 under Apache License
 */
-
-import codeanticode.gsvideo.*;
-
-ActiveColorGrabber grabber;
-
 void setup() {
   size(320, 240, P3D); 
   grabber = new ActiveColorGrabber(this);

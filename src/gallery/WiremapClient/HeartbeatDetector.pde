@@ -24,6 +24,17 @@
 
 import processing.serial.*;
 
+/**
+The Heartbeat Detector class is a tool to read analog data in over a serial
+connection (probably an Arduino), average the input and detect peaks. For the
+August 23, 1966 installation, the peaks correspond to heart beats.
+
+From these peaks, a heart rate frequency can be determined and this is used by
+the Wiremap Client to update the star oscillation simulation.
+
+@author Christopher Peplin (chris.peplin@rhubarbtech.com)
+@version 1.0, Copyright 2009 under Apache License
+*/
 public class HeartbeatDetector {
     private final int AVERAGE_COUNT = 10;
     private final float BIG_AVERAGE_COUNT = 100;

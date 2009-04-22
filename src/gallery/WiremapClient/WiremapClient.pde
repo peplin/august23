@@ -61,6 +61,44 @@ float x = 0;
 float y = 0;
 float z = 10;
 
+/**
+The Wiremap Client is not a direct Twoverse client. It requires a connection to
+a running instance of a MultitouchClient. This client is inteded for use in the
+August 23, 1966 gallery installation.
+
+This client waits for a signal from the Multitouch Client that a new star should
+be created. The star formation sequence then begins as follows:
+   Ambient spaceship sounds are played through the local sound card.
+
+   A voice over is played requesting the user to enter the airlock and plate
+   their finger on the heartbeat detector to connec their lifeline.
+   
+   If the heartbeat is a reasonable value it is set, and after at most 3 plays
+   of the audio the actual heartbeat value or a reasonable default is stored,
+   sent to the Multitouch Client and saved into the star simulation.
+
+   The user is instructed via voice over that the airlock atmosphere is
+   stabilizing, and that now they can enter "space". The user is told that star
+   formation is now commencing, and they are expected to walk into the darkened
+   environment with the helmet on in order to view the wiremap. This voice over
+   sounds are also requested over the network to be played on the Multitouch
+   Client computer - this is for pumping out over the radio headset.
+
+   At the end of the initial voice over sequence, the star formation animation
+   begins displaying on the wiremap. Periodically a voice over is requested to
+   be played by the Multitouch Client (requested over the network). The voice
+   overs correspond to the current state of the star formation. The end state of
+   the star is predetermined at this point, and is sent over the network to the
+   multitouch client so that the animations match.
+
+   When the animation is completed, a "done" command is sent over the network
+   and the multitouch client should save the new star into the database and
+   return the the default galaxy view. This client (Wiremap) goes into a "sleep"
+   state and waits for the next star formation request.
+
+@author Christopher Peplin (chris.peplin@rhubarbtech.com)
+@version 1.0, Copyright 2009 under Apache License
+*/
 void setup() {
     size(1024, 768, P3D);
     mServer = new Server(this, 1966);
