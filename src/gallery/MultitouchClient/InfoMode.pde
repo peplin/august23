@@ -22,6 +22,18 @@
 ** limitations under the License. 
 */
 
+/**
+The Info Mode is a more detailed, close up view of a single star. It displays
+textual & numerical statistics for the star, as well as a larger view.
+
+Clicking and dragging the mouse in this mode will move the viewpoint
+left/right/up/down.
+
+Scrolling the mouse wheel in this mode will NOT change the zoom level.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class InfoMode implements ModeInterface {
     protected static final int MASTER_PARENT_ID = 1;
     private Star mSelectedStar = null;

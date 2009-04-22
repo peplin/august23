@@ -24,6 +24,23 @@
 
 import twoverse.object.Link;
 
+/**
+The Connection Mode looks similar to the Galaxy Mode on the screen,
+but it allows the use to create links between stars by clicking with the mouse.
+
+This mode remains open until it is manually disabled, allowing the user to
+create more than one line at a time.
+
+Clicking and dragging the mouse in this mode will move the viewpoint
+left/right/up/down.
+
+Scrolling the mouse wheel in this mode will not change the zoom level. Selection
+of stars does not currently work proprely if the scale is not one, so switching
+to this mode also resets the zoom level.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class ConnectionMode extends GalaxyMode {
     private Link mOpenLink = null;
     public ConnectionMode(PApplet parent, ObjectManagerClient objectManager,

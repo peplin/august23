@@ -66,6 +66,27 @@ private Camera mCamera;
 private ModeInterface mModes[];
 private int mCurrentMode = 0;
 
+/**
+The Multitouch Client for Twoverse is the most advanced Twoverse client and 
+interfaces with the Wiremap Client for synchronized star formation. This client
+is intended for use with the August 23, 1966 gallery installation.
+
+With this client, users can:
+    View the universe of stars that is stored on the master Twoverse server
+    Navigate the universe (translation and zooming)
+    View more detailed information about any single star
+    Create a new star
+    Create constellation links between existing stars
+
+This client uses different ModeInterface objects to switch between these
+functions and views.
+
+This client is intended for use on a multitouch screen that uses TUIO to send
+input events. See the TuioController for more information.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 void setup() {
     size(WINDOW_WIDTH, WINDOW_HEIGHT, P3D);
 

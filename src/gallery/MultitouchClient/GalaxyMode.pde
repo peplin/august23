@@ -22,6 +22,22 @@
 ** limitations under the License. 
 */
 
+/**
+The Galaxy Mode is the default mode for all Twoverse clients. It is a simple
+view of all stars in the universe as well as any constellation links between
+them. 
+
+Clicking on a star in this mode will switch to the Info Mode for the selected
+star.
+
+Clicking and dragging the mouse in this mode will move the viewpoint
+left/right/up/down.
+
+Scrolling the mouse wheel in this mode will change the zoom level.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class GalaxyMode implements ModeInterface {
     protected static final int MASTER_PARENT_ID = 1;
     protected PApplet mParent;

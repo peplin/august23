@@ -22,6 +22,13 @@
 ** limitations under the License. 
 */
 
+/**
+This sketch is a simple tool to illuminate the wires of a Wiremap individually
+to examine how well each one is lighted.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 import wiremap.Wiremap;
 import wiremap.WiremapSliver;
 

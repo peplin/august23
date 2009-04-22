@@ -21,6 +21,14 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License. 
 */
+
+/**
+This sketch is a brief demo of a sphere bouncing around inside the Wiremap
+field.
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 import wiremap.Wiremap;
 import wiremap.WiremapGlowingSphere;
 
@@ -39,7 +47,7 @@ void setup() {
   size(1024, 768, P3D);
 
   map = new Wiremap(this, 256, 90, 36, 48, 36.0/9.0, .1875, 2,
-  "/home/peplin/programming/august/sketchbook/wiremap/ManualCalibrator/calibration-round1.txt");
+  "depth.txt");
 
 
   glowingSphere = new WiremapGlowingSphere(

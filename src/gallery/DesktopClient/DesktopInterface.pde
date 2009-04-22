@@ -25,6 +25,28 @@
 import processing.core.*;
 import twoverse.gui.RectButton;
 
+/**
+The DesktopInterface class manages the GUI elements on the screen for
+the Twoverse Desktop Client. It stores all of the buttons, draws them to the
+screen and checks for button presses.
+
+The buttons are draw down the right hand side of the screen, and are sized
+equally based on a few constants defined in the class.
+
+Buttons:
+    Zoom In
+    Zoom Out
+    Connect
+    Galaxy View
+
+The interface also supports:
+    zooming in/out with the mouse wheel.
+    moving the viewpoint when the mouse is dragged
+    drawing titles to the screen
+
+   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+   @version 1.0, Copyright 2009 under Apache License
+*/
 public class DesktopInterface {
     private final int BUTTON_WIDTH = 100;
     private final int BUTTON_HEIGHT = 75;
