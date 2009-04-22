@@ -99,6 +99,17 @@ public class StarSimulation {
     private float tsph2d;
     private PulsarSimulation pulsarSim;
 
+    private void drawPoints(float[] x, float[] y, float[] z, int n,
+            float rmin, float rmax) {
+        float r2;
+        for (int j=0;j<n;j++) {
+            r2 = x[j]*x[j]+y[j]*y[j]+z[j]*z[j];
+            if(r2 > rmin*rmin && r2 < rmax*rmax) {
+                point(x[j],y[j],z[j]);
+            }
+        } 
+    }
+
     public StarSimulation(PApplet parent, Wiremap map) {
         pulsarSim = new PulsarSimulation(parent);
         initialize();
@@ -217,17 +228,6 @@ public class StarSimulation {
             scale(scale_core/scale_p);
             sphere(rad_core);
         }
-    }
-
-    private void drawPoints(float[] x, float[] y, float[] z, int n,
-            float rmin, float rmax) {
-        float r2;
-        for (int j=0;j<n;j++) {
-            r2 = x[j]*x[j]+y[j]*y[j]+z[j]*z[j];
-            if(r2 > rmin*rmin && r2 < rmax*rmax) {
-                point(x[j],y[j],z[j]);
-            }
-        } 
     }
 
     public void initialize() {

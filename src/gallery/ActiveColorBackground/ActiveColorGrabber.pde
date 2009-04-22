@@ -72,6 +72,14 @@ public class ActiveColorGrabber {
     private int mBackgroundActivePixels = 650000;
     private int mLastBackgroundActivePixels = 650000;
 
+    /**
+    Construct a new ActiveColorGrabber.
+    
+    Registers with the parent for draw and key events.
+    Initializes video capture feed to default capture device.
+
+    @param parent parent applet
+    */
     public ActiveColorGrabber(PApplet parent) {
         parent.registerDraw(this);
         parent.registerKeyEvent(this);
@@ -79,12 +87,20 @@ public class ActiveColorGrabber {
         mPreviousFrame = new int[width * height];
     }
 
+    /**
+    Returns a slightly brighter version of the current average active color.
+
+    This number is already stored - there is no video frame analysis in this
+    method, so it's pretty quick and cheap.
+
+    @return current active color
+    */
     public color getActiveColor() {
         color averageColor = color(mAverageColorR, mAverageColorG, mAverageColorB);
         float hue = hue(averageColor);
         // optionally, brightens up colors a little because webcam is dark
         float saturation = constrain(saturation(averageColor) * 1.25, 0, 255);
-        float brightness = constrain(brightness(averageColor) * 1.25, 0, 255);;
+        float brightness = constrain(brightness(averageColor) * 1.25, 0, 255);
         colorMode(HSB, 255);
         averageColor = color(hue, saturation, brightness);
         colorMode(RGB, 255);
