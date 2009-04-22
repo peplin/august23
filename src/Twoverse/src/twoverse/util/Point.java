@@ -51,17 +51,29 @@ public class Point implements Serializable {
         }
     }
 
+    /**
+     * @param x
+     * @param y
+     * @param z
+     */
     public Point(double x, double y, double z) {
         loadConfig();
         intitialize(x, y, z);
     }
 
+    /**
+     * @param x
+     * @param y
+     */
     public Point(double x, double y) {
         loadConfig();
         mIsTwoDimensional = true;
         intitialize(x, y, 0);
     }
 
+    /**
+     * @param element
+     */
     public Point(Element element) {
         loadConfig();
         if(!element.getLocalName().equals(sConfigFile.getProperty("POINT_TAG"))) {
@@ -84,6 +96,9 @@ public class Point implements Serializable {
         intitialize(x, y, z);
     }
 
+    /**
+     * 
+     */
     private void loadConfig() {
         try {
             if(sConfigFile == null) {
@@ -98,6 +113,11 @@ public class Point implements Serializable {
         }
     }
 
+    /**
+     * @param x
+     * @param y
+     * @param z
+     */
     private void intitialize(double x, double y, double z) {
         setX(x);
         setY(y);
@@ -111,22 +131,38 @@ public class Point implements Serializable {
         }
     }
 
+    /**
+     * @param x
+     */
     public void setX(double x) {
         mX = x;
     }
 
+    /**
+     * @return
+     */
     public double getX() {
         return mX;
     }
 
+    /**
+     * @param y
+     */
     public void setY(double y) {
         mY = y;
     }
 
+    /**
+     * @return
+     */
     public double getY() {
         return mY;
     }
 
+    /**
+     * @param z
+     * @throws TwoDimensionalException
+     */
     public void setZ(double z) throws TwoDimensionalException {
         if(mIsTwoDimensional) {
             throw new TwoDimensionalException("Attempted to set Z value of 2D point");
@@ -134,6 +170,10 @@ public class Point implements Serializable {
         mZ = z;
     }
 
+    /**
+     * @return
+     * @throws TwoDimensionalException
+     */
     public double getZ() throws TwoDimensionalException {
         if(mIsTwoDimensional) {
             throw new TwoDimensionalException("Attempted to get Z value of 2D point");
@@ -157,6 +197,9 @@ public class Point implements Serializable {
         return s;
     }
 
+    /**
+     * @return
+     */
     public Element toXmlElement() {
         loadConfig();
         Element root = new Element(sConfigFile.getProperty("POINT_TAG"));

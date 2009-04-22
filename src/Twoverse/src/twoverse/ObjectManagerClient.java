@@ -177,7 +177,7 @@ public class ObjectManagerClient extends ObjectManager {
      * The object is updated locally even if the server request fails.
      * 
      * @param body
-     *            the object to updateinsert. The ID must be set, and it must
+     *            the object to update. The ID must be set, and it must
      *            match an ID known on the server.
      * 
      * @throws UnhandledCelestialBodyException
@@ -196,7 +196,7 @@ public class ObjectManagerClient extends ObjectManager {
      * 
      * The object is added locally even if the server request fails.
      * 
-     * @param body
+     * @param link
      *            the object to insert. The ID of the object is set after the
      *            server request returns.
      * 

@@ -285,7 +285,7 @@ public class RequestHandlerClient implements TwoversePublicApi {
      * TODO should probably confirm the ends of the link exist, otherwise we
      * just get an exception. In that case, maybe it's okay.
      * 
-     * @param body
+     * @param link
      *            the link to add
      * @return the object from the server with a valid ID
      */

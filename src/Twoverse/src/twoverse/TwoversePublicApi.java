@@ -93,7 +93,7 @@ public interface TwoversePublicApi {
     /**
      * Add a new link to the universe.
      * 
-     * @param body
+     * @param link
      *            the object to add. The ID must NOT be set, and will be set on
      *            returning from this method.
      * @return the ID for the new object

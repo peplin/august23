@@ -22,10 +22,6 @@
  * limitations under the License. 
  */
 
-/**
- This is a package level source comment. 
- TODO
- */
 package twoverse;
 
 import java.io.IOException;

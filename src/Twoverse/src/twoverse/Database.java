@@ -122,7 +122,7 @@ public class Database {
      * statements.
      * 
      * @throws DatabaseException
-     *             if unable to prepare statments
+     *             if unable to prepare statements
      */
     private void prepareStatements() throws DatabaseException {
         try {
@@ -171,7 +171,7 @@ public class Database {
     /**
      * Constructs a new Database object, initializing all statements.
      * 
-     * Attemps to create a connection to the MySQL database specificed in
+     * Attemps to create a connection to the MySQL database specified in
      * twoverse.conf.Database.properties. Initializes the statements for each
      * Twoverse object.
      * 
@@ -301,7 +301,7 @@ public class Database {
      * @param user
      *            the user to delete. The ID of the user must be set, and it
      *            must correspond with an ID returned from addUser.
-     * @see addUser
+     * @see Database#addUser
      */
     public synchronized void deleteUser(User user) {
         sLogger.log(Level.INFO, "Attempting to delete user: " + user);
@@ -351,7 +351,7 @@ public class Database {
      * @param body
      *            the object to delete. The ID of the body must be set, and it
      *            must correspond with an ID returned from insert().
-     * @see insert
+     * @see Database#insert
      */
     public synchronized void delete(CelestialBody body) {
         try {
@@ -367,7 +367,7 @@ public class Database {
      * @param body
      *            the object to update. The ID of the body must be set, and it
      *            must correspond with an ID returned from insert().
-     * @see insert
+     * @see Database#insert
      */
     public synchronized void update(CelestialBody body) {
         try {

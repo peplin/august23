@@ -42,16 +42,29 @@ public class PhysicsVector3d implements Serializable {
     private Point mUnitVectorPoint;
     private double mMagnitude;
 
+    /**
+     * @param x
+     * @param y
+     * @param z
+     * @param magnitude
+     */
     public PhysicsVector3d(double x, double y, double z, double magnitude) {
         loadConfig();
         initialize(new Point(x, y, z), magnitude);
     }
 
+    /**
+     * @param direction
+     * @param magnitude
+     */
     public PhysicsVector3d(Point direction, double magnitude) {
         loadConfig();
         initialize(direction, magnitude);
     }
 
+    /**
+     * @param element
+     */
     public PhysicsVector3d(Element element) {
         loadConfig();
         if(!element.getLocalName()
@@ -94,18 +107,30 @@ public class PhysicsVector3d implements Serializable {
         }
     }
 
+    /**
+     * @param newDirection
+     */
     public void setDirection(Point newDirection) {
         mUnitVectorPoint = newDirection;
     }
 
+    /**
+     * @param magnitude
+     */
     public void setMagnitude(double magnitude) {
         mMagnitude = magnitude;
     }
 
+    /**
+     * @return
+     */
     public Point getUnitDirection() {
         return mUnitVectorPoint;
     }
 
+    /**
+     * @return
+     */
     public double getMagnitude() {
         return mMagnitude;
     }
@@ -116,6 +141,9 @@ public class PhysicsVector3d implements Serializable {
                 + getMagnitude() + "]";
     }
 
+    /**
+     * @return
+     */
     public Element toXmlElement() {
         loadConfig();
         Element root = new Element(sConfigFile.getProperty("VECTOR_TAG"));

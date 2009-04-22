@@ -28,21 +28,24 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 public class Session implements Serializable {
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3290251644990110932L;
     private User mUser;
     private int mId;
     private Timestamp mLastRefresh;
     private static int sNextId = 0;
 
+    /**
+     * @param user
+     */
     public Session(User user) {
         refresh();
         setUser(user);
         setId(sNextId++);
     }
 
+    /**
+     * @param user
+     */
     public void setUser(User user) {
         mUser = user;
     }
@@ -51,23 +54,39 @@ public class Session implements Serializable {
         return mUser;
     }
 
+    /**
+     * @param sessionId
+     */
     public void setId(int sessionId) {
         mId = sessionId;
     }
 
+    /**
+     * @return
+     */
     public int getId() {
         return mId;
     }
 
+    /**
+     * 
+     */
     public void refresh() {
         java.util.Date now = new java.util.Date();
         mLastRefresh = new Timestamp(now.getTime());
     }
 
+    /**
+     * @return
+     */
     public Timestamp getLastRefresh() {
         return mLastRefresh;
     }
 
+    /**
+     * @author peplin
+     *
+     */
     @SuppressWarnings("serial")
     public class TimedOutException extends Exception {
         TimedOutException(String message) {
@@ -76,16 +95,27 @@ public class Session implements Serializable {
 
     @SuppressWarnings("serial")
     public class BadUsernameException extends Exception {
+        /**
+         * @param message
+         */
         BadUsernameException(String message) {
         }
     }
 
+    /**
+     * @author peplin
+     *
+     */
     @SuppressWarnings("serial")
     public class BadPasswordException extends Exception {
         BadPasswordException(String message) {
         }
     }
 
+    /**
+     * @param other
+     * @return
+     */
     public boolean equals(Session other) {
         return mId == other.mId && mUser.equals(other.mUser);
     }

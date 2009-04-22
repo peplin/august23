@@ -43,11 +43,19 @@ public class GalaxyShape implements Serializable {
     private String mName;
     private String mTextureFile;
 
+    /**
+     * @param id
+     * @param name
+     * @param textureFile
+     */
     public GalaxyShape(int id, String name, String textureFile) {
         loadConfig();
         initialize(id, name, textureFile);
     }
 
+    /**
+     * @param element
+     */
     public GalaxyShape(Element element) {
         loadConfig();
 
@@ -89,30 +97,51 @@ public class GalaxyShape implements Serializable {
         }
     }
 
+    /**
+     * @param id
+     */
     public void setId(int id) {
         mId = id;
     }
 
+    /**
+     * @return
+     */
     public int getId() {
         return mId;
     }
 
+    /**
+     * @param name
+     */
     public void setName(String name) {
         mName = name;
     }
 
+    /**
+     * @return
+     */
     public String getName() {
         return mName;
     }
 
+    /**
+     * @param textureFile
+     */
     public void setTextureFile(String textureFile) {
         mTextureFile = textureFile;
     }
 
+    /**
+     * @return
+     */
     public String getTextureFile() {
         return mTextureFile;
     }
 
+    /**
+     * @return
+     */
     public Element toXmlElement() {
         loadConfig();
         Element root = new Element(sConfigFile.getProperty("GALAXY_SHAPE_TAG"));
