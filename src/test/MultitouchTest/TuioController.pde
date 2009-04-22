@@ -1,4 +1,28 @@
-// Enable the mouse rotation and up and down arrow zooming
+/**
+** TUIO Controller for Multitouch Test
+**
+** by Christopher Peplin (chris.peplin@rhubarbtech.com)
+** for August 23, 1966 (GROCS Project Group)
+** University of Michigan, 2009
+**
+** http://august231966.com
+** http://www.dc.umich.edu/grocs
+**
+** Based on House of Cards sketch by Aaron Koblin
+**
+** Copyright 2009 Christopher Peplin 
+**
+** Licensed under the Apache License, Version 2.0 (the "License");
+** you may not use this file except in compliance with the License.
+** You may obtain a copy of the License at 
+** http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+** See the License for the specific language governing permissions and
+** limitations under the License. 
+*/
 
 float rX,rZ,vX,vZ;
 float zoomScale = 1.0;
@@ -78,30 +102,9 @@ void updateTuioCursor (TuioCursor tcur) {
   }
 }
 
-// called when a cursor is removed from the scene
 void removeTuioCursor(TuioCursor tcur) {
-  //TuioCursor[] cursors = tuioClient.getTuioCursors();
-  //if(cursors.length == 0) { // no other fingers down
     fingerDown = false;
     fingerMoved = false;
-    
-  //} 
-  //else { // new primary finger
-  //  primaryFingerId = cursors[0].getFingerID();
-  //}
-  //fingerMoved = false;
-}
-
-// called when an object is added to the scene
-void addTuioObject(TuioObject tobj) {
-}
-
-// called when an object is removed from the scene
-void removeTuioObject(TuioObject tobj) {
-}
-
-// called when an object is moved
-void updateTuioObject (TuioObject tobj) {
 }
 
 void refresh(long timestamp) { 

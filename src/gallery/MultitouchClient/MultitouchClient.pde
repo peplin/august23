@@ -1,3 +1,27 @@
+/**
+** Twoverse Multitouch Client
+**
+** by Christopher Peplin (chris.peplin@rhubarbtech.com)
+** for August 23, 1966 (GROCS Project Group)
+** University of Michigan, 2009
+**
+** http://august231966.com
+** http://www.dc.umich.edu/grocs
+**
+** Copyright 2009 Christopher Peplin 
+**
+** Licensed under the Apache License, Version 2.0 (the "License");
+** you may not use this file except in compliance with the License.
+** You may obtain a copy of the License at 
+** http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+** See the License for the specific language governing permissions and
+** limitations under the License. 
+*/
+
 import java.io.IOException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -39,7 +63,7 @@ private Camera mCamera;
 ** 2 - create star view (same as galaxy but different click function) 
 ** 3 - connect mode
 */
-private MultitouchModeInterface mModes[];
+private ModeInterface mModes[];
 private int mCurrentMode = 0;
 
 void setup() {
@@ -69,7 +93,7 @@ void setup() {
     mObjectManager = new ObjectManagerClient(mRequestHandler, "http://141.213.30.171/gallery/feed.xml");
     //mObjectManager = new ObjectManagerClient(mRequestHandler, "http://localhost/feed.xml");
 
-    mModes = new MultitouchModeInterface[4];
+    mModes = new ModeInterface[4];
     mModes[0] = new GalaxyMode(this, mObjectManager, mCamera);
     mModes[1] = new InfoMode(this);
     mModes[2] = new CreationMode(this, mObjectManager, mCamera);
@@ -94,7 +118,7 @@ void draw() {
     mInterface.display();
 }
 
-MultitouchModeInterface getMode() {
+ModeInterface getMode() {
     return mModes[mCurrentMode];
 }
 
