@@ -1,56 +1,58 @@
 /**
-** Multitouch Interface for Twoverse Multitouch Client
-**
-** by Christopher Peplin (chris.peplin@rhubarbtech.com)
-** for August 23, 1966 (GROCS Project Group)
-** University of Michigan, 2009
-**
-** http://august231966.com
-** http://www.dc.umich.edu/grocs
-**
-** Copyright 2009 Christopher Peplin 
-**
-** Licensed under the Apache License, Version 2.0 (the "License");
-** you may not use this file except in compliance with the License.
-** You may obtain a copy of the License at 
-** http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-** See the License for the specific language governing permissions and
-** limitations under the License. 
-*/
+ ** Multitouch Interface for Twoverse Multitouch Client
+ **
+ ** by Christopher Peplin (chris.peplin@rhubarbtech.com)
+ ** for August 23, 1966 (GROCS Project Group)
+ ** University of Michigan, 2009
+ **
+ ** http://august231966.com
+ ** http://www.dc.umich.edu/grocs
+ **
+ ** Copyright 2009 Christopher Peplin 
+ **
+ ** Licensed under the Apache License, Version 2.0 (the "License");
+ ** you may not use this file except in compliance with the License.
+ ** You may obtain a copy of the License at 
+ ** http://www.apache.org/licenses/LICENSE-2.0
+ **
+ ** Unless required by applicable law or agreed to in writing, software
+ ** distributed under the License is distributed on an "AS IS" BASIS,
+ ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ ** See the License for the specific language governing permissions and
+ ** limitations under the License. 
+ */
 
 import processing.core.*;
 import twoverse.gui.RectButton;
 
 /**
-The MultitouchInterface class manages the GUI elements on the screen for
-the Twoverse Multitouch Client. It stores all of the buttons, draws them to the
-screen and checks for button presses.
-
-The buttons are draw down the right hand side of the screen, and are sized
-equally based on a few constants defined in the class.
-
-Buttons:
-    Zoom In
-    Zoom Out
-    Create
-    Connect
-    Galaxy View
-
-The interface also supports:
-    zooming in/out with the mouse wheel.
-    moving the viewpoint when the mouse is dragged
-    drawing titles to the screen
-
-At the moment, this interface provides the most functionality among the clients
-because it includes the "Create" button.
-
-   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
-   @version 1.0, Copyright 2009 under Apache License
-*/
+ * The MultitouchInterface class manages the GUI elements on the screen for the
+ * Twoverse Multitouch Client. It stores all of the buttons, draws them to the
+ * screen and checks for button presses. <br>
+ * <br>
+ * 
+ * The buttons are draw down the right hand side of the screen, and are sized
+ * equally based on a few constants defined in the class.<br>
+ * <br>
+ * 
+ * Buttons: <br>
+ * Zoom In<br>
+ * Zoom Out <br>
+ * Create <br>
+ * Connect <br>
+ * Galaxy View<br>
+ * <br>
+ * 
+ * The interface also supports: zooming in/out with the mouse wheel. moving the
+ * viewpoint when the mouse is dragged drawing titles to the screen.<br>
+ * <br>
+ * 
+ * At the moment, this interface provides the most functionality among the
+ * clients because it includes the "Create" button.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class MultitouchInterface {
     private final int BUTTON_WIDTH = 100;
     private final int BUTTON_HEIGHT = 75;
@@ -70,63 +72,74 @@ public class MultitouchInterface {
     public MultitouchInterface(PApplet parent) {
         mParent = parent;
         mParent.registerMouseEvent(this);
-        addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
-            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) { 
-            mouseWheel(evt.getWheelRotation());
-        }}); 
+        addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                mouseWheel(evt.getWheelRotation());
+            }
+        });
 
         mFont = loadFont("buttonFont.vlw");
 
         // TODO make buttons pretty
-        mZoomInButton = new RectButton(parent,
-                new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
-                    BUTTON_PADDING + BUTTON_HEIGHT, 0),
-                BUTTON_BASE_COLOR,
-                BUTTON_HIGHLIGHT_COLOR,
-                "Zoom In",
-                BUTTON_WIDTH,
-                BUTTON_HEIGHT,
-                mFont);
+        mZoomInButton =
+                new RectButton(parent,
+                        new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
+                                BUTTON_PADDING + BUTTON_HEIGHT,
+                                0),
+                        BUTTON_BASE_COLOR,
+                        BUTTON_HIGHLIGHT_COLOR,
+                        "Zoom In",
+                        BUTTON_WIDTH,
+                        BUTTON_HEIGHT,
+                        mFont);
 
-        mZoomOutButton = new RectButton(parent,
-                new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
-                    2 * (BUTTON_PADDING + BUTTON_HEIGHT), 0),
-                BUTTON_BASE_COLOR,
-                BUTTON_HIGHLIGHT_COLOR,
-                "Zoom Out",
-                BUTTON_WIDTH,
-                BUTTON_HEIGHT,
-                mFont);
+        mZoomOutButton =
+                new RectButton(parent,
+                        new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
+                                2 * (BUTTON_PADDING + BUTTON_HEIGHT),
+                                0),
+                        BUTTON_BASE_COLOR,
+                        BUTTON_HIGHLIGHT_COLOR,
+                        "Zoom Out",
+                        BUTTON_WIDTH,
+                        BUTTON_HEIGHT,
+                        mFont);
 
-        mCreateButton = new RectButton(parent,
-                new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
-                    3 * (BUTTON_PADDING + BUTTON_HEIGHT), 0),
-                BUTTON_BASE_COLOR,
-                BUTTON_HIGHLIGHT_COLOR,
-                "Create",
-                BUTTON_WIDTH,
-                BUTTON_HEIGHT,
-                mFont);
+        mCreateButton =
+                new RectButton(parent,
+                        new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
+                                3 * (BUTTON_PADDING + BUTTON_HEIGHT),
+                                0),
+                        BUTTON_BASE_COLOR,
+                        BUTTON_HIGHLIGHT_COLOR,
+                        "Create",
+                        BUTTON_WIDTH,
+                        BUTTON_HEIGHT,
+                        mFont);
 
-        mConnectButton = new RectButton(parent,
-                new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
-                    4 * (BUTTON_PADDING + BUTTON_HEIGHT), 0),
-                BUTTON_BASE_COLOR,
-                BUTTON_HIGHLIGHT_COLOR,
-                "Connect",
-                BUTTON_WIDTH,
-                BUTTON_HEIGHT,
-                mFont);
+        mConnectButton =
+                new RectButton(parent,
+                        new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
+                                4 * (BUTTON_PADDING + BUTTON_HEIGHT),
+                                0),
+                        BUTTON_BASE_COLOR,
+                        BUTTON_HIGHLIGHT_COLOR,
+                        "Connect",
+                        BUTTON_WIDTH,
+                        BUTTON_HEIGHT,
+                        mFont);
 
-        mGalaxyButton = new RectButton(parent,
-                new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
-                    5 * (BUTTON_PADDING + BUTTON_HEIGHT), 0),
-                BUTTON_BASE_COLOR,
-                BUTTON_HIGHLIGHT_COLOR,
-                "Galaxy",
-                BUTTON_WIDTH,
-                BUTTON_HEIGHT,
-                mFont);
+        mGalaxyButton =
+                new RectButton(parent,
+                        new Point(width - BUTTON_WIDTH - BUTTON_PADDING,
+                                5 * (BUTTON_PADDING + BUTTON_HEIGHT),
+                                0),
+                        BUTTON_BASE_COLOR,
+                        BUTTON_HIGHLIGHT_COLOR,
+                        "Galaxy",
+                        BUTTON_WIDTH,
+                        BUTTON_HEIGHT,
+                        mFont);
         mGalaxyButton.setLocked(true);
     }
 
@@ -137,16 +150,16 @@ public class MultitouchInterface {
     public void mouseEvent(MouseEvent e) {
         Point cursor = new Point(e.getX(), e.getY(), 0);
 
-        switch(e.getID()) {
-            case MouseEvent.MOUSE_CLICKED:
-                if(checkButtons(cursor)) {
-                    break;
-                }
-                getMode().cursorPressed(cursor);
+        switch (e.getID()) {
+        case MouseEvent.MOUSE_CLICKED:
+            if(checkButtons(cursor)) {
                 break;
-            case MouseEvent.MOUSE_DRAGGED:
-                getMode().cursorDragged(cursor);
-                break;
+            }
+            getMode().cursorPressed(cursor);
+            break;
+        case MouseEvent.MOUSE_DRAGGED:
+            getMode().cursorDragged(cursor);
+            break;
         }
         mPreviousCursor = cursor;
     }

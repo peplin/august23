@@ -22,13 +22,7 @@
 ** limitations under the License. 
 */
 
-/**
-This sketch is a brief demo of a sphere bouncing around inside the Wiremap
-field.
 
-   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
-   @version 1.0, Copyright 2009 under Apache License
-*/
 import wiremap.Wiremap;
 import wiremap.WiremapGlowingSphere;
 
@@ -43,6 +37,13 @@ float x = 0;
 float y = 0;
 float z = 10;
 
+/**
+ * This sketch is a brief demo of a sphere bouncing around inside the Wiremap
+ * field.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 void setup() {
   size(1024, 768, P3D);
 

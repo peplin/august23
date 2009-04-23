@@ -28,17 +28,17 @@ import ddf.minim.*;
 /**
 The Creation Mode looks similar to the Galaxy Mode on the screen,
 but it allows the use to create new stars by clicking on an empty place in the
-universe.
+universe. <br><br>
 
 This mode interfaces with the WiremapClient in order to synchronize the star
-formation process between machines (over the network) and also to play sounds.
+formation process between machines (over the network) and also to play sounds.<br><br>
 
 This mode remains active until a location for a new star is selected, and the
 WiremapClient returns "done" meaning that the star is now fully created. When
-the star formation is complete, the star is added to the ObjectManager.
+the star formation is complete, the star is added to the ObjectManager.<br><br>
 
 Clicking and dragging the mouse in this mode will move the viewpoint
-left/right/up/down.
+left/right/up/down.<br><br>
 
 Scrolling the mouse wheel in this mode will not change the zoom level. Selection
 of star locations does not currently work proprely if the scale is not one, so switching

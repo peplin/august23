@@ -63,21 +63,20 @@ private MultitouchModeInterface mModes[];
 private int mCurrentMode = 0;
 
 /**
-The Desktop Client for Twoverse is a more limited client than the Multitouch
-Client. This client is intended for use on home computers.
-
-With this client, users can:
-    View the universe of stars that is stored on the master Twoverse server
-    Navigate the universe (translation and zooming)
-    View more detailed information about any single star
-    Create constellation links between existing stars
-
-This client uses different ModeInterface objects to switch between these
-functions and views.
-
-   @author Christopher Peplin (chris.peplin@rhubarbtech.com)
-   @version 1.0, Copyright 2009 under Apache License
-*/
+ * The Desktop Client for Twoverse is a more limited client than the Multitouch
+ * Client. This client is intended for use on home computers.
+ * 
+ * With this client, users can: View the universe of stars that is stored on the
+ * master Twoverse server Navigate the universe (translation and zooming) View
+ * more detailed information about any single star Create constellation links
+ * between existing stars
+ * 
+ * This client uses different ModeInterface objects to switch between these
+ * functions and views.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 void setup() {
     frameRate(FRAME_RATE);
     size(WINDOW_WIDTH, WINDOW_HEIGHT, P3D);
