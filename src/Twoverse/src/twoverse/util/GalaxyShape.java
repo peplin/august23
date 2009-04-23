@@ -34,6 +34,14 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
+/**
+ * Holder for shape of the galaxy type. <br><br>
+ * 
+ * Not currently used in Twoverse.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class GalaxyShape implements Serializable {
     private static final long serialVersionUID = 6779708232529398026L;
     private static Properties sConfigFile;
@@ -44,9 +52,14 @@ public class GalaxyShape implements Serializable {
     private String mTextureFile;
 
     /**
+     * Construct a new GalaxyShape.
+     * 
      * @param id
+     *            must correspond to a shape ID in the database.
      * @param name
+     *            name of the shape
      * @param textureFile
+     *            path to the texture file for displaying this shape
      */
     public GalaxyShape(int id, String name, String textureFile) {
         loadConfig();
@@ -54,7 +67,10 @@ public class GalaxyShape implements Serializable {
     }
 
     /**
+     * Construct a GalaxyShape from an XML Element.
+     * 
      * @param element
+     *            element that contains a GalaxyShape
      */
     public GalaxyShape(Element element) {
         loadConfig();
@@ -91,13 +107,15 @@ public class GalaxyShape implements Serializable {
             sConfigFile.load(this.getClass()
                     .getClassLoader()
                     .getResourceAsStream("twoverse/conf/GalaxyShape.properties"));
-        } catch(IOException e) {
+        } catch (IOException e) {
             sLogger.log(Level.SEVERE, "Unable to laod config: "
                     + e.getMessage(), e);
         }
     }
 
     /**
+     * Set the ID.
+     * 
      * @param id
      */
     public void setId(int id) {
@@ -105,13 +123,17 @@ public class GalaxyShape implements Serializable {
     }
 
     /**
-     * @return
+     * Get the shape's ID.
+     * 
+     * @return id
      */
     public int getId() {
         return mId;
     }
 
     /**
+     * Set the name of the shape.
+     * 
      * @param name
      */
     public void setName(String name) {
@@ -119,13 +141,17 @@ public class GalaxyShape implements Serializable {
     }
 
     /**
-     * @return
+     * Get the name of the shape.
+     * 
+     * @return name
      */
     public String getName() {
         return mName;
     }
 
     /**
+     * Set the path to the shape's texture file.
+     * 
      * @param textureFile
      */
     public void setTextureFile(String textureFile) {
@@ -133,14 +159,18 @@ public class GalaxyShape implements Serializable {
     }
 
     /**
-     * @return
+     * Get the path to the shape's texture file.
+     * 
+     * @return path
      */
     public String getTextureFile() {
         return mTextureFile;
     }
 
     /**
-     * @return
+     * Convert this shape to an XML element.
+     * 
+     * @return this shape as an XML element
      */
     public Element toXmlElement() {
         loadConfig();

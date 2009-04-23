@@ -42,10 +42,10 @@ import twoverse.object.applet.AppletBodyInterface;
 
 /**
  * The Object Manager Client handles adding and update client universe objects,
- * as well as updating via an XML feed.
+ * as well as updating via an XML feed. <br><br>
  * 
  * All universe updates are handled locally as well as being passed to a
- * RequestHandler for sending to the server.
+ * RequestHandler for sending to the server. <br><br>
  * 
  * This class is thread-safe.
  * 

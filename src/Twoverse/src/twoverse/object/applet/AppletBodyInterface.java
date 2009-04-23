@@ -26,6 +26,21 @@ package twoverse.object.applet;
 
 import twoverse.util.Point.TwoDimensionalException;
 
+/**
+ * All bodies that want to be drawn to the screen must have a version of
+ * themselves that implement this interface. They should also provide an easy
+ * way to convert from the parent type to the applet type, altohugh there is no
+ * way to enforce that.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public interface AppletBodyInterface {
+    /**
+     * Displays the body to the parent applet screen.
+     * 
+     * @throws TwoDimensionalException
+     *             if 2D/3D conversion improperly handled
+     */
     public abstract void display() throws TwoDimensionalException;
 }

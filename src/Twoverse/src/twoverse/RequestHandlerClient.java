@@ -41,17 +41,17 @@ import twoverse.util.Session;
 import twoverse.util.User;
 
 /**
- * This class is the client side implementation of the Twoverse Public API.
+ * This class is the client side implementation of the Twoverse Public API. <br><br>
  * 
  * The RequestHandlerClient uses Apache XML-RPC to communicate with the Twoverse
- * server.
+ * server.<br><br>
  * 
  * A client should generally use this class only to log into the system. The
  * ObjectManagerClient should be used to modify the universe, as that then uses
- * the requst handler to update the server.
+ * the request handler to update the server.<br><br>
  * 
  * This should probably be changed in the future so that a client need only to
- * worry about one class.
+ * worry about one class.<br><br>
  * 
  * The request handler can only have one active session at a time.
  * 

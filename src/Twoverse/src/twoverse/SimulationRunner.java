@@ -36,9 +36,9 @@ import twoverse.object.CelestialBody;
 
 /**
  * The SimulationRunner is a periodic task that effects each object in the
- * universe based on their physical properties.
+ * universe based on their physical properties. <br><br>
  * 
- * It is currenly unimplemented.
+ * It is currently unimplemented.
  * 
  * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
  * @version 1.0, Copyright 2009 under Apache License

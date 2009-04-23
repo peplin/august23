@@ -34,15 +34,15 @@ import twoverse.util.User.UnsetPasswordException;
 /**
  * The Twoverse Public API is my hacked up way of setting a public XML-RPC API
  * for clients of Twoverse to use. Defined here are MOST of the functions the
- * clients can call.
+ * clients can call.<br><br>
  * 
  * The API because slightly more complicated when differences in loggin in with
  * each request handler became obvious. There are now a few extra functions
- * defined outside of this API.
+ * defined outside of this API.<br><br>
  * 
  * NOTE: All of these functions must return something - they CANNOT return void.
  * This is due to a limitation in Apache XML-RPC. In some cases, the return
- * value may seem unneccessary because of this.
+ * value may seem unneccessary because of this.<br><br>
  * 
  * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
  * @version 1.0, Copyright 2009 under Apache License

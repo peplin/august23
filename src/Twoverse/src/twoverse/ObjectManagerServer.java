@@ -43,7 +43,7 @@ import twoverse.object.Star;
  * The Object Manager Server is an extentension of the Object Manager that uses
  * a Database instance as its backend storage. This derivative also periodically
  * pushes the universe to an XML feed file, so it must be run on the same
- * machine as the web server.
+ * machine as the web server. <br><br>
  * 
  * This class is thread-safe.
  * 

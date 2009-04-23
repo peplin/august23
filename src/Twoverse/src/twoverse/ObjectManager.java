@@ -38,18 +38,18 @@ import twoverse.object.Link;
 
 /**
  * The Object Manager is a middle man between any Twoverse client or server and
- * wherever it is ultimately storing the information about the universe.
+ * wherever it is ultimately storing the information about the universe. <br><br>
  * 
  * In the case of the server, the Object Manager will act as a frontend to the
- * database, since all objects are stored there.
+ * database, since all objects are stored there.<br><br>
  * 
  * In the case of a client, the Object Manager will act as a frontend to XML-RPC
  * calls (or as a frontend to an XML-RPC call handler), as its objects are
- * stored elsewhere.
+ * stored elsewhere.<br><br>
  * 
  * In both cases, a local copy of the object must be kept. This abstract class
  * represents the common set of operations between client and server object
- * management.
+ * management.<br><br>
  * 
  * This class is thread-safe.
  * 

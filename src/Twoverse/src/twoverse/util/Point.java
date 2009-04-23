@@ -34,6 +34,12 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
+/**
+ * 2D or 3D point in cartesian coordinates.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class Point implements Serializable {
     private static final long serialVersionUID = 6712603407109374020L;
     private static Properties sConfigFile;
@@ -42,6 +48,33 @@ public class Point implements Serializable {
     private double mY;
     private double mZ;
     private boolean mIsTwoDimensional = false;
+
+    private void loadConfig() {
+        try {
+            if(sConfigFile == null) {
+                sConfigFile = new Properties();
+                sConfigFile.load(this.getClass()
+                        .getClassLoader()
+                        .getResourceAsStream("twoverse/conf/Point.properties"));
+            }
+        } catch (IOException e) {
+            sLogger.log(Level.SEVERE, "Unable to laod config: "
+                    + e.getMessage(), e);
+        }
+    }
+
+    private void intitialize(double x, double y, double z) {
+        setX(x);
+        setY(y);
+        try {
+            setZ(z);
+        } catch (TwoDimensionalException e) {
+            sLogger.log(Level.SEVERE,
+                    "Is point 2D or 3D? Called wrong initialize function if it is 2D"
+                            + e.getMessage(),
+                    e);
+        }
+    }
 
     public class TwoDimensionalException extends Exception {
         private static final long serialVersionUID = -2462077367673447134L;
@@ -52,6 +85,8 @@ public class Point implements Serializable {
     }
 
     /**
+     * Construct a new 3-dimensional point
+     * 
      * @param x
      * @param y
      * @param z
@@ -62,6 +97,8 @@ public class Point implements Serializable {
     }
 
     /**
+     * Construct a new 2-dimensional point
+     * 
      * @param x
      * @param y
      */
@@ -72,7 +109,10 @@ public class Point implements Serializable {
     }
 
     /**
+     * Construct a new point from an XML element.
+     * 
      * @param element
+     *            an XML element that contains a 2D or 3D point
      */
     public Point(Element element) {
         loadConfig();
@@ -97,41 +137,8 @@ public class Point implements Serializable {
     }
 
     /**
+     * Set the x value for this point.
      * 
-     */
-    private void loadConfig() {
-        try {
-            if(sConfigFile == null) {
-                sConfigFile = new Properties();
-                sConfigFile.load(this.getClass()
-                        .getClassLoader()
-                        .getResourceAsStream("twoverse/conf/Point.properties"));
-            }
-        } catch(IOException e) {
-            sLogger.log(Level.SEVERE, "Unable to laod config: "
-                    + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * @param x
-     * @param y
-     * @param z
-     */
-    private void intitialize(double x, double y, double z) {
-        setX(x);
-        setY(y);
-        try {
-            setZ(z);
-        } catch(TwoDimensionalException e) {
-            sLogger.log(Level.SEVERE,
-                    "Is point 2D or 3D? Called wrong initialize function if it is 2D"
-                            + e.getMessage(),
-                    e);
-        }
-    }
-
-    /**
      * @param x
      */
     public void setX(double x) {
@@ -139,13 +146,17 @@ public class Point implements Serializable {
     }
 
     /**
-     * @return
+     * Get the x value for this point.
+     * 
+     * @return x
      */
     public double getX() {
         return mX;
     }
 
     /**
+     * Set the y value for this point.
+     * 
      * @param y
      */
     public void setY(double y) {
@@ -153,15 +164,20 @@ public class Point implements Serializable {
     }
 
     /**
-     * @return
+     * Get the y value for this point.
+     * 
+     * @return y
      */
     public double getY() {
         return mY;
     }
 
     /**
+     * Set the z value for this point. Only works for 3-dimensional points.
+     * 
      * @param z
      * @throws TwoDimensionalException
+     *             if point was constructed as 2D
      */
     public void setZ(double z) throws TwoDimensionalException {
         if(mIsTwoDimensional) {
@@ -171,8 +187,11 @@ public class Point implements Serializable {
     }
 
     /**
-     * @return
+     * Get the z value for this point. Only works for 3-dimensional points.
+     * 
+     * @return z value
      * @throws TwoDimensionalException
+     *             if point was constructed as 2D
      */
     public double getZ() throws TwoDimensionalException {
         if(mIsTwoDimensional) {
@@ -187,7 +206,7 @@ public class Point implements Serializable {
         if(!mIsTwoDimensional) {
             try {
                 s += ", " + "z: " + getZ();
-            } catch(TwoDimensionalException e) {
+            } catch (TwoDimensionalException e) {
                 sLogger.log(Level.SEVERE,
                         "Is point 2D or 3D?" + e.getMessage(),
                         e);
@@ -198,7 +217,9 @@ public class Point implements Serializable {
     }
 
     /**
-     * @return
+     * Convert this point to an XML element.
+     * 
+     * @return this point as an XML element
      */
     public Element toXmlElement() {
         loadConfig();

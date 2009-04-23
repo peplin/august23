@@ -28,6 +28,12 @@ import java.io.Serializable;
 
 import jbcrypt.BCrypt;
 
+/**
+ * User account object for Twoverse.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class User implements Serializable {
     private static final long serialVersionUID = 1849465514178345554L;
     private String mUsername;
@@ -81,7 +87,7 @@ public class User implements Serializable {
     }
 
     /**
-     * @return
+     * @return username
      */
     public String getUsername() {
         return mUsername;
@@ -103,7 +109,7 @@ public class User implements Serializable {
 
     /**
      * @param plaintextCandidate
-     * @return
+     * @return true if the password hashes properly, false otherwise
      * @throws UnsetPasswordException
      */
     public boolean validatePassword(String plaintextCandidate)
@@ -120,7 +126,7 @@ public class User implements Serializable {
 
     /**
      * @param hashedCandidate
-     * @return
+     * @return true if the hashed candidate matches the user's hashed password
      * @throws UnsetPasswordException
      */
     public boolean validateHashedPassword(String hashedCandidate)
@@ -137,7 +143,7 @@ public class User implements Serializable {
 
     /**
      * @param user
-     * @return
+     * @return true if the provided password authenticates with the current user
      * @throws UnsetPasswordException
      */
     public boolean validate(User user) throws UnsetPasswordException {
@@ -145,7 +151,7 @@ public class User implements Serializable {
     }
 
     /**
-     * @return
+     * @return hashed password
      */
     public String getHashedPassword() {
         return mHashedPassword;
@@ -173,7 +179,7 @@ public class User implements Serializable {
     }
 
     /**
-     * @return
+     * @return total available points
      */
     public int getPoints() {
         return mPoints;
@@ -187,7 +193,7 @@ public class User implements Serializable {
     }
 
     /**
-     * @return
+     * @return phone number
      */
     public String getPhone() {
         return mPhone;
@@ -201,7 +207,7 @@ public class User implements Serializable {
     }
 
     /**
-     * @return
+     * @return email address
      */
     public String getEmail() {
         return mEmail;
@@ -215,7 +221,7 @@ public class User implements Serializable {
     }
 
     /**
-     * @return
+     * @return ID
      */
     public int getId() {
         return mId;
@@ -223,7 +229,9 @@ public class User implements Serializable {
 
     /**
      * @param other
-     * @return
+     *            user to compare
+     * @return true iff username, hashed password, id, email, phone and points
+     *         are equal
      */
     public boolean equals(User other) {
         return mUsername.equals(other.mUsername)

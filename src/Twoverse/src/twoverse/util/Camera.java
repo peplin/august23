@@ -27,7 +27,7 @@ package twoverse.util;
 import processing.core.PApplet;
 
 /**
- * This class is a wrapper for the 3D camera in Processing.
+ * Convenience wrapper for the 3D camera in Processing. <br><br>
  * 
  * It provides a neat way to store camera position, rotation and direction, as
  * well as a good interface for changing each value and applying them to the
@@ -95,33 +95,62 @@ public class Camera {
         mScale = PApplet.lerp(mScale, mScaleTarget, (float) .02);
     }
 
+    /**
+     * @param differenceX
+     * @param differenceY
+     * @param differenceZ
+     */
     public void moveEye(float differenceX, float differenceY, float differenceZ) {
         mEyeX += differenceX;
         mEyeY += differenceY;
         mEyeZ += differenceZ;
     }
 
+    /**
+     * @param difference
+     */
     public void zoom(float difference) {
         mScaleTarget += difference;
     }
 
+    /**
+     * Reset the scale factor to 1.
+     */
     public void resetScale() {
         mScaleTarget = 1;
     }
 
+    /**
+     * Change the velocity of translation. Could be positive or negative.
+     * 
+     * @param differenceX
+     * @param differenceY
+     */
     public void changeTranslateVelocity(float differenceX, float differenceY) {
         mCenterXVelocity += differenceX * .1;
         mCenterYVelocity += differenceY * .1;
     }
 
+    /**
+     * Get camera center point X
+     * @return current center X
+     */
     public float getCenterX() {
         return mCenterX;
     }
 
+    /**
+     * Get camera center point Y
+     * @return current center Y
+     */
     public float getCenterY() {
         return mCenterY;
     }
 
+    /**
+     * Get current scale
+     * @return current scale
+     */
     public float getScale() {
         return mScale;
     }

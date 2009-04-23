@@ -28,36 +28,19 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import twoverse.util.Point;
 
+/**
+ * Rectangular implementation of Button.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class RectButton extends Button {
     private int mWidth;
     private int mHeight;
     private PFont mFont;
 
-    public RectButton(PApplet parentApplet, Point center, int baseColor,
-            int highlightColor, String name, int width, int height, PFont font) {
-        super(parentApplet, center, baseColor, highlightColor, name);
-        setWidth(width);
-        setHeight(height);
-        setFont(font);
-    }
-
     private void setFont(PFont font) {
         mFont = font;
-    }
-
-    @Override
-    public boolean isPressed(Point cursor) {
-        return overRect(cursor, getCorner(), mWidth, mHeight) && isVisible();
-    }
-
-    public void display(Point cursor) {
-        if(isVisible()) {
-            if(isPressed(cursor) || isLocked()) {
-                drawHighlight();
-            } else {
-                drawNormal();
-            }
-        }
     }
 
     private void drawNormal() {
@@ -96,6 +79,48 @@ public class RectButton extends Button {
         mParentApplet.text(getName(),
                 (float) getCorner().getX(),
                 (float) getCorner().getY() - 5);
+    }
+
+    /**
+     * Construct a new RectangleButton.
+     * 
+     * @param width
+     *            width of the rectangle
+     * @param height
+     *            height of the rectangle
+     * @param font
+     *            font to use for display text
+     */
+    public RectButton(PApplet parentApplet, Point center, int baseColor,
+            int highlightColor, String name, int width, int height, PFont font) {
+        super(parentApplet, center, baseColor, highlightColor, name);
+        setWidth(width);
+        setHeight(height);
+        setFont(font);
+    }
+
+    @Override
+    public boolean isPressed(Point cursor) {
+        return overRect(cursor, getCorner(), mWidth, mHeight) && isVisible();
+    }
+
+    /**
+     * Displays the button on the screen if it is marked as visible.
+     * 
+     * If locked or pressed, uses the highlight color. Otherwise uses the normal
+     * color.
+     * 
+     * @param cursor
+     *            position of cursor, to check if the button is pressed
+     */
+    public void display(Point cursor) {
+        if(isVisible()) {
+            if(isPressed(cursor) || isLocked()) {
+                drawHighlight();
+            } else {
+                drawNormal();
+            }
+        }
     }
 
     public void setWidth(int width) {

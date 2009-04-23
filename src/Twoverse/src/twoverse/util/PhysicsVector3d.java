@@ -34,6 +34,12 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
+/**
+ * Coordinate space 3-dimensional vector.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class PhysicsVector3d implements Serializable {
     private static final long serialVersionUID = -7483027109043816672L;
     private static Properties sConfigFile;
@@ -43,6 +49,9 @@ public class PhysicsVector3d implements Serializable {
     private double mMagnitude;
 
     /**
+     * Construct a new vector. Use the parameters to specifiy this as a unit
+     * vector.
+     * 
      * @param x
      * @param y
      * @param z
@@ -63,7 +72,10 @@ public class PhysicsVector3d implements Serializable {
     }
 
     /**
+     * Construct a new vector from an XML Element.
+     * 
      * @param element
+     *            an element containing a vector
      */
     public PhysicsVector3d(Element element) {
         loadConfig();
@@ -101,20 +113,25 @@ public class PhysicsVector3d implements Serializable {
                         .getClassLoader()
                         .getResourceAsStream("twoverse/conf/PhysicsVector3d.properties"));
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             sLogger.log(Level.SEVERE, "Unable to laod config: "
                     + e.getMessage(), e);
         }
     }
 
     /**
+     * Set the direction of the vector.
+     * 
      * @param newDirection
+     *            new point to use for unit vector definition
      */
     public void setDirection(Point newDirection) {
         mUnitVectorPoint = newDirection;
     }
 
     /**
+     * Set the magnitude of the vector.
+     * 
      * @param magnitude
      */
     public void setMagnitude(double magnitude) {
@@ -122,14 +139,18 @@ public class PhysicsVector3d implements Serializable {
     }
 
     /**
-     * @return
+     * Get the direction of this unit vector as a point.
+     * 
+     * @return point where the unit vector is directed
      */
     public Point getUnitDirection() {
         return mUnitVectorPoint;
     }
 
     /**
-     * @return
+     * Get the magnitude of this vector.
+     * 
+     * @return magnitude
      */
     public double getMagnitude() {
         return mMagnitude;
@@ -142,7 +163,9 @@ public class PhysicsVector3d implements Serializable {
     }
 
     /**
-     * @return
+     * Convert this vector to an XML element.
+     * 
+     * @return vector as an XML element
      */
     public Element toXmlElement() {
         loadConfig();

@@ -45,6 +45,17 @@ import twoverse.util.PhysicsVector3d;
 import twoverse.util.Point;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
+/**
+ * Implementation of CelestialBody for a Star. <br><br>
+ * 
+ * Beyond position, velocity, acceleration, etc, a Star has a radius, mass,
+ * color, luminosity, frequency and a state.<br><br>
+ * 
+ * This class was used extensively in the August 23, 1966 installation.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class Star extends CelestialBody implements Serializable {
     private static final long serialVersionUID = -1152118681822794656L;
     private static Properties sConfigFile;
@@ -61,6 +72,41 @@ public class Star extends CelestialBody implements Serializable {
     private static PreparedStatement sUpdateStarStatement;
     private static Connection sConnection;
 
+    private void initialize(double radius, double mass, int colorR, int colorB,
+            int colorG, double luminosity, double frequency) {
+        setRadius(radius);
+        setMass(mass);
+        setColorR(colorR);
+        setColorG(colorG);
+        setColorB(colorB);
+        setLuminosity(luminosity);
+        setFrequency(frequency);
+    }
+
+    private synchronized void loadConfig() {
+        if(sConfigFile == null) {
+            sConfigFile = loadConfigFile("Star");
+        }
+    }
+
+    /**
+     * Constructs an instance of Star.
+     * 
+     * @param mass
+     *            mass of the star
+     * @param radius
+     *            radius of the star
+     * @param colorR
+     *            red value of the star's color
+     * @param colorB
+     *            blue value of the star's color
+     * @param colorG
+     *            green value of the star's color
+     * @param luminosity
+     *            luminosity of the star
+     * @param frequency
+     *            frequency of oscillation of the star
+     */
     public Star(int ownerId, String name, int parentId, Point position,
             PhysicsVector3d velocity, PhysicsVector3d acceleration,
             double mass, double radius, int colorR, int colorB, int colorG,
@@ -70,6 +116,24 @@ public class Star extends CelestialBody implements Serializable {
         initialize(radius, mass, colorR, colorG, colorB, luminosity, frequency);
     }
 
+    /**
+     * Constructs a more detailed instance of Star.
+     * 
+     * @param mass
+     *            mass of the star
+     * @param radius
+     *            radius of the star
+     * @param colorR
+     *            red value of the star's color
+     * @param colorB
+     *            blue value of the star's color
+     * @param colorG
+     *            green value of the star's color
+     * @param luminosity
+     *            luminosity of the star
+     * @param frequency
+     *            frequency of oscillation of the star
+     */
     public Star(int id, int ownerId, String name, Timestamp birthTime,
             Timestamp deathTime, int parentId, Point position,
             PhysicsVector3d velocity, PhysicsVector3d acceleration,
@@ -89,6 +153,27 @@ public class Star extends CelestialBody implements Serializable {
         initialize(radius, mass, colorR, colorG, colorB, luminosity, frequency);
     }
 
+    /**
+     * Construct an instance of Star based on an existing CelestialBody. Useful
+     * for constructing from a database result set.
+     * 
+     * @param body
+     *            base body to construct this star from
+     * @param mass
+     *            mass of the star
+     * @param radius
+     *            radius of the star
+     * @param colorR
+     *            red value of the star's color
+     * @param colorB
+     *            blue value of the star's color
+     * @param colorG
+     *            green value of the star's color
+     * @param luminosity
+     *            luminosity of the star
+     * @param frequency
+     *            frequency of oscillation of the star
+     */
     public Star(CelestialBody body, double mass, double radius, int colorR,
             int colorB, int colorG, double luminosity, double frequency) {
         super(body);
@@ -96,6 +181,14 @@ public class Star extends CelestialBody implements Serializable {
         initialize(radius, mass, colorR, colorG, colorB, luminosity, frequency);
     }
 
+    /**
+     * Construct a Star from an XML element
+     * 
+     * @param element
+     *            element from which to parse a Star
+     * @throws UnexpectedXmlElementException
+     *             if the element does not contain a Star
+     */
     public Star(Element element) {
         super(element.getFirstChildElement(CelestialBody.XML_TAG));
         loadConfig();
@@ -136,6 +229,12 @@ public class Star extends CelestialBody implements Serializable {
         initialize(radius, mass, colorR, colorG, colorB, luminosity, frequency);
     }
 
+    /**
+     * Copy constructor for a Star.
+     * 
+     * @param star
+     *            star to copy
+     */
     public Star(Star star) {
         super(star);
         mState = star.getState();
@@ -146,23 +245,6 @@ public class Star extends CelestialBody implements Serializable {
                 star.getColorB(),
                 star.getLuminosity(),
                 star.getFrequency());
-    }
-
-    private void initialize(double radius, double mass, int colorR, int colorB,
-            int colorG, double luminosity, double frequency) {
-        setRadius(radius);
-        setMass(mass);
-        setColorR(colorR);
-        setColorG(colorG);
-        setColorB(colorB);
-        setLuminosity(luminosity);
-        setFrequency(frequency);
-    }
-
-    private synchronized void loadConfig() {
-        if(sConfigFile == null) {
-            sConfigFile = loadConfigFile("Star");
-        }
     }
 
     @Override
@@ -196,7 +278,7 @@ public class Star extends CelestialBody implements Serializable {
             ResultSet resultSet = sSelectAllStarsStatement.executeQuery();
             ArrayList<CelestialBody> bodies = parseAll(resultSet);
             resultSet.beforeFirst();
-            for(CelestialBody body : bodies) {
+            for (CelestialBody body : bodies) {
                 if(!resultSet.next()) {
                     throw new SQLException("Mismatch between stars and celestial bodies");
                 }
@@ -214,7 +296,7 @@ public class Star extends CelestialBody implements Serializable {
                 stars.put(star.getId(), star);
             }
             resultSet.close();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Unable to get stars", e);
         }
         return stars;
@@ -238,7 +320,7 @@ public class Star extends CelestialBody implements Serializable {
 
             sInsertStarStatement.executeUpdate();
             setDirty(false);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not add system " + this, e);
         }
     }
@@ -260,7 +342,7 @@ public class Star extends CelestialBody implements Serializable {
             sUpdateStarStatement.setDouble(9, getId());
             sUpdateStarStatement.executeUpdate();
             setDirty(false);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Could not update star " + this, e);
         }
     }

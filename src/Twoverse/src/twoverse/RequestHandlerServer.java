@@ -46,10 +46,12 @@ import twoverse.util.User;
 import twoverse.util.User.UnsetPasswordException;
 
 /**
- * This class is the server side implementation of the Twoverse Public API.
+ * This class is the server side implementation of the Twoverse Public API. <br>
+ * <br>
  * 
  * The RequestHandlerServer accepts incoming Apache XML-RPC requests from the
- * Twoverse client.
+ * Twoverse client. <br>
+ * <br>
  * 
  * The server side can support more than one session at the same time.
  * 

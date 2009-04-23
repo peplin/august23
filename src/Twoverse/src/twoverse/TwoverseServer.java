@@ -43,12 +43,12 @@ import twoverse.Database.DatabaseException;
  * Backend server for Twoverse simulation. The server must be run on the same
  * machine as the database and web server. Together, they provide access to the
  * list of all objects in the universe via an XML feed and API access via
- * XML-RPC.
+ * XML-RPC.<br><br>
  * 
  * Any watchdog threads are spawned from here, including the simulation runner
- * and feed updater.
+ * and feed updater.<br><br>
  * 
- * Currently, the servlet web server is run from this clasS.
+ * Currently, the servlet web server is run from this class.<br><br>
  * 
  * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
  * @version 1.0, Copyright 2009 under Apache License

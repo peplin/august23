@@ -27,6 +27,12 @@ package twoverse.util;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * Session for a logged in user.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class Session implements Serializable {
     private static final long serialVersionUID = 3290251644990110932L;
     private User mUser;
@@ -35,7 +41,10 @@ public class Session implements Serializable {
     private static int sNextId = 0;
 
     /**
+     * Constructs a new session for the given user.
+     * 
      * @param user
+     *            account for this session
      */
     public Session(User user) {
         refresh();
@@ -44,17 +53,26 @@ public class Session implements Serializable {
     }
 
     /**
+     * Sets the user of this session.
+     * 
      * @param user
      */
     public void setUser(User user) {
         mUser = user;
     }
 
+    /**
+     * Returns the user of this session.
+     * 
+     * @return user
+     */
     public User getUser() {
         return mUser;
     }
 
     /**
+     * Sets the session ID. This should be a valid session from the server.
+     * 
      * @param sessionId
      */
     public void setId(int sessionId) {
@@ -62,14 +80,17 @@ public class Session implements Serializable {
     }
 
     /**
-     * @return
+     * Returns the current session ID.
+     * 
+     * @return id
      */
     public int getId() {
         return mId;
     }
 
     /**
-     * 
+     * Updates the time of this session to the current time. Used to time out
+     * old, inactive sessions.
      */
     public void refresh() {
         java.util.Date now = new java.util.Date();
@@ -77,16 +98,14 @@ public class Session implements Serializable {
     }
 
     /**
-     * @return
+     * Get the time of the last refresh.
+     * 
+     * @return time of last refresh
      */
     public Timestamp getLastRefresh() {
         return mLastRefresh;
     }
 
-    /**
-     * @author peplin
-     *
-     */
     @SuppressWarnings("serial")
     public class TimedOutException extends Exception {
         TimedOutException(String message) {
@@ -102,10 +121,6 @@ public class Session implements Serializable {
         }
     }
 
-    /**
-     * @author peplin
-     *
-     */
     @SuppressWarnings("serial")
     public class BadPasswordException extends Exception {
         BadPasswordException(String message) {
@@ -113,8 +128,10 @@ public class Session implements Serializable {
     }
 
     /**
+     * 
      * @param other
-     * @return
+     *            session for comparison
+     * @return true iff both session have the same ID and user
      */
     public boolean equals(Session other) {
         return mId == other.mId && mUser.equals(other.mUser);

@@ -42,10 +42,10 @@ import twoverse.util.User.UnsetPasswordException;
 
 /**
  * The SessionManager handles all user account creation, updates, authentication
- * and session timeout.
+ * and session timeout. <br><br>
  * 
  * The list of know users is loaded from the database at runtime, and any new
- * users created afterwards are flushed the database.
+ * users created afterwards are flushed the database.<br><br>
  * 
  * Before using any methods defined by the RequestHandlerServer, a client must
  * have created a session here with a valid account. If there is no activity for

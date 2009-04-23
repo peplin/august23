@@ -39,6 +39,18 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import twoverse.util.XmlExceptions.UnexpectedXmlElementException;
 
+/**
+ * A meta object that links two Star objects together. Useful for creating
+ * constellations.<br><br>
+ * 
+ * This object is the only body in Twoverse that does not inherit from
+ * CelestialBody. This is a good case for separating out the database
+ * functionality of CelestialBody from the positioning attributes. Either that,
+ * or create a new parent type for these meta-objects.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public class Link implements Serializable {
     private static final long serialVersionUID = -382030465269046974L;
     private static Properties sLinkConfigFile;
@@ -51,17 +63,81 @@ public class Link implements Serializable {
     private int mFirstId;
     private int mSecondId;
 
+    private synchronized void loadConfig() {
+        if(sLinkConfigFile == null) {
+            sLinkConfigFile = loadConfigFile("Link");
+        }
+    }
+
+    private synchronized Properties loadConfigFile(String className) {
+        Properties configFile = null;
+        try {
+            configFile = new Properties();
+            configFile.load(this.getClass()
+                    .getClassLoader()
+                    .getResourceAsStream("twoverse/conf/" + className
+                            + ".properties"));
+        } catch (IOException e) {
+            sLogger.log(Level.SEVERE, "Unable to load config: "
+                    + e.getMessage(), e);
+        }
+        return configFile;
+    }
+
+    private static Logger getLogger() {
+        return sLogger;
+    }
+
+    private static Link parse(ResultSet resultSet) {
+        Link link = null;
+        try {
+            link =
+                    new Link(resultSet.getInt("link.id"),
+                            resultSet.getInt("link.first"),
+                            resultSet.getInt("link.second"));
+        } catch (SQLException e) {
+            sLogger.log(Level.WARNING, "Unable to parse links from set: "
+                    + resultSet, e);
+        }
+        return link;
+    }
+
+    /**
+     * Construct a new link with the IDs of the bodies it links.
+     * 
+     * @param id
+     *            of this link, must be a valid link ID on the server
+     * @param firstId
+     *            ID of first body in link
+     * @param secondId
+     *            ID of second body in link
+     */
     public Link(int id, int firstId, int secondId) {
         mId = id;
         mFirstId = firstId;
         mSecondId = secondId;
     }
 
+    /**
+     * Construct a new link with two Star objects. Figures out the IDs on its
+     * own as a convenience. Order of stars (first, second) makes no difference.
+     * 
+     * @param first
+     *            first star in link
+     * @param second
+     *            second star in link
+     */
     public Link(Star first, Star second) {
         mFirstId = first.getId();
         mSecondId = second.getId();
     }
 
+    /**
+     * Construct a new link from an XML element.
+     * 
+     * @param element
+     *            XML element that contains a Link
+     */
     public Link(Element element) {
         loadConfig();
 
@@ -81,41 +157,13 @@ public class Link implements Serializable {
                         .getValue());
     }
 
-    private synchronized void loadConfig() {
-        if(sLinkConfigFile == null) {
-            sLinkConfigFile = loadConfigFile("Link");
-        }
-    }
-
-    protected synchronized Properties loadConfigFile(String className) {
-        Properties configFile = null;
-        try {
-            configFile = new Properties();
-            configFile.load(this.getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("twoverse/conf/" + className
-                            + ".properties"));
-        } catch(IOException e) {
-            sLogger.log(Level.SEVERE, "Unable to load config: "
-                    + e.getMessage(), e);
-        }
-        return configFile;
-    }
-
-    protected static Logger getLogger() {
-        return sLogger;
-    }
-
-    public static void prepareDatabaseStatements(Connection connection)
-            throws SQLException {
-        sConnection = connection;
-        sInsertStatement =
-                sConnection.prepareStatement("INSERT INTO link (first, second) "
-                        + "VALUES (?, ?)");
-        sSelectAllLinksStatement =
-                sConnection.prepareStatement("SELECT * FROM link");
-    }
-
+    /**
+     * Constructs an open link with only one Star. This instance cannot be
+     * stored in the database until it receives a second Star.
+     * 
+     * @param first
+     *            the opening Star for the link
+     */
     public Link(Star first) {
         mFirstId = first.getId();
         mSecondId = 0;
@@ -145,6 +193,33 @@ public class Link implements Serializable {
         return mId;
     }
 
+    /**
+     * Store database connection and initialize all statements with it. This
+     * should needs to be called once, and only once per run of the program.
+     * 
+     * @param connection
+     *            a database connection that will be used exclusively by this
+     *            class (ie. must be a fresh copy of another connection)
+     * @throws SQLException
+     *             if unable to prepare statements
+     */
+    public static void prepareDatabaseStatements(Connection connection)
+            throws SQLException {
+        sConnection = connection;
+        sInsertStatement =
+                sConnection.prepareStatement("INSERT INTO link (first, second) "
+                        + "VALUES (?, ?)");
+        sSelectAllLinksStatement =
+                sConnection.prepareStatement("SELECT * FROM link");
+    }
+
+    /**
+     * Insert this link into the database. After a successful insert, it will
+     * have a valid ID.
+     * 
+     * @throws SQLException
+     *             if unable to insert
+     */
     public synchronized void insertInDatabase() throws SQLException {
         if(sConnection == null) {
             throw new SQLException("Unset database connection");
@@ -159,43 +234,41 @@ public class Link implements Serializable {
             }
             setId(keySet.getInt(1));
             keySet.close();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Add link query failed for link: "
                     + this, e);
             throw new SQLException("Add link query failed for link: " + this);
         }
     }
 
+    /**
+     * Select all links from the database.
+     * 
+     * @return all links from database, mapped by ID
+     * @throws SQLException
+     *             if unable to select
+     */
     public static synchronized HashMap<Integer, Link> selectAllFromDatabase()
             throws SQLException {
         HashMap<Integer, Link> links = new HashMap<Integer, Link>();
         try {
             ResultSet resultSet = sSelectAllLinksStatement.executeQuery();
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 Link link = parse(resultSet);
                 links.put(link.getId(), link);
             }
             resultSet.close();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             sLogger.log(Level.WARNING, "Unable to get stars", e);
         }
         return links;
     }
 
-    static protected Link parse(ResultSet resultSet) {
-        Link link = null;
-        try {
-            link =
-                    new Link(resultSet.getInt("link.id"),
-                            resultSet.getInt("link.first"),
-                            resultSet.getInt("link.second"));
-        } catch(SQLException e) {
-            sLogger.log(Level.WARNING, "Unable to parse links from set: "
-                    + resultSet, e);
-        }
-        return link;
-    }
-
+    /**
+     * Convert this Link to an XML element.
+     * 
+     * @return this link as an XML element
+     */
     public Element toXmlElement() {
         loadConfig();
         Element element = new Element(sLinkConfigFile.getProperty("LINK_TAG"));

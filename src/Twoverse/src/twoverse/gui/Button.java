@@ -27,6 +27,12 @@ package twoverse.gui;
 import processing.core.PApplet;
 import twoverse.util.Point;
 
+/**
+ * Abstract parent for all GUI buttons in Twoverse clients.
+ * 
+ * @author Christopher Peplin (chris.peplin@rhubarbtech.com)
+ * @version 1.0, Copyright 2009 under Apache License
+ */
 public abstract class Button {
     private Point mCorner;
     private int mBaseColor;
@@ -36,6 +42,20 @@ public abstract class Button {
     private String mName;
     protected PApplet mParentApplet;
 
+    /**
+     * Construct a new button for the parent applet.
+     * 
+     * @param parentApplet
+     *            applet this button will be displayed in
+     * @param center
+     *            center coordinate of button
+     * @param baseColor
+     *            non-highlighted, non-clicked color
+     * @param highlightColor
+     *            rollover or clicked (& locked) color
+     * @param name
+     *            textual name of the button (often used as display text)
+     */
     public Button(PApplet parentApplet, Point center, int baseColor,
             int highlightColor, String name) {
         setCorner(center);
@@ -50,8 +70,32 @@ public abstract class Button {
         mParentApplet = parentApplet;
     }
 
+    /**
+     * Abstract method to check if a button is pressed based on the provided
+     * cursor location.
+     * 
+     * Not checking mouseX and mouseY directly on purpose - by abstracting away,
+     * we can use TUIO cursor if we want.
+     * 
+     * @param cursor
+     *            position of cursor
+     * @return true if cursor over button
+     */
     public abstract boolean isPressed(Point cursor);
 
+    /**
+     * General method to check if a cursor is over a rectangle.
+     * 
+     * @param cursor
+     *            position to evaluate
+     * @param corner
+     *            top left corner of rectangle
+     * @param width
+     *            width of rectangle
+     * @param height
+     *            height of rectangle
+     * @return true if cursor over the rectangle
+     */
     boolean overRect(Point cursor, Point corner, int width, int height) {
         if(cursor.getX() >= corner.getX()
                 && cursor.getX() <= corner.getX() + width
@@ -63,6 +107,17 @@ public abstract class Button {
         }
     }
 
+    /**
+     * General method to check if a cursor is over a circle.
+     * 
+     * @param cursor
+     *            position to evaluate
+     * @param center
+     *            of circle
+     * @param diameter
+     *            diameter of circle
+     * @return true if cursor is over the circle
+     */
     boolean overCircle(Point cursor, Point center, int diameter) {
         double disX = center.getX() - cursor.getX();
         double disY = center.getY() - cursor.getY();
@@ -106,6 +161,12 @@ public abstract class Button {
         return mHighlightColor;
     }
 
+    /**
+     * Set the button locked, meaning it will remain its highlight color until
+     * unlocked.
+     * 
+     * @param locked true to lock the button
+     */
     public void setLocked(boolean locked) {
         mLocked = locked;
     }
