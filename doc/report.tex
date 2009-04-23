@@ -1,3 +1,13 @@
+\documentclass[11pt]{report}
+\date{\today}
+\usepackage{graphicx,amssymb,amstext,amsmath}
+%\oddsidemargin=0in
+%\evensidemargin=0in
+%\textwidth=6.3in
+%\topmargin=-.5in
+%\textheight=9in
+
+\begin{document}
 \title{August 23, 1966}
 \author{
         Jiangang Hao (jghao@umich.ed) \\
@@ -5,86 +15,24 @@
         Christopher Peplin (peplin@umich.edu) \\
         John Walters (jdwalter@umich.edu)
 }
-\date{\today}
-
-\documentclass[10pt]{article}
-
-\oddsidemargin=0in
-\evensidemargin=0in
-\textwidth=6.3in
-\topmargin=-.5in
-\textheight=9in
-
-\begin{document}
 \maketitle
 
-\section{Introduction}
+\begin{abstract}\centering
 August 23, 1966 is a project from the University of Michigan, supported by a
 grant from the GROCS (Grant Opportunities Collaborative Spaces) program in 2009.
 This report serves as documentation of the activities of the project over the
 course of the semester, as well as a guide for future groups to use or learn
 from the hardware and software created.
+\end{abstract}
 
-\paragraph{Outline}
-This report is divided into a few main sections.
-\begin{itemize}
-    \item Proposal Summary
-    \item Design Reviews \& Meetings
-    \item Gallery Installation
-    \item Hardware/Software Documentation
-    \item Reflection
-\end{itemize}
+\tableofcontents
 
-\section{Proposal Summary}
-
-\section{Design Reviews \& Meetings}
-
-\section{Gallery Installation}
-
-\section{Hardware/Software Documentation}
-
-\section{Reflection}
-
-\section{Compatibility}
-Since Processing is based on the Java programming language, it is very easily
-made cross-platform. Distributions of this simulator for Windows, Mac OS X
-and Linux are available online at
-http://rhubarbtech.com/software/rocket/simulator.tar.gz
-
-Also, the simulator runs well as a Java applet in a web browser. An applet is
-available online at http://rhubarbtech.com/software/rocket. 
-
-\section{Usage}
-\paragraph{Calculating the Amount of Fuel}
-If the user leaves the amount of fuel field empty and clicks "Save,"
-the simulator will use the Tsiolkovsky rocket equation to give a rough
-low-end estimate at the amount of fuel required to reach the desired velocity
-with the given rocket mass and fuel exit velocity. This calculation is a 
-ROUGH minimum estimate, and doesn't take into account the turn to 90 degrees
-for orbit or atmospheric drag.
-
-\paragraph{Real-time Graphs}
-The graphs use a variable x scale - the scale always goes from 0 to the
-current timestep, in order to show the most interest fluctuations in 
-great detail early and also show the entire run at the finish.
-
-For more accurate graphing, the user can export a run to a CSV file for
-use in a external spreadsheet program. The graphs accompanying this report were
-generated in this manner (using Gnumeric).
-
-\paragraph{Presets}
-There are two buttons for loading preset values for the scenarios described
-in the assignment:
-\begin{itemize}
-    \item "Load LEO" - 450km orbit at ~7600m/s
-    \item "Load Ballistic" - 100km apogee at ~1000m/s
-\end{itemize}
-
-\section{References}
-\begin{itemize}
-	\item Processing - http://processing.org
-        \item controlP5 - http://www.sojamo.de/libraries/controlP5/
-\end{itemize}
+\include{proposalsummary}
+\include{designreview}
+\include{gallery}
+\include{documentation}
+\include{reflection}
+\include{references}
 
 \end{document}
 
