@@ -1,27 +1,7 @@
 \chapter{Hardware/Software Documentation}
 This chapter describes the individual hardware and software systems built by the group. Some systems were directed at use in the gallery system, so the documentation is somewhat specific. In other cases, the system is easily generalized and the documentation reflects that.
-
-\section{Multitouch Table}
-
-\section{Pulse Oximeter (Hearbeat Monitor)}
-
-\section{Twoverse System \& Library}
-
-\section{Gallery Software Clients}
-
-\section{Wiremap}
-
-\subsection{Wiremap Software Library}
-In order to facilitate quicker prototyping and make the Wiremap software more accessible to the team, we wrote a simple Processing library for rendering certain shapes in the Wiremap field. The library replaces the source code provided by the creator of the Wiremap \cite{AH} by reducing code duplication and abstracting most of the implementation details away from a user who wishes to simply draw a sphere, rectangle or sliver in the field.
-
-\paragraph{Abstraction}
-The Wiremap library gathers the coordinate conversion and wire selection math into a single class. The previous method required duplicating a set of functions in every Processing sketch that output to the Wiremap. Now, the user creates an instance of the Wiremap class and provides a few key measurements of the physical interface as well as a text file listing the wire depths. The calculation is done as necessary, and not exposed to the user.
-
-\paragraph{Coordinate Systems}
-One key difference between the original source and the Wiremap library is the coordinate system used for each plane. Previously, the coordinates of X, Y and Z were all physical inches and matched the actual dimensions of the Wiremap. To facilitate quicker transitioning from a regular Processing sketch (using the standard 2D renderer) to one for the Wiremap, the X and Y were changed to be in the standard, Processing-style pixel coordinate system.
-
-The Z plane remains in inches, as thre is no obvious relationship between Z space on the screen (which is infinite in both directions) and Z space in the Wiremap field (limited by the physical dimensions). Thus, Z coordinates in the field range from 0 to the field depth.
-
-\paragraph{}The library has been released under the Apache open source license, and will continue to evolve after this project's completion. See the library's documentation for details on installation and usage \cite{CP}.
-
-
+\input{mtdoc}
+\input{pulsedoc}
+\input{twoversedoc}
+\input{gallerysoftwaredoc}
+\input{wiremapdoc}
