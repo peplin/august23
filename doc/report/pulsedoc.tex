@@ -6,6 +6,10 @@ A pulse oximeter simply illuminates the skin with light from an LED (usually inf
 
 This project required knowledge of photoplethysmography \cite{PO} \cite{EC1}, signal processing filters \cite{EC2} and operational amplifiers \cite{HL} \cite{BK} \cite{BB}.
 
+\begin{figure}[htp]\centering
+  \includegraphics[width=.99\textwidth]{images/schematic-final.png}
+  \caption{This is the pulse oximeter schematic!}\label{fig:poschem}
+\end{figure}
 \paragraph{Implementation}
 This device is adventageous for its low intrusiveness. In our implementation, the visitor just needs to gently place their finger on top of the light sensor. Depending on the person, the shape, rate and range of the photoplethysmograph obtained can vary widely, but we found the results distinct enough to obtain a heart rate from almost every participant. 
 
@@ -14,4 +18,4 @@ Our device used the amplified signal of an inexpensive photoresistor passed thro
 \paragraph{}
 The electronics schematics are included as both a PDF diagram and as a file for Frizing\cite{FTZ} and can be found in this pacakge at \texttt{/august/doc/heartbeatmonitor}.
 
-The source code for the microcontroller and for computer-side analysis can be found in this package at \texttt{/august/src/gallery/PulseOximeter} and \texttt{/august/src/gallery/WiremapClient}.
+The source code for the microcontroller and for computer-side analysis can be found in this package at \texttt{/august/src/gallery/PulseOximeter} and \texttt{/august/src/gallery/WiremapClient} \cite{PACK}.
