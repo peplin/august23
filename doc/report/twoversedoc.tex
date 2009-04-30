@@ -3,7 +3,7 @@ The software core of the August 23, 1966 project is a Java software system coine
 
 \begin{figure}[htp]\centering
 \includegraphics[width=.99\textwidth]{images/twoverse_arch.jpg}
-  \caption{This is the Twoverse architecture!}\label{fig:twoversearch}
+  \caption{The Twoverse architecture can be split into three levels - server, client and input. This diagram includes some unimplemented elements, such as input from a sound sensor.}\label{fig:twoversearch}
 \end{figure}
 \paragraph{System Design}
 The broad concept of Twoverse includes mechanics and partial system specifications for a massively multiplayer online game. The scope was minimized due to time constraints and to better fit the gallery installation. However, even with a smaller scope, a complete vertical slice of the entire system was implemented and used. Downsized from a universe of many types of objects, the system currently supports a universe made of stars with a few properties, and constellations that connect them with meta-objects known as links. Scalability was stressed from the beginning of development, so extending the universe with new objects will require a minimal amount of work.
@@ -30,12 +30,12 @@ Using the public API, many types of clients are possible. This includes graphica
 The graphical client uses the XML-RPC API as defined by the server, and updates its local cache of the universe via the server's XML feed.
 \begin{figure}[htp]\centering
   \includegraphics[width=.4\textwidth]{images/starchart.png}
-  \caption{This is the star chart!}\label{fig:starchart}
+  \caption{A screenshot of the star chart in a web browser during the time the gallery was open.}\label{fig:starchart}
 \end{figure}
 \paragraph{Library}
 The client and server for Twoverse share many common functions, and were designed to inherit their source from the same tree of code. They both stem from a Twoverse Java library, which includes many utility classes, shared functionality and the server executable. The Twoverse library provides these features and many others:
 \begin{itemize}
-\item Database wrapper class for a persistant universe - could be used to run SQL database client-side
+\item Database wrapper class for a persistent universe - could be used to run SQL database client-side
 \item XML-RPC servlet for serving XML-RPC requests
 \item Thread-safe universal object manager for maintaining the state of the universe
 \item User session manager

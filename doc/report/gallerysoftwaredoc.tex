@@ -1,1 +1,51 @@
-\section{Gallery Software Clients}
+\section{Gallery Software Setup}
+To replicate the gallery installation, the following systems \& equipment are required:
+
+\paragraph{Server}
+\begin{itemize}
+\item MySQL server
+\item Web server, root pointing to $<$location of august package$>$/www
+\item Ports 80 \& 8080 open
+\item Java JRE 1.5 or greater
+\end{itemize}
+
+\paragraph{Multitouch or Desktop Client}
+\begin{itemize}
+\item Multitouch table
+\item Hardware accelerated graphics
+\item Network connection to server (can be over Internet)
+\item Sound output (ideally to a radio headset)
+\end{itemize}
+
+\paragraph{Wiremap Client}
+\begin{itemize}
+\item Wiremap
+\item Projector
+\item Sound output (ideally to a sound dome)
+\end{itemize}
+
+\subsection{Server Setup}
+\begin{enumerate}
+\item Create an "august" user for the MySQL database
+\item Initialize the august database using the SQL script found at \texttt{/august/database/create.sql}
+\item Run the compiled Twoverse server to check the database connection and create the XML feed file: \texttt{java -jar twoverse\_server.jar}
+\item Create a symbolic link to the feed.xml file that was just created in the web server's root directory (this should be /august/www/)
+\end{enumerate}
+
+\subsection{Multitouch or Desktop Client Setup}
+\begin{enumerate}
+\item Plug the radio headset into the audio output of the computer (if you are using a radio)
+\item Open the client sketch (either Multitouch or Desktop version) and modify the configuration parameter for the server IP to point to the correct address.
+\item Configure the Wiremap server IP configuration parameter in the CreateMode.pde file to point to the address of the Wiremap client (if you are using one)
+\item Run the sketch in Processing, or export a compiled application to simplify restarting the application
+\end{enumerate}
+
+\subsection{Wiremap Client Setup}
+\begin{enumerate}
+\item Plug the sound dome into the audio output of the computer (if you are using a sound dome)
+\item Open the client sketch and modify the configuration parameter for the Multitouch Client IP to point to the correct address of the Multitouch Client (not the Twoverse server)
+\item Run the sketch in Processing, or export a compiled application to simplify restarting the application
+\end{enumerate}
+
+
+The Multitouch or Desktop client connects to the Twoverse server and manages the creation and storing of new stars. The Wiremap client receives a message from the Multitouch Client when a new star is being created, which initializes the sound and visuals for the star formation experience. See the Twoverse library documentation for more detailed information on this relationship.
