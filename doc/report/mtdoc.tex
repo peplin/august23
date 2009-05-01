@@ -11,3 +11,16 @@ In addition, infrared light is also projected at the diffuser from below (inside
 The multitouch table uses The Beta, from the NUI Group \cite{NUI}, to process the video stream from the webcam. The Beta, tbeta for short, is an open source tool that analyzes a video to find tracking data for objects it recognizes as fingers or cursor devices. The software provides a great deal of control over the video parameters (high-pass filter, amplification, threshold, etc.) that adapts well to many types of multitouch displays.
 
 Tbeta outputs the tracking data using the TUIO protocol \cite{TUIO}, which is an open framework for receiving input events in various programming environments. For this project, the TUIO events sent by tbeta were received using the open source Java TUIO library in a Processing sketch. 
+\begin{figure}[htp]\centering
+  \includegraphics[width=.8\textwidth]{images/Screenshot-MultitouchClient.png}
+  \caption{A screenshot of the Multitouch Client with a group of stars displayed at the default zoom level. The lines connecting the stars are constellations.}\label{fig:mtdiagram}
+\end{figure}
+\begin{figure}[htp]\centering
+  \includegraphics[width=.8\textwidth]{images/Screenshot-MultitouchClient-1.png}
+  \caption{A screenshot of the Multitouch Client viewing the details of a single star.}\label{fig:mtdiagram-1}
+\end{figure}
+\begin{figure}[htp]\centering
+  \includegraphics[width=.8\textwidth]{images/Screenshot-MultitouchClient-2.png}
+  \caption{A screenshot of the Multitouch Client zoomed in for a closer look at a cluster of stars.}\label{fig:mtdiagram-2}
+\end{figure}
+\clearpage
