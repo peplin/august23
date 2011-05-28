@@ -1,0 +1,49 @@
+August 23, 1966
+==================
+
+This repository is a collection of artifacts from a collaborative grant project
+at the University of Michigan in 2009. This repository includes all of the
+source code, schematics, more detailed technical documentation and other media
+for the project. August was made possible by grant from the 
+[GROCS](http://www.dc.umich.edu/dmc/grocs/index.html) program, and the team
+consistent of:
+
+* Chris Peplin
+* Brian Nord
+* Jiangang Hao
+* John Walters
+
+This [video](http://vimeo.com/5368587) gives you a sense of what the final
+gallery installation looked like, and hopefully a vauge sense of how it
+operated.
+
+For a more in-depth writeup, see
+[this article](http://christopherpeplin.com/2011/05/august23).
+
+## How to Use the Twoverse Library in Processing
+
+1. Pull the latest revision of the repository - I will assume this is to ~/august
+1. Extract the twoverse.zip file into your sketchbook/libraries directory
+1. Assuming your installation of processing is at ~/processing...
+    1. `cd ~/processing/java/lib/zi`
+    1. `mkdir US`
+    1. `ln -s ../America/New_York US/Michigan`
+1. Now, open process and look in the sketchbook list - you should see an august
+    folder
+1. Open the TwoverseClient sketch, or whatever other sketch you're working on
+
+If you are attempting to build or run from the source code (and not one of the
+provided precompiled .jar files), you will need to have these libraries
+installed:
+
+* libxom-java
+* junit
+* libxmlrpc3-client-java
+* libxmlrpc3-server-java
+* libxmlrpc3-common-java
+* libws-commons-util-java
+* libmysql-java
+* libjaxen-java
+* libxerces-java
+
+If you are using Ubuntu, those names are the names you can provide to apt-get.
