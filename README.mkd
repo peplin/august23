@@ -4,7 +4,7 @@ August 23, 1966
 This repository is a collection of artifacts from a collaborative grant project
 at the University of Michigan in 2009. This repository includes all of the
 source code, schematics, more detailed technical documentation and other media
-for the project. August was made possible by grant from the 
+for the project. August was made possible by grant from the
 [GROCS](http://www.dc.umich.edu/dmc/grocs/index.html) program, and the team
 consistent of:
 
@@ -47,3 +47,7 @@ installed:
 * libxerces-java
 
 If you are using Ubuntu, those names are the names you can provide to apt-get.
+
+## License
+
+This project is available under the MIT open source license.
