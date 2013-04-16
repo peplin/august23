@@ -20,6 +20,9 @@ operated.
 For a more in-depth writeup, see
 [this article](http://christopherpeplin.com/2011/05/august23).
 
+The code for the Arduino-based pulse oximeter is available in a [separate
+repository](https://github.com/peplin/pulse-oximeter).
+
 ## How to Use the Twoverse Library in Processing
 
 1. Pull the latest revision of the repository - I will assume this is to ~/august
@@ -50,4 +53,5 @@ If you are using Ubuntu, those names are the names you can provide to apt-get.
 
 ## License
 
-This project is available under the MIT open source license.
+This project is available under the MIT open source license, with some portions
+of the source code under the Apache license.
